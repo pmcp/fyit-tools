@@ -51,6 +51,10 @@ const props = defineProps({
     type: Array,
     default: []
   },
+  activeItem: {
+    type: Object,
+    default: () => ({})
+  },
   collection: {
     type: String,
     default: ''
@@ -67,23 +71,33 @@ const props = defineProps({
 
 const { defaultValue, schema } = usePosts()
 
-// Create a reactive form item
-const state = ref({})
+// Create a reactive form state
+const state = reactive({
+  id: null,
+  title: '',
+  content: '',
+  image: null
+})
 
 const selectedFile = ref<File | null>(null)
 
 // Compute what the initial values should be based on props
 const getInitialValues = () => {
-  if (props.action === 'update' && props.items[0]) {
-    // Update mode: prepare the item data
+  console.log('Getting initial values - action:', props.action, 'activeItem:', props.activeItem)
+  
+  if (props.action === 'update' && props.activeItem && props.activeItem.id) {
+    // Update mode: use activeItem data
     return {
-      ...props.items[0]
+      ...props.activeItem
     }
-  } else {
-    // Create mode: use defaults with first location if available
+  } else if (props.action === 'create') {
+    // Create mode: use defaults
     return {
       ...defaultValue
     }
+  } else {
+    // Fallback to empty object
+    return {}
   }
 }
 
@@ -97,7 +111,10 @@ const handleFileSelected = (file: File | null) => {
 
 // Initialize and watch for prop changes
 watchEffect(() => {
-  state.value = getInitialValues()
+  const initialValues = getInitialValues()
+  // Merge the values into the reactive state
+  Object.assign(state, initialValues)
+  console.log('State after assignment:', state)
 })
 
 

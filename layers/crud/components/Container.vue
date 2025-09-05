@@ -22,11 +22,12 @@
           <CrudLoading v-if="loading !== 'notLoading'" class="h-full w-full"/>
           <CrudDynamicFormLoader
             v-else
-            :key="`${activeCollection}-${action}-${items?.[0]?.id || 'new'}`"
+            :key="`${activeCollection}-${action}-${activeItem?.id || 'new'}`"
             :collection="activeCollection"
             :loading="loading"
             :action="action"
             :items="items"
+            :activeItem="activeItem"
           />
         </div>
       </div>
@@ -58,6 +59,7 @@ interface CrudItem {
 interface CrudComposableReturn {
   showCrud: Ref<boolean>
   items: Ref<CrudItem[]>
+  activeItem: Ref<CrudItem>
   activeCollection: Ref<string | null>
   close: () => void
   loading: Ref<LoadingState>
@@ -77,7 +79,7 @@ interface ComposableWithModalConfig {
 type ComposableFunction = () => ComposableWithModalConfig
 
 // Use the typed composables
-const { showCrud, items, activeCollection, close, loading, action }: CrudComposableReturn = useCrud()
+const { showCrud, items, activeItem, activeCollection, close, loading, action }: CrudComposableReturn = useCrud()
 const { collectionWithCapitalSingular }: FormatCollectionsReturn = useFormatCollections()
 
 // Local open state that mirrors showCrud

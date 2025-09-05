@@ -28,12 +28,7 @@ export default function () {
   const items = useState('items', () => [])
   const activeItem = useState('activeItem', () => {})
 
-  // Simple vars
-  const actions = {
-    create: 'POST',
-    update: 'POST',
-    delete: 'DELETE',
-  }
+  // Simple vars - removed unused actions object
 
   // Functions
 
@@ -90,10 +85,10 @@ export default function () {
 
 
   // This updates the DOM before the API call is made
-  async function optimisticUpdate(action, collection, data) {
+  async function optimisticUpdate(action: string, collection: string, data: any) {
     console.log(`FUNCTION: optimisticUpdate -- DOING ${action} IN COLLECTION ${collection} FOR ITEM`, data)
 
-    const itemToUpdate = { ... data, optimisticId: nanoid(10), optimisticAction: action }
+    const itemToUpdate = { ...data, optimisticId: nanoid(10), optimisticAction: action }
 
     // Get collections reference before any async operations
     const collections = useCollections();
@@ -102,7 +97,7 @@ export default function () {
 
     // DELETE (Data is an array of ids)
     if(action === 'delete') {
-      collectionItems.value = collectionItems.value.filter(item => !data.includes(item.id));
+      collectionItems.value = collectionItems.value.filter((item: any) => !data.includes(item.id));
       // Empty "selectedRows" array (in table component)
       const selectedRows = useState('selectedRows')
       selectedRows.value = []
@@ -115,23 +110,32 @@ export default function () {
       console.log(itemToUpdate, collectionItems);
       return itemToUpdate;
     }
+    
     // UPDATE -- Check if the item is in the collection array
     if(action === 'update') {
       console.log(itemToUpdate, collectionItems.value);
-      console.log(items, collectionItems.value.findIndex(item => item.id === itemToUpdate.id));
-      collectionItems.value[collectionItems.value.findIndex(item => item.id === itemToUpdate.id)] = itemToUpdate
+      
+      // Update the main collection
+      const collectionIndex = collectionItems.value.findIndex((item: any) => item.id === itemToUpdate.id)
+      if(collectionIndex !== -1) {
+        collectionItems.value[collectionIndex] = itemToUpdate
+      }
+      
+      // Also update activeItem to reflect optimistic changes
+      activeItem.value = itemToUpdate
+      
       return itemToUpdate
     }
   }
 
-  async function send(action, collection, data) {
+  async function send(action: string, collection: string, data: any) {
     console.log(`DOING ACTION ${action} ON COLLECTION ${collection}`, data)
     if(useCrudError().foundErrors()) return;
     loading.value = `${action}_send`
 
     // Get collections reference before async operations
     const collections = useCollections();
-    const collectionRef = collections[collection];
+    const collectionRef = collections[collection as keyof typeof collections] as any;
 
     const optimisticItem = await optimisticUpdate(action, collection, data)
     console.log(data.id)
@@ -141,13 +145,16 @@ export default function () {
       let res;
 
      if(action === 'update') {
-
-       console.log(actions[action])
+       console.log('Updating with data:', data)
        res = await $fetch(
           `/api/teams/${currentTeam.value.id}/${collection}/${data.id}`,
           {
             method: 'PATCH',
-            body: data
+            body: {
+              title: data.title,
+              content: data.content,
+              image: data.image
+            }
           },
         )
      }
@@ -156,17 +163,17 @@ export default function () {
        res = await $fetch(
          `/api/teams/${currentTeam.value.id}/${collection}/`,
          {
-           method: actions[action],
-           body: optimisticItem,
+           method: 'POST',
+           body: data,
          },
        )
      }
 
 
       if(action === 'create' || action === 'update') {
-        const index = collectionRef.value.findIndex(item => (item.optimisticId === optimisticItem.optimisticId))
+        const index = collectionRef.value.findIndex((item: any) => (item.optimisticId === optimisticItem.optimisticId))
         console.log(collectionRef.value, index)
-        if(index !== -1) collectionRef.value[collectionRef.value.findIndex(item => (item.optimisticId === optimisticItem.optimisticId))] = { ...res }
+        if(index !== -1) collectionRef.value[index] = { ...res }
       }
 
       // Show success toast only when operation succeeds
@@ -174,9 +181,13 @@ export default function () {
       if (collection === 'users' && action === 'create') {
         const wasExistingUser = optimisticItem.isExistingUser;
         if (wasExistingUser) {
-          toast.add('User added to organisation successfully');
+          toast.add({
+            title: 'User added to organisation successfully'
+          });
         } else {
-          toast.success('User created and added to organisation');
+          toast.add({
+            title: 'User created and added to organisation'  
+          });
         }
       } else {
         toast.add(
@@ -203,7 +214,7 @@ export default function () {
         title: 'Uh oh! Something went wrong.',
         description: errorMessage,
         icon: 'i-lucide-octagon-alert',
-        color: 'error'
+        color: 'primary'
       })
 
 
@@ -236,7 +247,7 @@ export default function () {
     }
   }
 
-  const open = async (actionIn, collection, ids) => {
+  const open = async (actionIn: string, collection: string, ids: string[]) => {
     console.log('OPENING CRUD', `DOING ${actionIn} ON ${collection}`, `IDS: ${ids}`)
     if(useCrudError().foundErrors()) return;
 
@@ -249,26 +260,35 @@ export default function () {
     if (actionIn === 'update') {
       try {
         // Use $fetch for API calls with proper error handling
-        const item = await $fetch(`/api/teams/${currentTeam.value.id}/${collection}/`, {
+        const response = await $fetch(`/api/teams/${currentTeam.value.id}/${collection}/`, {
           method: 'GET',
           query: { ids: ids.join(',') }
         });
 
-        items.value = [...items.value, ...item]
+        // For update, we expect a single item - store it in activeItem
+        activeItem.value = Array.isArray(response) ? response[0] : response
+        console.log('Fetched item for update - activeItem:', activeItem.value)
       } catch (error) {
         toast.add({
           title: 'Uh oh! Something went wrong.',
-          description: error,
+          description: String(error),
           icon: 'i-lucide-octagon-alert',
-          color: 'error'
+          color: 'primary'
         })
         close();
         return;
       }
     }
 
-    if(actionIn === 'delete') items.value = ids
+    if(actionIn === 'create') {
+      // For create, start with empty activeItem
+      activeItem.value = {}
+    }
 
+    if(actionIn === 'delete') {
+      // For delete, store IDs in items array
+      items.value = ids
+    }
 
     loading.value = 'notLoading'
   }

@@ -20,6 +20,10 @@ const props = defineProps({
   items: {
     type: Array,
     default: () => []
+  },
+  activeItem: {
+    type: Object,
+    default: () => ({})
   }
 })
 
@@ -37,6 +41,7 @@ const componentProps = computed(() => ({
   loading: props.loading,
   action: props.action,
   items: props.items,
+  activeItem: props.activeItem,
   ...useAttrs() // Also include any additional attrs that might be passed
 }))
 </script>
