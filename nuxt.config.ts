@@ -9,7 +9,18 @@ export default defineNuxtConfig({
     'nuxt-auth-utils',
     'nuxthub-ratelimit',
     '@nuxt/eslint',
+    '@nuxtjs/i18n',
   ],
+
+
+  extends: [
+    './layers/crud',
+    './layers/typo',
+    './layers/collections',
+    './layers/collections/posts'
+
+  ],
+
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
   colorMode: {

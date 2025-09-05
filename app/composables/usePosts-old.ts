@@ -3,7 +3,7 @@ import { ref, reactive } from 'vue'
 import { FetchError } from 'ofetch'
 import type { Post, InsertPost } from '@@/types/database'
 
-export const usePosts = async () => {
+export const usePostsOld = async () => {
   const { currentTeam } = useTeam()
   const toast = useToast()
   const loading = ref(false)

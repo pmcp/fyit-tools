@@ -1,7 +1,7 @@
 <template>
   <NuxtRouteAnnouncer />
   <NuxtLoadingIndicator color="#000000" />
-  <UApp :toaster="{ position: 'top-center' }">
+  <UApp :toaster="{ position: 'bottom-right' }">
     <NuxtPage />
   </UApp>
 </template>

@@ -1,4 +1,4 @@
-import { getAllPosts } from '@@/server/database/queries/posts'
+import { getAllPosts, getPostsByIds } from '@@/server/database/queries/posts'
 import { isTeamMember } from '@@/server/database/queries/teams'
 
 export default defineEventHandler(async (event) => {
@@ -11,6 +11,17 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Unauthorized Access',
     })
   }
-  const posts = await getAllPosts(teamId)
-  return posts
+
+  const query = getQuery(event)
+  const ids = query.ids
+  if (ids) {
+    const postIds = Array.isArray(ids)
+      ? ids.map(String)
+      : typeof ids === 'string'
+        ? ids.split(',')
+        : [String(ids)]
+    return await getPostsByIds(teamId, postIds)
+  }
+
+  return await getAllPosts(teamId)
 })

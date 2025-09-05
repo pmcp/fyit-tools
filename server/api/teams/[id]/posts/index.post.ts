@@ -20,6 +20,9 @@ export default defineEventHandler(async (event) => {
     teamId,
     userId: user.id,
   }
+console.log(payload)
   const post = await createPost(payload)
   return post
+
+
 })
