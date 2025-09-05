@@ -512,7 +512,7 @@ function generateGetEndpoint(data) {
   const { pascalCase, pascalCasePlural } = data
   
   return `import { getAll${pascalCasePlural}, get${pascalCasePlural}ByIds } from '../../../../database/queries'
-import { isTeamMember } from '../../../../../../../../../server/database/queries/teams'
+import { isTeamMember } from '@@/server/database/queries/teams'
 
 export default defineEventHandler(async (event) => {
   const { teamId } = getRouterParams(event)
@@ -541,7 +541,7 @@ function generatePostEndpoint(data) {
   const { singular, pascalCase } = data
   
   return `import { create${pascalCase} } from '../../../../database/queries'
-import { isTeamMember } from '../../../../../../../../../server/database/queries/teams'
+import { isTeamMember } from '@@/server/database/queries/teams'
 
 export default defineEventHandler(async (event) => {
   const { teamId } = getRouterParams(event)
@@ -565,7 +565,7 @@ function generatePatchEndpoint(data) {
   const { singular, pascalCase } = data
   
   return `import { update${pascalCase} } from '../../../../database/queries'
-import { isTeamMember } from '../../../../../../../../../server/database/queries/teams'
+import { isTeamMember } from '@@/server/database/queries/teams'
 
 export default defineEventHandler(async (event) => {
   const { teamId, ${singular}Id } = getRouterParams(event)
@@ -589,7 +589,7 @@ function generateDeleteEndpoint(data) {
   const { singular, pascalCase } = data
   
   return `import { delete${pascalCase} } from '../../../../database/queries'
-import { isTeamMember } from '../../../../../../../../../server/database/queries/teams'
+import { isTeamMember } from '@@/server/database/queries/teams'
 
 export default defineEventHandler(async (event) => {
   const { teamId, ${singular}Id } = getRouterParams(event)
