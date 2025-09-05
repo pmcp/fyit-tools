@@ -775,22 +775,35 @@ async function createDatabaseTable(config) {
   const cases = toCase(name)
   
   try {
-    // First, ensure the schema file is created - always in definitions folder
+    // Verify the schema file exists
     const schemaPath = path.join(process.cwd(), 'layers', 'collections', 'definitions', cases.plural, 'server', 'database', 'schema.ts')
     
-    // Import the schema dynamically
-    const schemaModule = await import(schemaPath)
-    const tableName = `${cases.plural}Table`
+    try {
+      await fs.access(schemaPath)
+    } catch {
+      console.error(`${colors.red}✗${colors.reset} Schema file not found at ${schemaPath}`)
+      return false
+    }
     
     // Run drizzle-kit push to sync with database
     console.log(`${colors.yellow}↻${colors.reset} Creating database table...`)
-    await execAsync('pnpm drizzle-kit push:pg')
-    console.log(`${colors.green}✓${colors.reset} Database table created`)
+    console.log(`${colors.yellow}!${colors.reset} Running: pnpm drizzle-kit push`)
     
-    return true
+    try {
+      const { stdout, stderr } = await execAsync('pnpm drizzle-kit push')
+      if (stderr && !stderr.includes('Warning')) {
+        console.error(`${colors.yellow}!${colors.reset} Drizzle warnings:`, stderr)
+      }
+      console.log(`${colors.green}✓${colors.reset} Database migration completed`)
+      return true
+    } catch (execError) {
+      console.error(`${colors.red}✗${colors.reset} Failed to run database migration:`, execError.message)
+      console.log(`${colors.yellow}!${colors.reset} You can manually run: pnpm drizzle-kit push`)
+      return false
+    }
   } catch (error) {
     console.error(`${colors.red}✗${colors.reset} Failed to create database table:`, error.message)
-    console.log(`${colors.yellow}!${colors.reset} You may need to create the table manually or run migrations`)
+    console.log(`${colors.yellow}!${colors.reset} You may need to create the table manually with: pnpm drizzle-kit push`)
     return false
   }
 }
