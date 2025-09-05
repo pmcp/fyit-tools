@@ -125,24 +125,13 @@ const modalProps = computed<Record<string, any>>(() => {
 const loadModalConfig = (collection: string | null): ModalConfig => {
   if (!collection) return DEFAULT_MODAL_CONFIG
 
-  const collectionName = collectionWithCapitalSingular(collection)
-  const composableName = `use${collectionName}s`
-
-  try {
-    // Map of composable names to their modal configs
-    const composableConfigs: Record<string, ComposableFunction> = {
-      'usePages': usePages,
-      'useLocations': useLocations,
-      'useBookings': useBookings,
-      'useOrganisations': useOrganisations,
-    }
-
-    if (composableName in composableConfigs) {
-      const composable = composableConfigs[composableName]()
-      return composable.modalConfig || DEFAULT_MODAL_CONFIG
-    }
-  } catch (error) {
-    // Silently fall back to default modal config
+  // Get the collection config from useCollections
+  const collections = useCollections()
+  const config = collections.getConfig(collection)
+  
+  // Use modal config from collection if defined, otherwise use default
+  if (config?.modalConfig) {
+    return config.modalConfig
   }
 
   return DEFAULT_MODAL_CONFIG

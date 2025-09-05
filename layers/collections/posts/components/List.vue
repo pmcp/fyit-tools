@@ -21,12 +21,13 @@
   </CrudTable>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import type { Post } from '../types'
 const { columns } = usePosts()
 const { currentTeam } = useTeam()
 const { posts: collectionPosts } = useCollections()
 
-const { data: posts, refresh } = await useFetch(
+const { data: posts, refresh } = await useFetch<Post[]>(
   `/api/teams/${currentTeam.value.id}/posts`,
   {
     watch: [currentTeam],
@@ -35,7 +36,6 @@ const { data: posts, refresh } = await useFetch(
 
 // Directly assign the fetched posts to the collection
 if (posts.value) {
-  console.log('📊 Initial sync of posts to useCollections:', posts.value)
   collectionPosts.value = posts.value
 }
 </script>

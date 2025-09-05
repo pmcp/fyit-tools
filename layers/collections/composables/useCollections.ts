@@ -1,10 +1,22 @@
-import { postsConfig } from '../posts/composables/usePosts'
+// Auto-discover all collection configs using glob import
+const modules = import.meta.glob('../*/composables/use*.ts', { eager: true })
 
-// Collection registry using functional approach
-const collectionConfigs = {
-  posts: postsConfig,
-  // Add more collections here as they're created
-} as const
+// Build collection configs from discovered modules
+const collectionConfigs = Object.entries(modules).reduce((configs, [path, module]) => {
+  // Extract collection name from path (e.g., '../posts/composables/usePosts.ts' -> 'posts')
+  const collectionName = path.split('/')[1]
+  
+  // Try to find the config in the module
+  // First check for named export matching pattern
+  const configName = `${collectionName}Config`
+  const config = (module as any)[configName]
+  
+  if (config && config.name) {
+    configs[config.name] = config
+  }
+  
+  return configs
+}, {} as Record<string, any>)
 
 // Create reactive state for each collection
 const createCollectionState = (name: string) => 

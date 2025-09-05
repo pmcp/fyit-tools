@@ -44,51 +44,28 @@
   </div>
 </template>
 <script setup lang="ts">
+import type { PostFormProps, PostFormData } from '../types'
+import { z } from 'zod'
+
 const { send } = useCrud()
 
-const props = defineProps({
-  items: {
-    type: Array,
-    default: []
-  },
-  activeItem: {
-    type: Object,
-    default: () => ({})
-  },
-  collection: {
-    type: String,
-    default: ''
-  },
-  loading: {
-    type: String,
-    default: ''
-  },
-  action: {
-    type: String,
-    default: ''
-  }
-})
+const props = defineProps<PostFormProps>()
 
 const { defaultValue, schema } = usePosts()
-// Or use the config directly
-// import { postsConfig } from '../composables/usePosts'
-// const { defaultValues: defaultValue, schema } = postsConfig
 
-// Create a reactive form state
-const state = reactive({
+// Create a reactive form state with proper typing
+const state = reactive<PostFormData & { id?: string | null }>({
   id: null,
   title: '',
   content: '',
-  image: null
+  image: undefined
 })
 
 const selectedFile = ref<File | null>(null)
 
 // Compute what the initial values should be based on props
 const getInitialValues = () => {
-  console.log('Getting initial values - action:', props.action, 'activeItem:', props.activeItem)
-  
-  if (props.action === 'update' && props.activeItem && props.activeItem.id) {
+  if (props.action === 'update' && 'id' in props.activeItem && props.activeItem.id) {
     // Update mode: use activeItem data
     return {
       ...props.activeItem
@@ -117,14 +94,8 @@ watchEffect(() => {
   const initialValues = getInitialValues()
   // Merge the values into the reactive state
   Object.assign(state, initialValues)
-  console.log('State after assignment:', state)
 })
 
 
-
-// Handle form submission - convert moment to number for API
-const handleSubmit = () => {
-  send(props.action, props.collection, submitData);
-};
 
 </script>

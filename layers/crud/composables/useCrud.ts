@@ -49,8 +49,7 @@ export default function () {
   }
 
 
-  async function getCollection(collection, query, pagination) {
-    console.log(`GETTING COLLECTION ${collection} AND PAGINATION IS ${pagination}, QUERY = `, query)
+  async function getCollection(collection: string, query: any, pagination: boolean) {
     if(useCrudError().foundErrors()) return;
 
     if (pagination) query.pagination = useUserSettings().pagination.value[collection]
@@ -69,7 +68,6 @@ export default function () {
         credentials: 'include'
       })
 
-      console.log(`RESPONSE FOR GETTING COLLECTION ${collection}:`, res)
       // Set collection with received items only when fetching a full collection
       if(res && res.items && collectionRef) {
         collectionRef.value = res.items
@@ -93,8 +91,7 @@ export default function () {
 
 
   // Pure functional optimistic update
-  function optimisticUpdate(action: string, collection: string, data: any) {
-    console.log(`FUNCTION: optimisticUpdate -- DOING ${action} IN COLLECTION ${collection} FOR ITEM`, data)
+  function optimisticUpdate(action: string, collection: string, data: any): any {
 
     // Get collections reference
     const collections = useCollections();
@@ -122,13 +119,10 @@ export default function () {
         data
       )
       collectionItems.value = newCollection
-      console.log(optimisticItem, newCollection)
       return optimisticItem
     }
 
     if (action === 'update') {
-      console.log('🔄 OPTIMISTIC UPDATE - Starting update for item:', data)
-      
       const { collection: newCollection, optimisticItem } = applyOptimisticUpdate(
         collectionItems.value,
         data.id,
@@ -138,9 +132,6 @@ export default function () {
       if (optimisticItem) {
         collectionItems.value = newCollection
         activeItem.value = optimisticItem
-        console.log('✅ Update applied:', optimisticItem)
-      } else {
-        console.log('❌ Item not found in collection!')
       }
       
       return optimisticItem
@@ -149,8 +140,7 @@ export default function () {
     return null
   }
 
-  async function send(action: string, collection: string, data: any) {
-    console.log(`DOING ACTION ${action} ON COLLECTION ${collection}`, data)
+  async function send(action: string, collection: string, data: any): Promise<any> {
     if(useCrudError().foundErrors()) return;
     loading.value = `${action}_send`
 
@@ -158,9 +148,7 @@ export default function () {
     const collections = useCollections();
     const collectionRef = collections[collection as keyof typeof collections] as any;
 
-    console.log('📨 SEND - Starting send operation');
     const optimisticItem = optimisticUpdate(action, collection, data)
-    console.log('🎯 Optimistic item returned:', optimisticItem);
 
     try {
       let res;
@@ -168,10 +156,8 @@ export default function () {
 
       // Use functional API helpers
       if (action === 'update') {
-        console.log('🌐 API UPDATE - Sending PATCH request');
         // Send the entire data object, not just specific fields
         res = await apiPatch(`${baseUrl}/${data.id}`)(data)
-        console.log('🌐 API Response:', res);
       }
 
       if (action === 'create') {
@@ -189,8 +175,6 @@ export default function () {
 
 
       if(action === 'create' || action === 'update') {
-        console.log('🔄 POST-API UPDATE - Replacing optimistic item with server response');
-        
         // Use functional helper to replace optimistic item with server response
         if (optimisticItem && optimisticItem.optimisticId) {
           collectionRef.value = replaceByOptimisticId(
@@ -198,7 +182,6 @@ export default function () {
             optimisticItem.optimisticId,
             res
           )
-          console.log('✅ Replaced optimistic item with server data');
         }
       }
 
@@ -233,8 +216,6 @@ export default function () {
       return res
 
     } catch (error) {
-      // Show error message
-      console.log(error)
       const errorMessage = error.data?.message || error.data || 'Operation failed';
       toast.add({
         title: 'Uh oh! Something went wrong.',
@@ -247,21 +228,21 @@ export default function () {
       // Rollback optimistic update using functional helpers
       if(action === 'create' && optimisticItem?.optimisticId) {
         collectionRef.value = rollbackCreate(collectionRef.value, optimisticItem.optimisticId)
-        console.log('Rolled back optimistic create')
-      } else if(action === 'update') {
-        // For update, we need the original item - refetch it
-        // This is a limitation we should address with better state management
-        const index = collectionRef.value.findIndex((item: any) => item.id === optimisticItem?.id)
+      } else if(action === 'update' && optimisticItem) {
+        // For update rollback, remove the optimistic flags
+        const index = collectionRef.value.findIndex((item: any) => item.id === optimisticItem.id)
         if(index !== -1) {
-          delete collectionRef.value[index].optimisticAction
+          // Remove optimistic flags but keep the item
+          const cleanItem = { ...collectionRef.value[index] }
+          delete cleanItem.optimisticAction
+          delete cleanItem.optimisticId
+          collectionRef.value[index] = cleanItem
         }
       } else if(action === 'delete') {
-        // For delete rollback, we'd need the original items
-        // Consider storing them before deletion in future iteration
-        console.log('Delete rollback would require refetching deleted items')
+        // For delete rollback, we would need to restore the items
+        // Since we don't store them, we'd need to refetch
+        // This is a known limitation that's acceptable for now
       }
-
-      console.log('ERROR', error)
 
       // Keep the modal open on error so user can retry
       loading.value = 'notLoading'
@@ -269,8 +250,7 @@ export default function () {
     }
   }
 
-  const open = async (actionIn: string, collection: string, ids: string[]) => {
-    console.log('OPENING CRUD', `DOING ${actionIn} ON ${collection}`, `IDS: ${ids}`)
+  const open = async (actionIn: string, collection: string, ids: string[]): Promise<void> => {
     if(useCrudError().foundErrors()) return;
 
     action.value = actionIn
@@ -289,7 +269,6 @@ export default function () {
 
         // For update, we expect a single item - store it in activeItem
         activeItem.value = Array.isArray(response) ? response[0] : response
-        console.log('Fetched item for update - activeItem:', activeItem.value)
       } catch (error) {
         toast.add({
           title: 'Uh oh! Something went wrong.',
@@ -319,7 +298,7 @@ export default function () {
 
 
 
-  const close = () => {
+  const close = (): void => {
     // Set showCrud first - this is the single source of truth
     showCrud.value = false
     // Then reset all other state
@@ -331,7 +310,7 @@ export default function () {
   }
 
   // Reset function for navigation scenarios
-  const reset = () => {
+  const reset = (): void => {
     showCrud.value = false
     loading.value = 'notLoading'
     items.value = []
