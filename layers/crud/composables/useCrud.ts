@@ -113,15 +113,28 @@ export default function () {
     
     // UPDATE -- Check if the item is in the collection array
     if(action === 'update') {
-      console.log(itemToUpdate, collectionItems.value);
+      console.log('🔄 OPTIMISTIC UPDATE - Starting update for item:', itemToUpdate);
+      console.log('📦 Collection before update:', JSON.parse(JSON.stringify(collectionItems.value)));
       
       // Update the main collection
       const collectionIndex = collectionItems.value.findIndex((item: any) => item.id === itemToUpdate.id)
+      console.log('🔍 Found item at index:', collectionIndex);
+      
       if(collectionIndex !== -1) {
+        const oldItem = collectionItems.value[collectionIndex];
+        console.log('📤 Old item:', oldItem);
+        console.log('📥 New item:', itemToUpdate);
+        
         collectionItems.value[collectionIndex] = itemToUpdate
+        
+        console.log('📦 Collection after update:', JSON.parse(JSON.stringify(collectionItems.value)));
+        console.log('✅ Item at index after update:', collectionItems.value[collectionIndex]);
+      } else {
+        console.log('❌ Item not found in collection!');
       }
       
       // Also update activeItem to reflect optimistic changes
+      console.log('🎯 Updating activeItem from:', activeItem.value, 'to:', itemToUpdate);
       activeItem.value = itemToUpdate
       
       return itemToUpdate
@@ -137,15 +150,25 @@ export default function () {
     const collections = useCollections();
     const collectionRef = collections[collection as keyof typeof collections] as any;
 
+    console.log('📨 SEND - Starting send operation');
+    console.log('Action:', action, 'Collection:', collection, 'Data:', data);
     const optimisticItem = await optimisticUpdate(action, collection, data)
-    console.log(data.id)
+    console.log('🎯 Optimistic item returned:', optimisticItem);
+    console.log('Data ID:', data.id)
 
     try {
 
       let res;
 
      if(action === 'update') {
-       console.log('Updating with data:', data)
+       console.log('🌐 API UPDATE - Sending PATCH request');
+       console.log('URL:', `/api/teams/${currentTeam.value.id}/${collection}/${data.id}`);
+       console.log('Body:', {
+         title: data.title,
+         content: data.content,
+         image: data.image
+       });
+       
        res = await $fetch(
           `/api/teams/${currentTeam.value.id}/${collection}/${data.id}`,
           {
@@ -157,6 +180,8 @@ export default function () {
             }
           },
         )
+       
+       console.log('🌐 API Response:', res);
      }
 
      if(action === 'create') {
@@ -171,9 +196,21 @@ export default function () {
 
 
       if(action === 'create' || action === 'update') {
+        console.log('🔄 POST-API UPDATE - Replacing optimistic item with server response');
+        console.log('Looking for optimisticId:', optimisticItem.optimisticId);
+        console.log('Collection before replacement:', JSON.parse(JSON.stringify(collectionRef.value)));
+        
         const index = collectionRef.value.findIndex((item: any) => (item.optimisticId === optimisticItem.optimisticId))
-        console.log(collectionRef.value, index)
-        if(index !== -1) collectionRef.value[index] = { ...res }
+        console.log('Found at index:', index);
+        
+        if(index !== -1) {
+          console.log('Replacing with server data:', res);
+          collectionRef.value[index] = { ...res }
+          console.log('Collection after replacement:', JSON.parse(JSON.stringify(collectionRef.value)));
+          console.log('Item at index after replacement:', collectionRef.value[index]);
+        } else {
+          console.log('❌ Could not find optimistic item to replace!');
+        }
       }
 
       // Show success toast only when operation succeeds
