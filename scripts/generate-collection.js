@@ -511,19 +511,28 @@ export const use${pascalCasePlural} = () => ${plural}Config`
 function generateGetEndpoint(data) {
   const { pascalCase, pascalCasePlural } = data
   
-  return `import { getAll${pascalCasePlural}, get${pascalCasePlural}ByIds } from '../../../database/queries'
+  return `import { getAll${pascalCasePlural}, get${pascalCasePlural}ByIds } from '../../../../database/queries'
+import { isTeamMember } from '../../../../../../../../../server/database/queries/teams'
 
 export default defineEventHandler(async (event) => {
-  await isTeamMember(event)
+  const { teamId } = getRouterParams(event)
+  const { user } = await requireUserSession(event)
+  const hasAccess = await isTeamMember(teamId, user.id)
+  if (!hasAccess) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Unauthorized Access',
+    })
+  }
   
   const query = getQuery(event)
   
   if (query.ids) {
     const ids = String(query.ids).split(',')
-    return await get${pascalCasePlural}ByIds(event, ids)
+    return await get${pascalCasePlural}ByIds(teamId, ids)
   }
   
-  return await getAll${pascalCasePlural}(event)
+  return await getAll${pascalCasePlural}(teamId)
 })`
 }
 
@@ -531,16 +540,23 @@ export default defineEventHandler(async (event) => {
 function generatePostEndpoint(data) {
   const { singular, pascalCase } = data
   
-  return `import { create${pascalCase} } from '../../../database/queries'
-import { ${singular}Schema } from '../../../../app/composables/use${data.pascalCasePlural}'
+  return `import { create${pascalCase} } from '../../../../database/queries'
+import { isTeamMember } from '../../../../../../../../../server/database/queries/teams'
 
 export default defineEventHandler(async (event) => {
-  await isTeamMember(event)
+  const { teamId } = getRouterParams(event)
+  const { user } = await requireUserSession(event)
+  const hasAccess = await isTeamMember(teamId, user.id)
+  if (!hasAccess) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Unauthorized Access',
+    })
+  }
   
   const body = await readBody(event)
-  const validated = ${singular}Schema.parse(body)
   
-  return await create${pascalCase}(event, validated)
+  return await create${pascalCase}({ ...body, teamId, userId: user.id })
 })`
 }
 
@@ -548,24 +564,23 @@ export default defineEventHandler(async (event) => {
 function generatePatchEndpoint(data) {
   const { singular, pascalCase } = data
   
-  return `import { update${pascalCase} } from '../../../database/queries'
-import { ${singular}Schema } from '../../../../app/composables/use${data.pascalCasePlural}'
+  return `import { update${pascalCase} } from '../../../../database/queries'
+import { isTeamMember } from '../../../../../../../../../server/database/queries/teams'
 
 export default defineEventHandler(async (event) => {
-  await isTeamMember(event)
-  
-  const ${singular}Id = getRouterParam(event, '${singular}Id')
-  if (!${singular}Id) {
+  const { teamId, ${singular}Id } = getRouterParams(event)
+  const { user } = await requireUserSession(event)
+  const hasAccess = await isTeamMember(teamId, user.id)
+  if (!hasAccess) {
     throw createError({
-      statusCode: 400,
-      statusMessage: '${pascalCase} ID is required'
+      statusCode: 403,
+      statusMessage: 'Unauthorized Access',
     })
   }
   
   const body = await readBody(event)
-  const validated = ${singular}Schema.partial().parse(body)
   
-  return await update${pascalCase}(event, ${singular}Id, validated)
+  return await update${pascalCase}(${singular}Id, teamId, user.id, body)
 })`
 }
 
@@ -573,20 +588,21 @@ export default defineEventHandler(async (event) => {
 function generateDeleteEndpoint(data) {
   const { singular, pascalCase } = data
   
-  return `import { delete${pascalCase} } from '../../../database/queries'
+  return `import { delete${pascalCase} } from '../../../../database/queries'
+import { isTeamMember } from '../../../../../../../../../server/database/queries/teams'
 
 export default defineEventHandler(async (event) => {
-  await isTeamMember(event)
-  
-  const ${singular}Id = getRouterParam(event, '${singular}Id')
-  if (!${singular}Id) {
+  const { teamId, ${singular}Id } = getRouterParams(event)
+  const { user } = await requireUserSession(event)
+  const hasAccess = await isTeamMember(teamId, user.id)
+  if (!hasAccess) {
     throw createError({
-      statusCode: 400,
-      statusMessage: '${pascalCase} ID is required'
+      statusCode: 403,
+      statusMessage: 'Unauthorized Access',
     })
   }
   
-  return await delete${pascalCase}(event, ${singular}Id)
+  return await delete${pascalCase}(${singular}Id, teamId, user.id)
 })`
 }
 
@@ -598,9 +614,8 @@ function generateQueries(data) {
 import { ${plural}Table } from './schema'
 import type { ${pascalCase}, New${pascalCase} } from '../types'
 
-export async function getAll${pascalCasePlural}(event: H3Event) {
+export async function getAll${pascalCasePlural}(teamId: string) {
   const db = useDB()
-  const { teamId } = event.context.params as { teamId: string }
   
   const ${plural} = await db
     .select()
@@ -611,9 +626,8 @@ export async function getAll${pascalCasePlural}(event: H3Event) {
   return ${plural}
 }
 
-export async function get${pascalCasePlural}ByIds(event: H3Event, ids: string[]) {
+export async function get${pascalCasePlural}ByIds(teamId: string, ids: string[]) {
   const db = useDB()
-  const { teamId } = event.context.params as { teamId: string }
   
   const ${plural} = await db
     .select()
@@ -628,27 +642,19 @@ export async function get${pascalCasePlural}ByIds(event: H3Event, ids: string[])
   return ${plural}
 }
 
-export async function create${pascalCase}(event: H3Event, data: New${pascalCase}) {
+export async function create${pascalCase}(data: New${pascalCase}) {
   const db = useDB()
-  const { teamId } = event.context.params as { teamId: string }
-  const user = await requireUser(event)
   
   const [${singular}] = await db
     .insert(${plural}Table)
-    .values({
-      ...data,
-      teamId,
-      userId: user.id
-    })
+    .values(data)
     .returning()
   
   return ${singular}
 }
 
-export async function update${pascalCase}(event: H3Event, ${singular}Id: string, data: Partial<New${pascalCase}>) {
+export async function update${pascalCase}(${singular}Id: string, teamId: string, userId: string, data: Partial<New${pascalCase}>) {
   const db = useDB()
-  const { teamId } = event.context.params as { teamId: string }
-  const user = await requireUser(event)
   
   const [${singular}] = await db
     .update(${plural}Table)
@@ -660,7 +666,7 @@ export async function update${pascalCase}(event: H3Event, ${singular}Id: string,
       and(
         eq(${plural}Table.id, ${singular}Id),
         eq(${plural}Table.teamId, teamId),
-        eq(${plural}Table.userId, user.id)
+        eq(${plural}Table.userId, userId)
       )
     )
     .returning()
@@ -675,10 +681,8 @@ export async function update${pascalCase}(event: H3Event, ${singular}Id: string,
   return ${singular}
 }
 
-export async function delete${pascalCase}(event: H3Event, ${singular}Id: string) {
+export async function delete${pascalCase}(${singular}Id: string, teamId: string, userId: string) {
   const db = useDB()
-  const { teamId } = event.context.params as { teamId: string }
-  const user = await requireUser(event)
   
   const [deleted] = await db
     .delete(${plural}Table)
@@ -686,7 +690,7 @@ export async function delete${pascalCase}(event: H3Event, ${singular}Id: string)
       and(
         eq(${plural}Table.id, ${singular}Id),
         eq(${plural}Table.teamId, teamId),
-        eq(${plural}Table.userId, user.id)
+        eq(${plural}Table.userId, userId)
       )
     )
     .returning()
@@ -754,15 +758,20 @@ export type New${pascalCase} = Omit<${pascalCase}, 'id' | 'createdAt' | 'updated
 
 // Generate nuxt.config.ts for the layer
 function generateNuxtConfig(data) {
-  const { pascalCase } = data
+  const { pascalCasePlural } = data
   
-  return `export default defineNuxtConfig({
+  return `import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
+
+const currentDir = fileURLToPath(new URL('.', import.meta.url))
+
+export default defineNuxtConfig({
   components: {
     dirs: [
       {
-        path: './app/components',
-        prefix: '${pascalCase}',
-        pathPrefix: false
+        path: join(currentDir, 'app/components'),
+        prefix: '${pascalCasePlural}',
+        global: true // Makes them available globally
       }
     ]
   }
@@ -785,12 +794,12 @@ async function createDatabaseTable(config) {
       return false
     }
     
-    // Run drizzle-kit push to sync with database
+    // Run db:generate to sync with database
     console.log(`${colors.yellow}↻${colors.reset} Creating database table...`)
-    console.log(`${colors.yellow}!${colors.reset} Running: pnpm drizzle-kit push`)
+    console.log(`${colors.yellow}!${colors.reset} Running: pnpm db:generate`)
     
     try {
-      const { stdout, stderr } = await execAsync('pnpm drizzle-kit push')
+      const { stdout, stderr } = await execAsync('pnpm db:generate')
       if (stderr && !stderr.includes('Warning')) {
         console.error(`${colors.yellow}!${colors.reset} Drizzle warnings:`, stderr)
       }
@@ -798,12 +807,12 @@ async function createDatabaseTable(config) {
       return true
     } catch (execError) {
       console.error(`${colors.red}✗${colors.reset} Failed to run database migration:`, execError.message)
-      console.log(`${colors.yellow}!${colors.reset} You can manually run: pnpm drizzle-kit push`)
+      console.log(`${colors.yellow}!${colors.reset} You can manually run: pnpm db:generate`)
       return false
     }
   } catch (error) {
     console.error(`${colors.red}✗${colors.reset} Failed to create database table:`, error.message)
-    console.log(`${colors.yellow}!${colors.reset} You may need to create the table manually with: pnpm drizzle-kit push`)
+    console.log(`${colors.yellow}!${colors.reset} You may need to create the table manually with: pnpm db:generate`)
     return false
   }
 }

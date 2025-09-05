@@ -13,6 +13,7 @@ export default defineNuxtConfig({
     ]
   },
   extends: [
-    './definitions/posts'
+    './definitions/posts',
+    './definitions/works'
   ]
 })
