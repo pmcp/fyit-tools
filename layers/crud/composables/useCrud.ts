@@ -1,6 +1,14 @@
-import { nanoid } from "nanoid";
-import type {Post} from "~~/types/database";
-import {updatePost} from "~~/server/database/queries/posts";
+import {
+  applyOptimisticCreate,
+  applyOptimisticUpdate,
+  applyOptimisticDelete,
+  replaceByOptimisticId,
+  rollbackCreate,
+  apiGet,
+  apiPost,
+  apiPatch,
+  apiDelete
+} from '../utils/functional';
 
 
 export default function () {
@@ -84,61 +92,61 @@ export default function () {
   }
 
 
-  // This updates the DOM before the API call is made
-  async function optimisticUpdate(action: string, collection: string, data: any) {
+  // Pure functional optimistic update
+  function optimisticUpdate(action: string, collection: string, data: any) {
     console.log(`FUNCTION: optimisticUpdate -- DOING ${action} IN COLLECTION ${collection} FOR ITEM`, data)
 
-    const itemToUpdate = { ...data, optimisticId: nanoid(10), optimisticAction: action }
-
-    // Get collections reference before any async operations
+    // Get collections reference
     const collections = useCollections();
     const collectionItems = collections[collection]
-    console.log(collectionItems)
+    if (!collectionItems) return null
 
-    // DELETE (Data is an array of ids)
-    if(action === 'delete') {
-      collectionItems.value = collectionItems.value.filter((item: any) => !data.includes(item.id));
-      // Empty "selectedRows" array (in table component)
+    // Apply the appropriate optimistic transformation
+    if (action === 'delete') {
+      const { collection: newCollection, deletedIds } = applyOptimisticDelete(
+        collectionItems.value,
+        data // data is array of ids for delete
+      )
+      collectionItems.value = newCollection
+      
+      // Clear selected rows
       const selectedRows = useState('selectedRows')
       selectedRows.value = []
-      return data
+      
+      return deletedIds
     }
 
-    // CREATE -- Data is an object, the item to create, add an optimistId
-    if(action === 'create') {
-      collectionItems.value.push(itemToUpdate);
-      console.log(itemToUpdate, collectionItems);
-      return itemToUpdate;
+    if (action === 'create') {
+      const { collection: newCollection, optimisticItem } = applyOptimisticCreate(
+        collectionItems.value,
+        data
+      )
+      collectionItems.value = newCollection
+      console.log(optimisticItem, newCollection)
+      return optimisticItem
     }
-    
-    // UPDATE -- Check if the item is in the collection array
-    if(action === 'update') {
-      console.log('🔄 OPTIMISTIC UPDATE - Starting update for item:', itemToUpdate);
-      console.log('📦 Collection before update:', JSON.parse(JSON.stringify(collectionItems.value)));
+
+    if (action === 'update') {
+      console.log('🔄 OPTIMISTIC UPDATE - Starting update for item:', data)
       
-      // Update the main collection
-      const collectionIndex = collectionItems.value.findIndex((item: any) => item.id === itemToUpdate.id)
-      console.log('🔍 Found item at index:', collectionIndex);
+      const { collection: newCollection, optimisticItem } = applyOptimisticUpdate(
+        collectionItems.value,
+        data.id,
+        data
+      )
       
-      if(collectionIndex !== -1) {
-        const oldItem = collectionItems.value[collectionIndex];
-        console.log('📤 Old item:', oldItem);
-        console.log('📥 New item:', itemToUpdate);
-        
-        collectionItems.value[collectionIndex] = itemToUpdate
-        
-        console.log('📦 Collection after update:', JSON.parse(JSON.stringify(collectionItems.value)));
-        console.log('✅ Item at index after update:', collectionItems.value[collectionIndex]);
+      if (optimisticItem) {
+        collectionItems.value = newCollection
+        activeItem.value = optimisticItem
+        console.log('✅ Update applied:', optimisticItem)
       } else {
-        console.log('❌ Item not found in collection!');
+        console.log('❌ Item not found in collection!')
       }
       
-      // Also update activeItem to reflect optimistic changes
-      console.log('🎯 Updating activeItem from:', activeItem.value, 'to:', itemToUpdate);
-      activeItem.value = itemToUpdate
-      
-      return itemToUpdate
+      return optimisticItem
     }
+    
+    return null
   }
 
   async function send(action: string, collection: string, data: any) {
@@ -151,65 +159,46 @@ export default function () {
     const collectionRef = collections[collection as keyof typeof collections] as any;
 
     console.log('📨 SEND - Starting send operation');
-    console.log('Action:', action, 'Collection:', collection, 'Data:', data);
-    const optimisticItem = await optimisticUpdate(action, collection, data)
+    const optimisticItem = optimisticUpdate(action, collection, data)
     console.log('🎯 Optimistic item returned:', optimisticItem);
-    console.log('Data ID:', data.id)
 
     try {
-
       let res;
+      const baseUrl = `/api/teams/${currentTeam.value.id}/${collection}`
 
-     if(action === 'update') {
-       console.log('🌐 API UPDATE - Sending PATCH request');
-       console.log('URL:', `/api/teams/${currentTeam.value.id}/${collection}/${data.id}`);
-       console.log('Body:', {
-         title: data.title,
-         content: data.content,
-         image: data.image
-       });
-       
-       res = await $fetch(
-          `/api/teams/${currentTeam.value.id}/${collection}/${data.id}`,
-          {
-            method: 'PATCH',
-            body: {
-              title: data.title,
-              content: data.content,
-              image: data.image
-            }
-          },
+      // Use functional API helpers
+      if (action === 'update') {
+        console.log('🌐 API UPDATE - Sending PATCH request');
+        // Send the entire data object, not just specific fields
+        res = await apiPatch(`${baseUrl}/${data.id}`)(data)
+        console.log('🌐 API Response:', res);
+      }
+
+      if (action === 'create') {
+        res = await apiPost(baseUrl)(data)
+      }
+
+      if (action === 'delete') {
+        // For delete, we need to delete each item individually
+        // since the API expects DELETE /api/teams/[teamId]/posts/[postId]
+        const deletePromises = data.map((id: string) => 
+          apiDelete(`${baseUrl}/${id}`)()
         )
-       
-       console.log('🌐 API Response:', res);
-     }
-
-     if(action === 'create') {
-       res = await $fetch(
-         `/api/teams/${currentTeam.value.id}/${collection}/`,
-         {
-           method: 'POST',
-           body: data,
-         },
-       )
-     }
+        res = await Promise.all(deletePromises)
+      }
 
 
       if(action === 'create' || action === 'update') {
         console.log('🔄 POST-API UPDATE - Replacing optimistic item with server response');
-        console.log('Looking for optimisticId:', optimisticItem.optimisticId);
-        console.log('Collection before replacement:', JSON.parse(JSON.stringify(collectionRef.value)));
         
-        const index = collectionRef.value.findIndex((item: any) => (item.optimisticId === optimisticItem.optimisticId))
-        console.log('Found at index:', index);
-        
-        if(index !== -1) {
-          console.log('Replacing with server data:', res);
-          collectionRef.value[index] = { ...res }
-          console.log('Collection after replacement:', JSON.parse(JSON.stringify(collectionRef.value)));
-          console.log('Item at index after replacement:', collectionRef.value[index]);
-        } else {
-          console.log('❌ Could not find optimistic item to replace!');
+        // Use functional helper to replace optimistic item with server response
+        if (optimisticItem && optimisticItem.optimisticId) {
+          collectionRef.value = replaceByOptimisticId(
+            collectionRef.value,
+            optimisticItem.optimisticId,
+            res
+          )
+          console.log('✅ Replaced optimistic item with server data');
         }
       }
 
@@ -255,25 +244,21 @@ export default function () {
       })
 
 
-      // Rollback optimistic update
-      const collectionItems = collectionRef
-
-      if(action === 'create') {
-        // Remove the optimistically added item
-        collectionItems.value = collectionItems.value.filter(item => item.optimisticId !== optimisticItem.optimisticId);
+      // Rollback optimistic update using functional helpers
+      if(action === 'create' && optimisticItem?.optimisticId) {
+        collectionRef.value = rollbackCreate(collectionRef.value, optimisticItem.optimisticId)
+        console.log('Rolled back optimistic create')
       } else if(action === 'update') {
-        // For update, we'd need the original item to restore - this is a limitation
-        // For now, just remove the optimistic flag
-        const index = collectionItems.value.findIndex(item => item.id === optimisticItem.id)
+        // For update, we need the original item - refetch it
+        // This is a limitation we should address with better state management
+        const index = collectionRef.value.findIndex((item: any) => item.id === optimisticItem?.id)
         if(index !== -1) {
-          delete collectionItems.value[index].optimisticAction
+          delete collectionRef.value[index].optimisticAction
         }
       } else if(action === 'delete') {
-        // Re-add the deleted items
-        if(Array.isArray(data)) {
-          // For delete, data is an array of IDs - we need to refetch to restore
-          // This is a limitation without storing the original items
-        }
+        // For delete rollback, we'd need the original items
+        // Consider storing them before deletion in future iteration
+        console.log('Delete rollback would require refetching deleted items')
       }
 
       console.log('ERROR', error)

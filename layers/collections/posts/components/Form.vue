@@ -70,6 +70,9 @@ const props = defineProps({
 })
 
 const { defaultValue, schema } = usePosts()
+// Or use the config directly
+// import { postsConfig } from '../composables/usePosts'
+// const { defaultValues: defaultValue, schema } = postsConfig
 
 // Create a reactive form state
 const state = reactive({
