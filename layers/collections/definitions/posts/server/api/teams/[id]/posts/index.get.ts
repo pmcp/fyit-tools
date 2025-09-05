@@ -1,5 +1,5 @@
-import { getAllTasks, getTasksByIds, getTasksByStatus } from '../../../../database/queries'
-import { isTeamMember } from '@@/server/database/queries/teams'
+import { getAllPosts, getPostsByIds } from '../../../../database/queries'
+import { isTeamMember } from '../../../../../../../../../server/database/queries/teams'
 
 export default defineEventHandler(async (event) => {
   const { id: teamId } = getRouterParams(event)
@@ -13,23 +13,15 @@ export default defineEventHandler(async (event) => {
   }
 
   const query = getQuery(event)
-  
-  // Filter by status if provided
-  if (query.status && typeof query.status === 'string') {
-    return await getTasksByStatus(teamId, query.status)
-  }
-  
-  // Get specific tasks by IDs
   const ids = query.ids
   if (ids) {
-    const taskIds = Array.isArray(ids)
+    const postIds = Array.isArray(ids)
       ? ids.map(String)
       : typeof ids === 'string'
         ? ids.split(',')
         : [String(ids)]
-    return await getTasksByIds(teamId, taskIds)
+    return await getPostsByIds(teamId, postIds)
   }
 
-  // Get all tasks
-  return await getAllTasks(teamId)
+  return await getAllPosts(teamId)
 })

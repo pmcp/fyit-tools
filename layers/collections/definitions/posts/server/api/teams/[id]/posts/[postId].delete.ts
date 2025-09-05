@@ -1,5 +1,5 @@
 import { deletePost } from '../../../../database/queries'
-import { isTeamMember } from '@@/server/database/queries/teams'
+import { isTeamMember } from '../../../../../../../../../server/database/queries/teams'
 
 export default defineEventHandler(async (event) => {
   const { id: teamId, postId } = getRouterParams(event)

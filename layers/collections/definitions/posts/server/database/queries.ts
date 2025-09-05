@@ -1,4 +1,4 @@
-import type { InsertPost, Post } from '@@/types/database'
+import type { InsertPost, Post } from '../../../../../../types/database'
 import { H3Error } from 'h3'
 
 export const getAllPosts = async (teamId: string) => {
@@ -87,14 +87,14 @@ export const updatePost = async (
         )
       )
       .returning()
-    
+
     if (!post[0]) {
       throw createError({
         statusCode: 404,
         statusMessage: 'Post not found or unauthorized',
       })
     }
-    
+
     return post[0]
   } catch (error) {
     if (error instanceof H3Error) throw error
@@ -118,14 +118,14 @@ export const deletePost = async (postId: string, teamId: string, userId: string)
         )
       )
       .returning()
-    
+
     if (!post[0]) {
       throw createError({
         statusCode: 404,
         statusMessage: 'Post not found or unauthorized',
       })
     }
-    
+
     return post[0]
   } catch (error) {
     if (error instanceof H3Error) throw error

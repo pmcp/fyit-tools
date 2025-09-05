@@ -1,6 +1,6 @@
 import { createPost } from '../../../../database/queries'
-import type { InsertPost } from '@@/types/database'
-import { isTeamMember } from '@@/server/database/queries/teams'
+import type { InsertPost } from '../../../../../../../../../types/database'
+import { isTeamMember } from '../../../../../../../../../server/database/queries/teams'
 
 export default defineEventHandler(async (event) => {
   const { id: teamId } = getRouterParams(event)

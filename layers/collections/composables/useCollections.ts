@@ -1,10 +1,14 @@
-// Auto-discover all collection configs using glob import
-const modules = import.meta.glob('../*/app/composables/use*.ts', { eager: true })
+// Auto-discover all collection configs using glob import (including nested definitions)
+const modules = import.meta.glob('../**/app/composables/use*.ts', { eager: true })
 
 // Build collection configs from discovered modules
 const collectionConfigs = Object.entries(modules).reduce((configs, [path, module]) => {
-  // Extract collection name from path (e.g., '../posts/composables/usePosts.ts' -> 'posts')
-  const collectionName = path.split('/')[1]
+  // Extract collection name from path 
+  // Handles both '../posts/app/composables/usePosts.ts' -> 'posts'
+  // and '../definitions/posts/app/composables/usePosts.ts' -> 'posts'
+  const pathParts = path.split('/')
+  const appIndex = pathParts.indexOf('app')
+  const collectionName = appIndex > 1 ? pathParts[appIndex - 1] : pathParts[1]
   
   // Try to find the config in the module
   // First check for named export matching pattern

@@ -11,5 +11,8 @@ export default defineNuxtConfig({
         global: true // Makes them available globally
       }
     ]
-  }
+  },
+  extends: [
+    './definitions/posts'
+  ]
 })

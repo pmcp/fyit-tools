@@ -1,5 +1,5 @@
 import { updatePost } from '../../../../database/queries'
-import type { Post } from '@@/types/database'
+import type { Post } from '../../../../../../../../../types/database'
 
 export default defineEventHandler(async (event) => {
   const params = getRouterParams(event)
