@@ -17,8 +17,8 @@ export default defineNuxtConfig({
     './layers/crud',
     './layers/typo',
     './layers/collections',
-    './layers/collections/posts'
-
+    './layers/collections/posts',
+    './layers/collections/tasks'
   ],
 
   devtools: { enabled: true },

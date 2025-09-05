@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { postsConfig } from './composables/usePosts'
+import { postsConfig } from './app/composables/usePosts'
 
 // Infer the type from the Zod schema for consistency
 export type PostFormData = z.infer<typeof postsConfig.schema>

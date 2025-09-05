@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { tasksConfig } from './composables/useTasks'
+import { tasksConfig } from './app/composables/useTasks'
 
 // Infer the type from the Zod schema for consistency
 export type TaskFormData = z.infer<typeof tasksConfig.schema>

@@ -1,5 +1,5 @@
 // Auto-discover all collection configs using glob import
-const modules = import.meta.glob('../*/composables/use*.ts', { eager: true })
+const modules = import.meta.glob('../*/app/composables/use*.ts', { eager: true })
 
 // Build collection configs from discovered modules
 const collectionConfigs = Object.entries(modules).reduce((configs, [path, module]) => {

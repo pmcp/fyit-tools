@@ -5,16 +5,28 @@ To add a new collection to the CRUD system, follow this template:
 ## 1. Create the folder structure
 ```
 layers/collections/[collection-name]/
-├── composables/
-│   └── use[CollectionName].ts
-├── components/
-│   ├── Form.vue
-│   └── List.vue
+├── app/
+│   ├── composables/
+│   │   └── use[CollectionName].ts
+│   └── components/
+│       ├── Form.vue
+│       └── List.vue
+├── server/
+│   ├── api/
+│   │   └── teams/
+│   │       └── [id]/
+│   │           └── [collection-name]/
+│   │               ├── index.get.ts
+│   │               ├── index.post.ts
+│   │               ├── [[itemId]].patch.ts
+│   │               └── [[itemId]].delete.ts
+│   └── database/
+│       └── queries.ts
 ├── types.ts
 └── nuxt.config.ts
 ```
 
-## 2. Create the composable config (`composables/use[CollectionName].ts`)
+## 2. Create the composable config (`app/composables/use[CollectionName].ts`)
 ```typescript
 import { z } from "zod";
 
@@ -56,7 +68,7 @@ export default function () {
 ## 3. Create types (`types.ts`)
 ```typescript
 import { z } from 'zod'
-import { [collectionName]Config } from './composables/use[CollectionName]'
+import { [collectionName]Config } from './app/composables/use[CollectionName]'
 
 export type [CollectionName]FormData = z.infer<typeof [collectionName]Config.schema>
 
@@ -79,7 +91,7 @@ export interface [CollectionName]FormProps {
 }
 ```
 
-## 4. Create the Form component (`components/Form.vue`)
+## 4. Create the Form component (`app/components/Form.vue`)
 ```vue
 <template>
   <div v-if="loading === 'notLoading'">
@@ -115,7 +127,7 @@ export interface [CollectionName]FormProps {
 </template>
 
 <script setup lang="ts">
-import type { [CollectionName]FormProps, [CollectionName]FormData } from '../types'
+import type { [CollectionName]FormProps, [CollectionName]FormData } from '../../types'
 
 const { send } = useCrud()
 const props = defineProps<[CollectionName]FormProps>()
@@ -141,7 +153,7 @@ watchEffect(() => {
 </script>
 ```
 
-## 5. Create the List component (`components/List.vue`)
+## 5. Create the List component (`app/components/List.vue`)
 ```vue
 <template>
   <CrudTable
@@ -165,7 +177,7 @@ watchEffect(() => {
 </template>
 
 <script setup lang="ts">
-import type { [CollectionName] } from '../types'
+import type { [CollectionName] } from '../../types'
 
 const { columns } = use[CollectionName]()
 const { currentTeam } = useTeam()
@@ -182,7 +194,95 @@ if ([collectionName].value) {
 </script>
 ```
 
-## 6. Create nuxt.config.ts
+## 6. Create the database queries (`server/database/queries.ts`)
+```typescript
+// Using the base CRUD utilities for standard operations
+import {
+  createGetAllQuery,
+  createGetByIdsQuery,
+  createInsertQuery,
+  createUpdateQuery,
+  createDeleteQuery,
+  type CrudQueryOptions
+} from '~~/layers/crud/server/database/baseCrudQueries'
+
+const [collectionName]Options: CrudQueryOptions = {
+  tableName: '[collection-name]',
+  teamIdField: 'teamId',
+  userIdField: 'userId',
+  orderByField: 'createdAt',
+  orderDirection: 'desc'
+}
+
+export const getAll[CollectionName] = createGetAllQuery([collectionName]Options)
+export const get[CollectionName]ByIds = createGetByIdsQuery([collectionName]Options)
+export const create[CollectionName] = createInsertQuery([collectionName]Options)
+export const update[CollectionName] = createUpdateQuery([collectionName]Options)
+export const delete[CollectionName] = createDeleteQuery([collectionName]Options)
+```
+
+## 7. Create API endpoints
+
+### `server/api/teams/[id]/[collection-name]/index.get.ts`
+```typescript
+import { getAll[CollectionName], get[CollectionName]ByIds } from '../../../../database/queries'
+import { isTeamMember } from '@@/server/database/queries/teams'
+
+export default defineEventHandler(async (event) => {
+  const { id: teamId } = getRouterParams(event)
+  const { user } = await requireUserSession(event)
+  const hasAccess = await isTeamMember(teamId, user.id)
+  if (!hasAccess) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Unauthorized Access',
+    })
+  }
+
+  const query = getQuery(event)
+  const ids = query.ids
+  if (ids) {
+    const itemIds = Array.isArray(ids)
+      ? ids.map(String)
+      : typeof ids === 'string'
+        ? ids.split(',')
+        : [String(ids)]
+    return await get[CollectionName]ByIds(teamId, itemIds)
+  }
+
+  return await getAll[CollectionName](teamId)
+})
+```
+
+### `server/api/teams/[id]/[collection-name]/index.post.ts`
+```typescript
+import { create[CollectionName] } from '../../../../database/queries'
+import { isTeamMember } from '@@/server/database/queries/teams'
+
+export default defineEventHandler(async (event) => {
+  const { id: teamId } = getRouterParams(event)
+  const { user } = await requireUserSession(event)
+  const hasAccess = await isTeamMember(teamId, user.id)
+  if (!hasAccess) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Unauthorized Access',
+    })
+  }
+  
+  const body = await readBody(event)
+  const payload = {
+    ...body,
+    teamId,
+    userId: user.id,
+  }
+  
+  const item = await create[CollectionName](payload)
+  return item
+})
+```
+
+## 8. Create nuxt.config.ts
 ```typescript
 import { basename } from 'path'
 
@@ -192,7 +292,7 @@ export default defineNuxtConfig({
   components: {
     dirs: [
       {
-        path: './components',
+        path: './app/components',
         prefix: layerName,
         global: true
       }
@@ -202,7 +302,7 @@ export default defineNuxtConfig({
 ```
 
 ## That's it! 
-The collection will be automatically discovered and registered. No manual registration needed.
+The collection will be automatically discovered and registered. Both client-side components and server-side API endpoints are included. No manual registration needed.
 
 ## Naming Convention Summary
 - Folder: `layers/collections/tasks/`
@@ -210,3 +310,12 @@ The collection will be automatically discovered and registered. No manual regist
 - Component prefix: `Tasks` (becomes `TasksForm`, `TasksList`)
 - Type names: `Task`, `TaskFormData`, `TaskFormProps`
 - Composable: `useTasks()`
+- API endpoints: `/api/teams/[id]/tasks/*`
+- Query functions: `getAllTasks`, `createTask`, `updateTask`, `deleteTask`
+
+## Server-Side Benefits
+- API endpoints are co-located with the collection
+- Can use generic base queries or write custom ones
+- Automatic authorization checks
+- Consistent error handling
+- Type-safe from database to API

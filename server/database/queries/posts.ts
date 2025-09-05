@@ -26,7 +26,6 @@ export const getAllPosts = async (teamId: string) => {
     })
   }
 }
-
 export const getPostsByIds = async (teamId: string, postIds: string[]) => {
   try {
     const posts = await useDB().query.posts.findMany({

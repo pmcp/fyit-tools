@@ -1,13 +1,14 @@
-import { basename } from 'path'
+import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 
-const layerName = basename(__dirname)
+const currentDir = fileURLToPath(new URL('.', import.meta.url))
 
 export default defineNuxtConfig({
   components: {
     dirs: [
       {
-        path: './components',
-        prefix: layerName,
+        path: join(currentDir, 'app/components'),
+        prefix: 'Tasks',
         global: true // Makes them available globally
       }
     ]
