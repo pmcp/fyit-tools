@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-// import useCollections from '~/layers/collections/all/composables/useCollections'
+// import useCollections from '~/layers/test/all/composables/useCollections'
 
 const props = defineProps({
   collection: String,
@@ -27,7 +27,7 @@ const props = defineProps({
   }
 })
 
-// Get component mapping from collections composable
+// Get component mapping from test composable
 const { componentMap } = useCollections()
 
 const currentComponent = computed(() => {

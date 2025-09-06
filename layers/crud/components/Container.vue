@@ -39,7 +39,7 @@
 import { USlideover, UModal } from '#components'
 import type { Component, Ref, ComputedRef } from 'vue'
 
-// Type definitions
+// Type collections
 type CrudAction = 'create' | 'update' | 'delete' | null
 type LoadingState = 'notLoading' | 'create_send' | 'update_send' | 'delete_send' | 'create_open' | 'update_open' | 'delete_open'
 type ModalComponent = 'USlideover' | 'UModal'
@@ -128,7 +128,7 @@ const loadModalConfig = (collection: string | null): ModalConfig => {
   // Get the collection config from useCollections
   const collections = useCollections()
   const config = collections.getConfig(collection)
-  
+
   // Use modal config from collection if defined, otherwise use default
   if (config?.modalConfig) {
     return config.modalConfig

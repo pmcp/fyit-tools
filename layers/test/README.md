@@ -76,7 +76,7 @@ export const [collectionName]Config = {
   },
   
   columns: [
-    // Table column definitions
+    // Table column collections
     { accessorKey: 'field', header: 'Field Name', sortable: true },
     { accessorKey: 'actions', header: 'Actions' }
   ],

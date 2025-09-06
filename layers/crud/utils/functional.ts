@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid'
 
-// Type definitions
+// Type collections
 export interface OptimisticItem {
   optimisticId?: string
   optimisticAction?: string
@@ -18,13 +18,13 @@ export const addOptimisticFlags = <T extends Record<string, any>>(
 })
 
 // Immutable collection operations
-export const addToCollection = <T>(collection: T[], item: T): T[] => 
+export const addToCollection = <T>(collection: T[], item: T): T[] =>
   [...collection, item]
 
 export const removeFromCollection = <T extends { id: string | number }>(
   collection: T[],
   ids: (string | number)[]
-): T[] => 
+): T[] =>
   collection.filter(item => !ids.includes(item.id))
 
 export const updateInCollection = <T extends { id: string | number }>(
@@ -32,7 +32,7 @@ export const updateInCollection = <T extends { id: string | number }>(
   id: string | number,
   updates: Partial<T>
 ): T[] =>
-  collection.map(item => 
+  collection.map(item =>
     item.id === id ? { ...item, ...updates } : item
   )
 
@@ -58,7 +58,7 @@ export const findIndexInCollection = <T extends { id: string | number }>(
   collection.findIndex(item => item.id === id)
 
 // Functional composition utilities
-export const pipe = <T>(...fns: Array<(arg: T) => T>) => 
+export const pipe = <T>(...fns: Array<(arg: T) => T>) =>
   (value: T): T =>
     fns.reduce((acc, fn) => fn(acc), value)
 
@@ -70,8 +70,8 @@ export const compose = <T>(...fns: Array<(arg: T) => T>) =>
 export const identity = <T>(x: T): T => x
 
 // Curried API builder
-export const createApiCall = (method: string) => 
-  (endpoint: string) => 
+export const createApiCall = (method: string) =>
+  (endpoint: string) =>
     (data?: any, options?: RequestInit) =>
       $fetch(endpoint, {
         method,
@@ -85,7 +85,7 @@ export const apiPost = createApiCall('POST')
 export const apiPatch = createApiCall('PATCH')
 export const apiDelete = createApiCall('DELETE')
 
-// Transform collections to optimistic state
+// Transform test to optimistic state
 export const applyOptimisticCreate = <T>(
   collection: T[],
   item: T,
@@ -106,7 +106,7 @@ export const applyOptimisticUpdate = <T extends { id: string | number }>(
 ): { collection: T[], optimisticItem: T & OptimisticItem | undefined } => {
   const item = findInCollection(collection, id)
   if (!item) return { collection, optimisticItem: undefined }
-  
+
   const optimisticItem = addOptimisticFlags({ ...item, ...updates }, action)
   return {
     collection: updateInCollection(collection, id, optimisticItem),

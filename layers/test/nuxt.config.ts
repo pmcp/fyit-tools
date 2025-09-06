@@ -13,7 +13,12 @@ export default defineNuxtConfig({
     ]
   },
   extends: [
-    './definitions/posts',
-    './definitions/works'
+    './collections/posts',
+    './collections/works',
+    './collections/events',
+    './collections/test1s',
+    './collections/test2s',
+    './collections/test3s',
+    './collections/test4s'
   ]
 })

@@ -1,29 +1,29 @@
-// Auto-discover all collection configs using glob import (including nested definitions)
+// Auto-discover all collection configs using glob import (including nested collections)
 const modules = import.meta.glob('../**/app/composables/use*.ts', { eager: true })
 
 // Build collection configs from discovered modules
 const collectionConfigs = Object.entries(modules).reduce((configs, [path, module]) => {
-  // Extract collection name from path 
+  // Extract collection name from path
   // Handles both '../posts/app/composables/usePosts.ts' -> 'posts'
-  // and '../definitions/posts/app/composables/usePosts.ts' -> 'posts'
+  // and '../collections/posts/app/composables/usePosts.ts' -> 'posts'
   const pathParts = path.split('/')
   const appIndex = pathParts.indexOf('app')
   const collectionName = appIndex > 1 ? pathParts[appIndex - 1] : pathParts[1]
-  
+
   // Try to find the config in the module
   // First check for named export matching pattern
   const configName = `${collectionName}Config`
   const config = (module as any)[configName]
-  
+
   if (config && config.name) {
     configs[config.name] = config
   }
-  
+
   return configs
 }, {} as Record<string, any>)
 
 // Create reactive state for each collection
-const createCollectionState = (name: string) => 
+const createCollectionState = (name: string) =>
   useState(name, () => [])
 
 // Build component map from configs
@@ -44,7 +44,7 @@ export default function () {
   const componentMap = buildComponentMap(collectionConfigs)
 
   // Get config for a specific collection
-  const getConfig = (name: string) => 
+  const getConfig = (name: string) =>
     collectionConfigs[name as keyof typeof collectionConfigs]
 
   return {

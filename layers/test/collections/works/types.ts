@@ -15,3 +15,12 @@ export interface Work {
 
 export type WorkFormData = z.infer<typeof workSchema>
 export type NewWork = Omit<Work, 'id' | 'createdAt' | 'updatedAt'>
+
+// Props type for the Form component
+export interface WorkFormProps {
+  items: string[] // Array of IDs for delete action
+  activeItem: Work | Record<string, never> // Work for update, empty object for create
+  collection: string
+  loading: string
+  action: 'create' | 'update' | 'delete'
+}

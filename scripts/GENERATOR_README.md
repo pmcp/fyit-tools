@@ -25,7 +25,7 @@ pnpm generate:collection products
 ### With Custom Fields
 
 Specify fields using the format `name:type:required`:
-
+c
 ```bash
 pnpm generate:collection products --fields="name:string:required,price:decimal:required,inStock:boolean,description:text"
 ```
@@ -168,12 +168,12 @@ Creating collection: products
 ✓ Generated server/database/schema.ts
 ✓ Generated types.ts
 ✓ Generated nuxt.config.ts
-✓ Updated collections layer nuxt.config.ts
+✓ Updated test layer nuxt.config.ts
 ✓ Database table created
 
 ✨ Collection 'products' generated successfully!
 
-📁 Location: layers/collections/products/
+📁 Location: layers/test/products/
 
 🎯 Next steps:
   1. Review the schema in useProducts.ts

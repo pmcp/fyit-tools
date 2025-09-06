@@ -56,7 +56,7 @@ export default function () {
 
     const { handleApiError } = useApiErrorHandler();
 
-    // Get collections reference before async operations
+    // Get test reference before async operations
     const collections = useCollections();
     const collectionRef = collections[collection];
 
@@ -93,7 +93,7 @@ export default function () {
   // Pure functional optimistic update
   function optimisticUpdate(action: string, collection: string, data: any): any {
 
-    // Get collections reference
+    // Get test reference
     const collections = useCollections();
     const collectionItems = collections[collection]
     if (!collectionItems) return null
@@ -105,11 +105,11 @@ export default function () {
         data // data is array of ids for delete
       )
       collectionItems.value = newCollection
-      
+
       // Clear selected rows
       const selectedRows = useState('selectedRows')
       selectedRows.value = []
-      
+
       return deletedIds
     }
 
@@ -128,15 +128,15 @@ export default function () {
         data.id,
         data
       )
-      
+
       if (optimisticItem) {
         collectionItems.value = newCollection
         activeItem.value = optimisticItem
       }
-      
+
       return optimisticItem
     }
-    
+
     return null
   }
 
@@ -144,7 +144,7 @@ export default function () {
     if(useCrudError().foundErrors()) return;
     loading.value = `${action}_send`
 
-    // Get collections reference before async operations
+    // Get test reference before async operations
     const collections = useCollections();
     const collectionRef = collections[collection as keyof typeof collections] as any;
 
@@ -167,7 +167,7 @@ export default function () {
       if (action === 'delete') {
         // For delete, we need to delete each item individually
         // since the API expects DELETE /api/teams/[teamId]/posts/[postId]
-        const deletePromises = data.map((id: string) => 
+        const deletePromises = data.map((id: string) =>
           apiDelete(`${baseUrl}/${id}`)()
         )
         res = await Promise.all(deletePromises)
@@ -195,7 +195,7 @@ export default function () {
           });
         } else {
           toast.add({
-            title: 'User created and added to organisation'  
+            title: 'User created and added to organisation'
           });
         }
       } else {

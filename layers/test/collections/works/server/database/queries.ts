@@ -1,5 +1,3 @@
-import { eq, and, inArray, desc } from 'drizzle-orm'
-import { worksTable } from './schema'
 import type { Work, NewWork } from '../types'
 
 export async function getAllWorks(teamId: string) {
@@ -7,9 +5,9 @@ export async function getAllWorks(teamId: string) {
   
   const works = await db
     .select()
-    .from(worksTable)
-    .where(eq(worksTable.teamId, teamId))
-    .orderBy(desc(worksTable.createdAt))
+    .from(tables.works)
+    .where(eq(tables.works.teamId, teamId))
+    .orderBy(desc(tables.works.createdAt))
   
   return works
 }
@@ -19,11 +17,11 @@ export async function getWorksByIds(teamId: string, ids: string[]) {
   
   const works = await db
     .select()
-    .from(worksTable)
+    .from(tables.works)
     .where(
       and(
-        eq(worksTable.teamId, teamId),
-        inArray(worksTable.id, ids)
+        eq(tables.works.teamId, teamId),
+        inArray(tables.works.id, ids)
       )
     )
   
@@ -34,27 +32,24 @@ export async function createWork(data: NewWork) {
   const db = useDB()
   
   const [work] = await db
-    .insert(worksTable)
+    .insert(tables.works)
     .values(data)
     .returning()
   
   return work
 }
 
-export async function updateWork(workId: string, teamId: string, userId: string, data: Partial<NewWork>) {
+export async function updateWork(workId: string, teamId: string, userId: string, updates: Partial<Work>) {
   const db = useDB()
   
   const [work] = await db
-    .update(worksTable)
-    .set({
-      ...data,
-      updatedAt: new Date()
-    })
+    .update(tables.works)
+    .set(updates)
     .where(
       and(
-        eq(worksTable.id, workId),
-        eq(worksTable.teamId, teamId),
-        eq(worksTable.userId, userId)
+        eq(tables.works.id, workId),
+        eq(tables.works.teamId, teamId),
+        eq(tables.works.userId, userId)
       )
     )
     .returning()
@@ -73,12 +68,12 @@ export async function deleteWork(workId: string, teamId: string, userId: string)
   const db = useDB()
   
   const [deleted] = await db
-    .delete(worksTable)
+    .delete(tables.works)
     .where(
       and(
-        eq(worksTable.id, workId),
-        eq(worksTable.teamId, teamId),
-        eq(worksTable.userId, userId)
+        eq(tables.works.id, workId),
+        eq(tables.works.teamId, teamId),
+        eq(tables.works.userId, userId)
       )
     )
     .returning()

@@ -1,4 +1,4 @@
-// Generic CRUD query utilities for collections
+// Generic CRUD query utilities for test
 // Collections can use these as base implementations or override with custom logic
 
 import { H3Error } from 'h3'
@@ -15,11 +15,11 @@ export interface CrudQueryOptions {
 export const createGetAllQuery = (options: CrudQueryOptions) => {
   return async (teamId: string) => {
     const { tableName, teamIdField = 'teamId', orderByField = 'createdAt', orderDirection = 'desc' } = options
-    
+
     try {
       const items = await useDB().query[tableName].findMany({
         where: and(eq(tables[tableName][teamIdField], teamId)),
-        orderBy: orderDirection === 'desc' 
+        orderBy: orderDirection === 'desc'
           ? [desc(tables[tableName][orderByField])]
           : [asc(tables[tableName][orderByField])],
       })
@@ -38,14 +38,14 @@ export const createGetAllQuery = (options: CrudQueryOptions) => {
 export const createGetByIdsQuery = (options: CrudQueryOptions) => {
   return async (teamId: string, itemIds: string[]) => {
     const { tableName, teamIdField = 'teamId', orderByField = 'createdAt', orderDirection = 'desc' } = options
-    
+
     try {
       const items = await useDB().query[tableName].findMany({
         where: and(
           eq(tables[tableName][teamIdField], teamId),
           inArray(tables[tableName].id, itemIds)
         ),
-        orderBy: orderDirection === 'desc' 
+        orderBy: orderDirection === 'desc'
           ? [desc(tables[tableName][orderByField])]
           : [asc(tables[tableName][orderByField])],
       })
@@ -64,7 +64,7 @@ export const createGetByIdsQuery = (options: CrudQueryOptions) => {
 export const createInsertQuery = (options: CrudQueryOptions) => {
   return async (payload: any) => {
     const { tableName } = options
-    
+
     try {
       const item = await useDB().insert(tables[tableName]).values(payload).returning()
       return item[0]
@@ -82,7 +82,7 @@ export const createInsertQuery = (options: CrudQueryOptions) => {
 export const createUpdateQuery = (options: CrudQueryOptions) => {
   return async (itemId: string, teamId: string, userId: string, updates: any) => {
     const { tableName, teamIdField = 'teamId', userIdField = 'userId' } = options
-    
+
     try {
       const item = await useDB()
         .update(tables[tableName])
@@ -95,14 +95,14 @@ export const createUpdateQuery = (options: CrudQueryOptions) => {
           )
         )
         .returning()
-      
+
       if (!item[0]) {
         throw createError({
           statusCode: 404,
           statusMessage: `${tableName} not found or unauthorized`,
         })
       }
-      
+
       return item[0]
     } catch (error) {
       if (error instanceof H3Error) throw error
@@ -119,7 +119,7 @@ export const createUpdateQuery = (options: CrudQueryOptions) => {
 export const createDeleteQuery = (options: CrudQueryOptions) => {
   return async (itemId: string, teamId: string, userId: string) => {
     const { tableName, teamIdField = 'teamId', userIdField = 'userId' } = options
-    
+
     try {
       const item = await useDB()
         .delete(tables[tableName])
@@ -131,14 +131,14 @@ export const createDeleteQuery = (options: CrudQueryOptions) => {
           )
         )
         .returning()
-      
+
       if (!item[0]) {
         throw createError({
           statusCode: 404,
           statusMessage: `${tableName} not found or unauthorized`,
         })
       }
-      
+
       return item[0]
     } catch (error) {
       if (error instanceof H3Error) throw error
