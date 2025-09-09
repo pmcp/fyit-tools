@@ -5,23 +5,24 @@
     v-model:open="localOpen"
     v-bind="modalProps"
   >
-    <template #content>
-      <div class="flex flex-col items-center justify-between gap-2 overflow-x-scroll">
-        <div class="flex items-center justify-between w-full border-b border-gray-200 dark:border-gray-700 mb-4 p-4">
-          <TypoH2>
-            <span class="capitalize">{{ action }}</span> {{ cat }}
-          </TypoH2>
-          <UButton
-            icon="i-heroicons-x-mark"
-            variant="ghost"
-            color="gray"
-            size="xs"
-            @click.stop="close()"/>
-        </div>
-        <div v-if="localOpen && activeCollection" class="w-full p-4">
-          <CrudLoading v-if="loading !== 'notLoading'" class="h-full w-full"/>
+    <template #header>
+      <div class="flex items-center justify-between w-full">
+        <TypoH2>
+          <span class="capitalize">{{ action }}</span> {{ cat }}
+        </TypoH2>
+        <UButton
+          icon="i-heroicons-x-mark"
+          variant="ghost"
+          color="gray"
+          size="xs"
+          @click.stop="close()"/>
+      </div>
+    </template>
+    <template #body>
+      <div v-if="localOpen && activeCollection" class="w-full h-full">
+        <CrudLoading v-if="loading !== 'notLoading'" class="h-full w-full"/>
+        <div v-else>
           <CrudDynamicFormLoader
-            v-else
             :key="`${activeCollection}-${action}-${activeItem?.id || 'new'}`"
             :collection="activeCollection"
             :loading="loading"

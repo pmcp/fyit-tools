@@ -30,7 +30,7 @@ export function generateListComponent(data, config = {}) {
 </template>
 
 <script setup lang="ts">${hasTranslations ? `
-const { t } = useTrans()
+const { t } = useEntityTranslations()
 const { locale } = useI18n()` : ''}
 const { columns } = use${prefixedPascalCasePlural}()
 const { currentTeam } = useTeam()

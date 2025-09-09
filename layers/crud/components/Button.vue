@@ -25,7 +25,6 @@
     :disabled="loading !== 'notLoading'"
     size="lg"
     block
-    color="gray"
     type="submit"
   >
     <div class="flex items-center gap-1">

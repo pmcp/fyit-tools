@@ -8,12 +8,12 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     'nuxt-auth-utils',
     'nuxthub-ratelimit',
-    '@nuxt/eslint',
-    '@nuxtjs/i18n',
+    '@nuxt/eslint'
   ],
 
 
   extends: [
+    './layers/i18n',
     './layers/crud',
     './layers/typo',
     './layers/pos'

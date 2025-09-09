@@ -1,0 +1,43 @@
+import { updatePosProduct, getPosProductsByIds } from '../../../../database/queries'
+import { isTeamMember } from '@@/server/database/queries/teams'
+import type { PosProduct } from '../../../../../../types'
+
+export default defineEventHandler(async (event) => {
+  const { id: teamId, productId } = getRouterParams(event)
+  const { user } = await requireUserSession(event)
+  const hasAccess = await isTeamMember(teamId, user.id)
+  if (!hasAccess) {
+    throw createError({ statusCode: 403, statusMessage: 'Unauthorized' })
+  }
+
+  const body = await readBody<Partial<PosProduct>>(event)
+  
+  // Handle translation updates properly
+  if (body.translations && body.locale) {
+    const [existing] = await getPosProductsByIds(teamId, [productId])
+    if (existing) {
+      body.translations = {
+        ...existing.translations,
+        [body.locale]: {
+          ...existing.translations?.[body.locale],
+          ...body.translations[body.locale]
+        }
+      }
+    }
+  }
+  
+  return await updatePosProduct(productId, teamId, user.id, {
+    eventId: body.eventId,
+    categoryId: body.categoryId,
+    locationId: body.locationId,
+    name: body.name,
+    description: body.description,
+    price: body.price,
+    isActive: body.isActive,
+    isTemplate: body.isTemplate,
+    requiresRemark: body.requiresRemark,
+    remarkPrompt: body.remarkPrompt,
+    sortOrder: body.sortOrder,
+    translations: body.translations
+  })
+})
