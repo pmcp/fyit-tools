@@ -1,4 +1,4 @@
-import { updatePosProduct } from '../../../../database/queries'
+import { updatePosProduct, getPosProductsByIds } from '../../../../database/queries'
 import { isTeamMember } from '@@/server/database/queries/teams'
 import type { PosProduct } from '../../../../../../types'
 
@@ -11,6 +11,21 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody<Partial<PosProduct>>(event)
+  
+  // Handle translation updates properly
+  if (body.translations && body.locale) {
+    const [existing] = await getPosProductsByIds(teamId, [productId])
+    if (existing) {
+      body.translations = {
+        ...existing.translations,
+        [body.locale]: {
+          ...existing.translations?.[body.locale],
+          ...body.translations[body.locale]
+        }
+      }
+    }
+  }
+  
   return await updatePosProduct(productId, teamId, user.id, {
     eventId: body.eventId,
     categoryId: body.categoryId,
@@ -22,6 +37,7 @@ export default defineEventHandler(async (event) => {
     isTemplate: body.isTemplate,
     requiresRemark: body.requiresRemark,
     remarkPrompt: body.remarkPrompt,
-    sortOrder: body.sortOrder
+    sortOrder: body.sortOrder,
+    translations: body.translations
   })
 })

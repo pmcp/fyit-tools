@@ -10,6 +10,8 @@ export default defineEventHandler(async (event) => {
   }
 
   const query = getQuery(event)
+  // Accept locale for future translation handling
+  const locale = String(query.locale || 'en')
   if (query.ids) {
     const ids = String(query.ids).split(',')
     return await getPosProductsByIds(teamId, ids)

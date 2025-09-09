@@ -1,6 +1,6 @@
 // Generator for database queries
 
-export function generateQueries(data) {
+export function generateQueries(data, config = null) {
   const { singular, plural, pascalCase, pascalCasePlural, layer, layerPascalCase } = data
   // Use layer-prefixed table name to match schema export
   // Convert layer to camelCase to ensure valid JavaScript identifier

@@ -1,4 +1,4 @@
-import { updatePosEvent } from '../../../../database/queries'
+import { updatePosEvent, getPosEventsByIds } from '../../../../database/queries'
 import { isTeamMember } from '@@/server/database/queries/teams'
 import type { PosEvent } from '../../../../../../types'
 
@@ -11,6 +11,21 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody<Partial<PosEvent>>(event)
+  
+  // Handle translation updates properly
+  if (body.translations && body.locale) {
+    const [existing] = await getPosEventsByIds(teamId, [eventId])
+    if (existing) {
+      body.translations = {
+        ...existing.translations,
+        [body.locale]: {
+          ...existing.translations?.[body.locale],
+          ...body.translations[body.locale]
+        }
+      }
+    }
+  }
+  
   return await updatePosEvent(eventId, teamId, user.id, {
     name: body.name,
     slug: body.slug,

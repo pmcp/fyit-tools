@@ -397,23 +397,23 @@ async function writeScaffold({ layer, collection, fields, dialect, autoRelations
     },
     { 
       path: path.join(base, 'server', 'api', 'teams', '[id]', apiPath, 'index.get.ts'),
-      content: generateGetEndpoint(data)
+      content: generateGetEndpoint(data, config)
     },
     { 
       path: path.join(base, 'server', 'api', 'teams', '[id]', apiPath, 'index.post.ts'),
-      content: generatePostEndpoint(data)
+      content: generatePostEndpoint(data, config)
     },
     { 
       path: path.join(base, 'server', 'api', 'teams', '[id]', apiPath, `[${cases.singular}Id].patch.ts`),
-      content: generatePatchEndpoint(data)
+      content: generatePatchEndpoint(data, config)
     },
     { 
       path: path.join(base, 'server', 'api', 'teams', '[id]', apiPath, `[${cases.singular}Id].delete.ts`),
-      content: generateDeleteEndpoint(data)
+      content: generateDeleteEndpoint(data, config)
     },
     { 
       path: path.join(base, 'server', 'database', 'queries.ts'),
-      content: generateQueries(data)
+      content: generateQueries(data, config)
     },
     { 
       path: path.join(base, 'server', 'database', 'schema.ts'),

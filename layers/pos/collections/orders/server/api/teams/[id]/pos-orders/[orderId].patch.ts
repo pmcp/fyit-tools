@@ -11,6 +11,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody<Partial<PosOrder>>(event)
+  
   return await updatePosOrder(orderId, teamId, user.id, {
     eventId: body.eventId,
     clientId: body.clientId,

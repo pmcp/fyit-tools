@@ -1,9 +1,12 @@
 // Generator for API endpoints
 
-export function generateGetEndpoint(data) {
-  const { pascalCase, pascalCasePlural, layerPascalCase } = data
+export function generateGetEndpoint(data, config = null) {
+  const { pascalCase, pascalCasePlural, layerPascalCase, plural, singular } = data
   const prefixedPascalCase = `${layerPascalCase}${pascalCase}`
   const prefixedPascalCasePlural = `${layerPascalCase}${pascalCasePlural}`
+  
+  // Check if this collection has translations
+  const hasTranslations = config?.translations?.collections?.[plural] || config?.translations?.collections?.[singular]
 
   return `import { getAll${prefixedPascalCasePlural}, get${prefixedPascalCasePlural}ByIds } from '../../../../database/queries'
 import { isTeamMember } from '@@/server/database/queries/teams'
@@ -16,7 +19,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, statusMessage: 'Unauthorized' })
   }
 
-  const query = getQuery(event)
+  const query = getQuery(event)${hasTranslations ? `
+  // Accept locale for future translation handling
+  const locale = String(query.locale || 'en')` : ''}
   if (query.ids) {
     const ids = String(query.ids).split(',')
     return await get${prefixedPascalCasePlural}ByIds(teamId, ids)
@@ -26,7 +31,7 @@ export default defineEventHandler(async (event) => {
 })`
 }
 
-export function generatePostEndpoint(data) {
+export function generatePostEndpoint(data, config = null) {
   const { singular, pascalCase, layerPascalCase } = data
   const prefixedPascalCase = `${layerPascalCase}${pascalCase}`
 
@@ -54,14 +59,28 @@ export default defineEventHandler(async (event) => {
 })`
 }
 
-export function generatePatchEndpoint(data) {
-  const { singular, pascalCase, layerPascalCase, fields } = data
+export function generatePatchEndpoint(data, config = null) {
+  const { singular, pascalCase, pascalCasePlural, layerPascalCase, fields, plural } = data
   const prefixedPascalCase = `${layerPascalCase}${pascalCase}`
+  const prefixedPascalCasePlural = `${layerPascalCase}${pascalCasePlural}`
+  
+  // Check if this collection has translations
+  const hasTranslations = config?.translations?.collections?.[plural] || config?.translations?.collections?.[singular]
 
   // Generate field selection for update
-  const fieldSelection = fields.map(field => `    ${field.name}: body.${field.name}`).join(',\n')
+  let fieldSelection = fields.map(field => `    ${field.name}: body.${field.name}`).join(',\n')
+  
+  // Add translations field if needed
+  if (hasTranslations) {
+    fieldSelection += ',\n    translations: body.translations'
+  }
+  
+  // Add imports based on translation needs
+  const imports = hasTranslations 
+    ? `import { update${prefixedPascalCase}, get${prefixedPascalCasePlural}ByIds } from '../../../../database/queries'`
+    : `import { update${prefixedPascalCase} } from '../../../../database/queries'`
 
-  return `import { update${prefixedPascalCase} } from '../../../../database/queries'
+  return `${imports}
 import { isTeamMember } from '@@/server/database/queries/teams'
 import type { ${prefixedPascalCase} } from '../../../../../../types'
 
@@ -73,14 +92,29 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, statusMessage: 'Unauthorized' })
   }
 
-  const body = await readBody<Partial<${prefixedPascalCase}>>(event)
+  const body = await readBody<Partial<${prefixedPascalCase}>>(event)${hasTranslations ? `
+  
+  // Handle translation updates properly
+  if (body.translations && body.locale) {
+    const [existing] = await get${prefixedPascalCasePlural}ByIds(teamId, [${singular}Id])
+    if (existing) {
+      body.translations = {
+        ...existing.translations,
+        [body.locale]: {
+          ...existing.translations?.[body.locale],
+          ...body.translations[body.locale]
+        }
+      }
+    }
+  }` : ''}
+  
   return await update${prefixedPascalCase}(${singular}Id, teamId, user.id, {
 ${fieldSelection}
   })
 })`
 }
 
-export function generateDeleteEndpoint(data) {
+export function generateDeleteEndpoint(data, config = null) {
   const { singular, pascalCase, layerPascalCase } = data
   const prefixedPascalCase = `${layerPascalCase}${pascalCase}`
 
