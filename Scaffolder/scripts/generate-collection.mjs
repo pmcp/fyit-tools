@@ -385,15 +385,15 @@ async function writeScaffold({ layer, collection, fields, dialect, autoRelations
   const files = [
     { 
       path: path.join(base, 'app', 'components', 'Form.vue'),
-      content: generateFormComponent(data)
+      content: generateFormComponent(data, config)
     },
     { 
       path: path.join(base, 'app', 'components', 'List.vue'),
-      content: generateListComponent(data)
+      content: generateListComponent(data, config)
     },
     { 
       path: path.join(base, 'app', 'composables', `use${layerPascalCase}${cases.pascalCasePlural}.ts`),
-      content: generateComposable(data)
+      content: generateComposable(data, config)
     },
     { 
       path: path.join(base, 'server', 'api', 'teams', '[id]', apiPath, 'index.get.ts'),

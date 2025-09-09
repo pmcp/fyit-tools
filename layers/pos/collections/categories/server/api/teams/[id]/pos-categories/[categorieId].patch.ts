@@ -1,20 +1,20 @@
-import { updatePosLocation, getPosLocationsByIds } from '../../../../database/queries'
+import { updatePosCategorie, getPosCategoriesByIds } from '../../../../database/queries'
 import { isTeamMember } from '@@/server/database/queries/teams'
-import type { PosLocation } from '../../../../../../types'
+import type { PosCategorie } from '../../../../../../types'
 
 export default defineEventHandler(async (event) => {
-  const { id: teamId, locationId } = getRouterParams(event)
+  const { id: teamId, categorieId } = getRouterParams(event)
   const { user } = await requireUserSession(event)
   const hasAccess = await isTeamMember(teamId, user.id)
   if (!hasAccess) {
     throw createError({ statusCode: 403, statusMessage: 'Unauthorized' })
   }
 
-  const body = await readBody<Partial<PosLocation>>(event)
+  const body = await readBody<Partial<PosCategorie>>(event)
   
   // Handle translation updates properly
   if (body.translations && body.locale) {
-    const [existing] = await getPosLocationsByIds(teamId, [locationId])
+    const [existing] = await getPosCategoriesByIds(teamId, [categorieId])
     if (existing) {
       body.translations = {
         ...existing.translations,
@@ -26,13 +26,13 @@ export default defineEventHandler(async (event) => {
     }
   }
   
-  return await updatePosLocation(locationId, teamId, user.id, {
+  return await updatePosCategorie(categorieId, teamId, user.id, {
     eventId: body.eventId,
     name: body.name,
-    description: body.description,
+    color: body.color,
+    icon: body.icon,
+    sortOrder: body.sortOrder,
     isActive: body.isActive,
-    printerMode: body.printerMode,
-    maxRetryAttempts: body.maxRetryAttempts,
     translations: body.translations
   })
 })

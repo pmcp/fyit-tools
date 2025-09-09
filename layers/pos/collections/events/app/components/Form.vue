@@ -18,16 +18,8 @@
       @submit="send(action, collection, state)"
       size="lg"
     >
-      <UFormField label="Name" name="name">
-        <UInput v-model="state.name" class="w-full" size="xl" />
-      </UFormField>
-
       <UFormField label="Slug" name="slug">
         <UInput v-model="state.slug" class="w-full" size="xl" />
-      </UFormField>
-
-      <UFormField label="Description" name="description">
-        <UTextarea v-model="state.description" class="w-full" size="xl" />
       </UFormField>
 
       <UFormField label="EventType" name="eventType">
@@ -66,6 +58,17 @@
         <UInput v-model="state.metadata" class="w-full" size="xl" />
       </UFormField>
 
+      <!-- Translation fields -->
+      <CrudTranslationField
+        v-model="state.translations"
+        :fields="['name', 'description', 'terms', 'conditions']"
+        :default-values="{
+          name: state.name,
+          description: state.description
+        }"
+        label="Translations"
+      />
+
       <CrudButton
         :action="action"
         :collection="collection"
@@ -100,7 +103,8 @@ const state = reactive<PosEventFormData & { id?: string | null }>({
   isCurrent: false,
   archivedAt: null,
   parentEventId: 0,
-  metadata: ''
+  metadata: '',
+  translations: {}
 })
 
 // Compute what the initial values should be based on props

@@ -12,3 +12,4 @@ export { posEvents } from '../../../layers/pos/collections/events/server/databas
 export { posProducts } from '../../../layers/pos/collections/products/server/database/schema'
 export { posOrders } from '../../../layers/pos/collections/orders/server/database/schema'
 export { posLocations } from '../../../layers/pos/collections/locations/server/database/schema'
+export { posCategories } from '../../../layers/pos/collections/categories/server/database/schema'

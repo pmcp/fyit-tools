@@ -1,12 +1,20 @@
 // Generator for Form.vue component
 
-export function generateFormComponent(data) {
-  const { pascalCase, pascalCasePlural, layerPascalCase, fields, singular } = data
+export function generateFormComponent(data, config = {}) {
+  const { pascalCase, pascalCasePlural, layerPascalCase, fields, singular, plural } = data
   const prefixedPascalCase = `${layerPascalCase}${pascalCase}`
   const prefixedPascalCasePlural = `${layerPascalCase}${pascalCasePlural}`
+  
+  // Check for translations
+  const translatableFieldNames = config?.translations?.collections?.[plural] || []
+  const hasTranslations = translatableFieldNames.length > 0
+  
+  // Separate fields
+  const translatableFields = fields.filter(f => translatableFieldNames.includes(f.name))
+  const regularFields = fields.filter(f => f.name !== 'id' && !translatableFieldNames.includes(f.name))
 
-  // Filter out id field from form fields (it's handled separately)
-  const formFields = fields.filter(field => field.name !== 'id').map(field => {
+  // Generate form fields for regular (non-translatable) fields only
+  const formFields = regularFields.map(field => {
     const fieldName = field.name.charAt(0).toUpperCase() + field.name.slice(1)
     if (field.type === 'text') {
       return `      <UFormField label="${fieldName}" name="${field.name}">
@@ -30,6 +38,19 @@ export function generateFormComponent(data) {
       </UFormField>`
     }
   }).join('\n\n')
+  
+  // Add CrudTranslationField if there are translatable fields
+  const translationField = hasTranslations ? `
+
+      <!-- Translation fields -->
+      <CrudTranslationField
+        v-model="state.translations"
+        :fields="[${translatableFieldNames.map(f => `'${f}'`).join(', ')}]"
+        :default-values="{
+          ${translatableFields.map(f => `${f.name}: state.${f.name}`).join(',\n          ')}
+        }"
+        label="Translations"
+      />` : ''
 
   // Generate initial state fields with proper defaults (excluding id)
   const stateFields = fields.filter(field => field.name !== 'id').map(field => {
@@ -38,6 +59,9 @@ export function generateFormComponent(data) {
                       field.type === 'date' ? 'null' : "''";
     return `  ${field.name}: ${defaultVal}`
   }).join(',\n')
+  
+  // Add translations to state if needed
+  const translationsState = hasTranslations ? ',\n  translations: {}' : ''
 
   return `<template>
   <div v-if="loading === 'notLoading'">
@@ -59,7 +83,7 @@ export function generateFormComponent(data) {
       @submit="send(action, collection, state)"
       size="lg"
     >
-${formFields}
+${formFields}${translationField}
 
       <CrudButton
         :action="action"
@@ -84,7 +108,7 @@ const { defaultValue, schema } = use${prefixedPascalCasePlural}()
 // Create a reactive form state with proper typing
 const state = reactive<${prefixedPascalCase}FormData & { id?: string | null }>({
   id: null,
-${stateFields}
+${stateFields}${translationsState}
 })
 
 // Compute what the initial values should be based on props

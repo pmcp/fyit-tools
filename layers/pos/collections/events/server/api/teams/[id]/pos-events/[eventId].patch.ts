@@ -38,6 +38,7 @@ export default defineEventHandler(async (event) => {
     isCurrent: body.isCurrent,
     archivedAt: body.archivedAt,
     parentEventId: body.parentEventId,
-    metadata: body.metadata
+    metadata: body.metadata,
+    translations: body.translations
   })
 })

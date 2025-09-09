@@ -1,6 +1,6 @@
 // Generator for use[Collection].ts composable
 
-export function generateComposable(data) {
+export function generateComposable(data, config = {}) {
   const { singular, plural, pascalCase, pascalCasePlural, layerPascalCase, layer } = data
   const prefixedSingular = `${layerPascalCase.toLowerCase()}${pascalCase}`
   const prefixedPlural = `${layerPascalCase.toLowerCase()}${pascalCasePlural}`

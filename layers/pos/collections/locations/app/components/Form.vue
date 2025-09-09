@@ -22,14 +22,6 @@
         <UInput v-model.number="state.eventId" type="number" class="w-full" size="xl" />
       </UFormField>
 
-      <UFormField label="Name" name="name">
-        <UInput v-model="state.name" class="w-full" size="xl" />
-      </UFormField>
-
-      <UFormField label="Description" name="description">
-        <UTextarea v-model="state.description" class="w-full" size="xl" />
-      </UFormField>
-
       <UFormField label="IsActive" name="isActive">
         <UCheckbox v-model="state.isActive" />
       </UFormField>
@@ -41,6 +33,17 @@
       <UFormField label="MaxRetryAttempts" name="maxRetryAttempts">
         <UInput v-model.number="state.maxRetryAttempts" type="number" class="w-full" size="xl" />
       </UFormField>
+
+      <!-- Translation fields -->
+      <CrudTranslationField
+        v-model="state.translations"
+        :fields="['name', 'description']"
+        :default-values="{
+          name: state.name,
+          description: state.description
+        }"
+        label="Translations"
+      />
 
       <CrudButton
         :action="action"
@@ -70,7 +73,8 @@ const state = reactive<PosLocationFormData & { id?: string | null }>({
   description: '',
   isActive: false,
   printerMode: '',
-  maxRetryAttempts: 0
+  maxRetryAttempts: 0,
+  translations: {}
 })
 
 // Compute what the initial values should be based on props

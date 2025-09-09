@@ -22,42 +22,28 @@
         <UInput v-model.number="state.eventId" type="number" class="w-full" size="xl" />
       </UFormField>
 
-      <UFormField label="CategoryId" name="categoryId">
-        <UInput v-model.number="state.categoryId" type="number" class="w-full" size="xl" />
+      <UFormField label="Color" name="color">
+        <UInput v-model="state.color" class="w-full" size="xl" />
       </UFormField>
 
-      <UFormField label="LocationId" name="locationId">
-        <UInput v-model.number="state.locationId" type="number" class="w-full" size="xl" />
-      </UFormField>
-
-      <UFormField label="Price" name="price">
-        <UInput v-model.number="state.price" type="number" class="w-full" size="xl" />
-      </UFormField>
-
-      <UFormField label="IsActive" name="isActive">
-        <UCheckbox v-model="state.isActive" />
-      </UFormField>
-
-      <UFormField label="IsTemplate" name="isTemplate">
-        <UCheckbox v-model="state.isTemplate" />
-      </UFormField>
-
-      <UFormField label="RequiresRemark" name="requiresRemark">
-        <UCheckbox v-model="state.requiresRemark" />
+      <UFormField label="Icon" name="icon">
+        <UInput v-model="state.icon" class="w-full" size="xl" />
       </UFormField>
 
       <UFormField label="SortOrder" name="sortOrder">
         <UInput v-model.number="state.sortOrder" type="number" class="w-full" size="xl" />
       </UFormField>
 
+      <UFormField label="IsActive" name="isActive">
+        <UCheckbox v-model="state.isActive" />
+      </UFormField>
+
       <!-- Translation fields -->
       <CrudTranslationField
         v-model="state.translations"
-        :fields="['name', 'description', 'remarkPrompt']"
+        :fields="['name', 'description']"
         :default-values="{
-          name: state.name,
-          description: state.description,
-          remarkPrompt: state.remarkPrompt
+          name: state.name
         }"
         label="Translations"
       />
@@ -73,29 +59,24 @@
 </template>
 
 <script setup lang="ts">
-import type { PosProductFormProps, PosProductFormData } from '../../types'
+import type { PosCategorieFormProps, PosCategorieFormData } from '../../types'
 import { z } from 'zod'
 
 const { send } = useCrud()
 
-const props = defineProps<PosProductFormProps>()
+const props = defineProps<PosCategorieFormProps>()
 
-const { defaultValue, schema } = usePosProducts()
+const { defaultValue, schema } = usePosCategories()
 
 // Create a reactive form state with proper typing
-const state = reactive<PosProductFormData & { id?: string | null }>({
+const state = reactive<PosCategorieFormData & { id?: string | null }>({
   id: null,
   eventId: 0,
-  categoryId: 0,
-  locationId: 0,
   name: '',
-  description: '',
-  price: 0,
-  isActive: false,
-  isTemplate: false,
-  requiresRemark: false,
-  remarkPrompt: '',
+  color: '',
+  icon: '',
   sortOrder: 0,
+  isActive: false,
   translations: {}
 })
 

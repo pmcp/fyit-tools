@@ -13,10 +13,6 @@ export default defineNuxtConfig({
     ]
   },
   extends: [
-    './collections/events',
-    './collections/products',
-    './collections/orders',
-    './collections/locations',
-    './collections/categories'
+    './collections/products'
   ]
 })

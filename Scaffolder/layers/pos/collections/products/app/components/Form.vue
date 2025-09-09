@@ -30,6 +30,14 @@
         <UInput v-model.number="state.locationId" type="number" class="w-full" size="xl" />
       </UFormField>
 
+      <UFormField label="Name" name="name">
+        <UInput v-model="state.name" class="w-full" size="xl" />
+      </UFormField>
+
+      <UFormField label="Description" name="description">
+        <UTextarea v-model="state.description" class="w-full" size="xl" />
+      </UFormField>
+
       <UFormField label="Price" name="price">
         <UInput v-model.number="state.price" type="number" class="w-full" size="xl" />
       </UFormField>
@@ -46,21 +54,13 @@
         <UCheckbox v-model="state.requiresRemark" />
       </UFormField>
 
+      <UFormField label="RemarkPrompt" name="remarkPrompt">
+        <UTextarea v-model="state.remarkPrompt" class="w-full" size="xl" />
+      </UFormField>
+
       <UFormField label="SortOrder" name="sortOrder">
         <UInput v-model.number="state.sortOrder" type="number" class="w-full" size="xl" />
       </UFormField>
-
-      <!-- Translation fields -->
-      <CrudTranslationField
-        v-model="state.translations"
-        :fields="['name', 'description', 'remarkPrompt']"
-        :default-values="{
-          name: state.name,
-          description: state.description,
-          remarkPrompt: state.remarkPrompt
-        }"
-        label="Translations"
-      />
 
       <CrudButton
         :action="action"
@@ -95,8 +95,7 @@ const state = reactive<PosProductFormData & { id?: string | null }>({
   isTemplate: false,
   requiresRemark: false,
   remarkPrompt: '',
-  sortOrder: 0,
-  translations: {}
+  sortOrder: 0
 })
 
 // Compute what the initial values should be based on props
