@@ -15,9 +15,7 @@ export default defineNuxtConfig({
 
   extends: [
     './layers/crud',
-    './layers/typo',
-    './layers/test',
-    './layers/test3'
+    './layers/typo'
   ],
 
   devtools: { enabled: true },

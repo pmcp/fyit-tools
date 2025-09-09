@@ -1,15 +1,17 @@
 <template>
-  <div
-    v-if="!smallerThanLg"
-    class="relative hidden w-0 flex-col items-stretch overflow-hidden border-r border-neutral-200 bg-neutral-100 p-2 md:flex md:w-64 dark:border-neutral-900 dark:bg-black"
-  >
+  <!-- Desktop sidebar - always rendered but hidden on mobile via CSS -->
+  <div class="hidden lg:flex relative w-64 flex-col items-stretch overflow-hidden border-r border-neutral-200 bg-neutral-100 p-2 dark:border-neutral-900 dark:bg-black">
     <slot />
   </div>
+  
+  <!-- Mobile slideover - always rendered but only visible when open -->
   <USlideover
-    v-else
     v-model:open="model"
     side="left"
-    :ui="{ content: 'max-w-[75%] sm:max-w-[50%]' }"
+    :ui="{ 
+      content: 'max-w-[75%] sm:max-w-[50%]',
+      wrapper: 'lg:hidden' 
+    }"
   >
     <template #content>
       <div class="flex h-full flex-col p-2">
@@ -20,9 +22,5 @@
 </template>
 
 <script lang="ts" setup>
-import { useBreakpoints, breakpointsTailwind } from '@vueuse/core'
-
 const model = defineModel<boolean>({ required: true })
-const breakpoints = useBreakpoints(breakpointsTailwind)
-const smallerThanLg = breakpoints.smaller('lg')
 </script>

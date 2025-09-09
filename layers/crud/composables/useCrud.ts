@@ -147,12 +147,16 @@ export default function () {
     // Get test reference before async operations
     const collections = useCollections();
     const collectionRef = collections[collection as keyof typeof collections] as any;
+    
+    // Get the apiPath from config, fallback to collection name
+    const config = collections.getConfig(collection)
+    const apiPath = config?.apiPath || collection
 
     const optimisticItem = optimisticUpdate(action, collection, data)
 
     try {
       let res;
-      const baseUrl = `/api/teams/${currentTeam.value.id}/${collection}`
+      const baseUrl = `/api/teams/${currentTeam.value.id}/${apiPath}`
 
       // Use functional API helpers
       if (action === 'update') {
@@ -261,8 +265,13 @@ export default function () {
 
     if (actionIn === 'update') {
       try {
+        // Get the apiPath from config, fallback to collection name
+        const collections = useCollections()
+        const config = collections.getConfig(collection)
+        const apiPath = config?.apiPath || collection
+        
         // Use $fetch for API calls with proper error handling
-        const response = await $fetch(`/api/teams/${currentTeam.value.id}/${collection}/`, {
+        const response = await $fetch(`/api/teams/${currentTeam.value.id}/${apiPath}/`, {
           method: 'GET',
           query: { ids: ids.join(',') }
         });

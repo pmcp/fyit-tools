@@ -13,7 +13,9 @@
     "lint:fix": "eslint . --fix",
     "format": "eslint . --fix",
     "db:generate": "drizzle-kit generate",
-    "generate:collection": "node scripts/generate-collection.js"
+    "generate:collection": "node Scaffolder/legacy/generate-collection.js",
+    "delete:collection": "node Scaffolder/legacy/delete-collection.js",
+    "scaffold": "node Scaffolder/scripts/generate-collection.mjs --config Scaffolder/pos/config.js"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.45",

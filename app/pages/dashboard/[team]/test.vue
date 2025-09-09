@@ -1,6 +1,6 @@
 <template>
 
-  <WorksList />
+  <PosProductsList />
   <CrudContainer />
 </template>
 
