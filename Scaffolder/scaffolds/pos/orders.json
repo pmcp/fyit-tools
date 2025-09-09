@@ -1,0 +1,93 @@
+{
+  "eventId": {
+    "type": "number",
+    "meta": {
+      "required": true
+    }
+  },
+  "clientId": {
+    "type": "number"
+  },
+  "locationId": {
+    "type": "number"
+  },
+  "orderNumber": {
+    "type": "string",
+    "meta": {
+      "maxLength": 100
+    }
+  },
+  "status": {
+    "type": "string",
+    "meta": {
+      "maxLength": 50
+    }
+  },
+  "paymentMethod": {
+    "type": "string",
+    "meta": {
+      "maxLength": 50
+    }
+  },
+  "paymentStatus": {
+    "type": "string",
+    "meta": {
+      "maxLength": 50
+    }
+  },
+  "subtotal": {
+    "type": "decimal",
+    "meta": {
+      "precision": 10,
+      "scale": 2
+    }
+  },
+  "taxAmount": {
+    "type": "decimal",
+    "meta": {
+      "precision": 10,
+      "scale": 2
+    }
+  },
+  "discountAmount": {
+    "type": "decimal",
+    "meta": {
+      "precision": 10,
+      "scale": 2
+    }
+  },
+  "totalAmount": {
+    "type": "decimal",
+    "meta": {
+      "precision": 10,
+      "scale": 2
+    }
+  },
+  "notes": {
+    "type": "text"
+  },
+  "metadata": {
+    "type": "json"
+  },
+  "completedAt": {
+    "type": "date"
+  },
+  "eventOrderNumber": {
+    "type": "number"
+  },
+  "clientName": {
+    "type": "string",
+    "meta": {
+      "maxLength": 255
+    }
+  },
+  "waiterId": {
+    "type": "number"
+  },
+  "personnel": {
+    "type": "boolean"
+  },
+  "overallRemarks": {
+    "type": "text"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "eventId": {
+    "type": "number",
+    "meta": {
+      "required": true
+    }
+  },
+  "name": {
+    "type": "string",
+    "meta": {
+      "required": true,
+      "maxLength": 255
+    }
+  },
+  "ipAddress": {
+    "type": "string",
+    "meta": {
+      "maxLength": 100
+    }
+  },
+  "port": {
+    "type": "number"
+  },
+  "status": {
+    "type": "number"
+  },
+  "showPrices": {
+    "type": "boolean"
+  },
+  "locationId": {
+    "type": "number"
+  },
+  "priority": {
+    "type": "number"
+  },
+  "healthStatus": {
+    "type": "string",
+    "meta": {
+      "maxLength": 50
+    }
+  },
+  "lastSuccessAt": {
+    "type": "date"
+  },
+  "lastFailureAt": {
+    "type": "date"
+  },
+  "consecutiveFailures": {
+    "type": "number"
+  }
+}

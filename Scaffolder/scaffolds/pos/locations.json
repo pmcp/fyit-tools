@@ -1,0 +1,30 @@
+{
+  "eventId": {
+    "type": "number",
+    "meta": {
+      "required": true
+    }
+  },
+  "name": {
+    "type": "string",
+    "meta": {
+      "required": true,
+      "maxLength": 255
+    }
+  },
+  "description": {
+    "type": "text"
+  },
+  "isActive": {
+    "type": "boolean"
+  },
+  "printerMode": {
+    "type": "string",
+    "meta": {
+      "maxLength": 50
+    }
+  },
+  "maxRetryAttempts": {
+    "type": "number"
+  }
+}

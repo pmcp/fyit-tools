@@ -1,0 +1,46 @@
+{
+  "eventId": {
+    "type": "number",
+    "meta": {
+      "required": true
+    }
+  },
+  "categoryId": {
+    "type": "number"
+  },
+  "locationId": {
+    "type": "number"
+  },
+  "name": {
+    "type": "string",
+    "meta": {
+      "required": true,
+      "maxLength": 255
+    }
+  },
+  "description": {
+    "type": "text"
+  },
+  "price": {
+    "type": "decimal",
+    "meta": {
+      "precision": 10,
+      "scale": 2
+    }
+  },
+  "isActive": {
+    "type": "boolean"
+  },
+  "isTemplate": {
+    "type": "boolean"
+  },
+  "requiresRemark": {
+    "type": "boolean"
+  },
+  "remarkPrompt": {
+    "type": "text"
+  },
+  "sortOrder": {
+    "type": "number"
+  }
+}

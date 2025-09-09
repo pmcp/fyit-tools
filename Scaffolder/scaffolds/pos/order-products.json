@@ -1,0 +1,61 @@
+{
+  "orderId": {
+    "type": "number",
+    "meta": {
+      "required": true
+    }
+  },
+  "productId": {
+    "type": "number",
+    "meta": {
+      "required": true
+    }
+  },
+  "quantity": {
+    "type": "number",
+    "meta": {
+      "required": true
+    }
+  },
+  "unitPrice": {
+    "type": "decimal",
+    "meta": {
+      "precision": 10,
+      "scale": 2
+    }
+  },
+  "taxRate": {
+    "type": "decimal",
+    "meta": {
+      "precision": 5,
+      "scale": 2
+    }
+  },
+  "discountAmount": {
+    "type": "decimal",
+    "meta": {
+      "precision": 10,
+      "scale": 2
+    }
+  },
+  "totalAmount": {
+    "type": "decimal",
+    "meta": {
+      "precision": 10,
+      "scale": 2
+    }
+  },
+  "notes": {
+    "type": "text"
+  },
+  "totalPrice": {
+    "type": "decimal",
+    "meta": {
+      "precision": 10,
+      "scale": 2
+    }
+  },
+  "remarks": {
+    "type": "text"
+  }
+}

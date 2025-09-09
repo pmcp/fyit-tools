@@ -1,4 +1,5 @@
 // Generator for Drizzle schema
+import { toSnakeCase } from '../utils/helpers.mjs'
 
 export function generateSchema(data, dialect) {
   const { plural, layer, layerPascalCase } = data
@@ -64,9 +65,12 @@ import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core'`
     ? `  id: text('id').primaryKey().$default(() => nanoid())`
     : `  id: uuid('id').primaryKey().defaultRandom()`
 
+  // Convert table name to snake_case for database
+  const snakeCaseTableName = toSnakeCase(`${layer}_${plural}`)
+
   return `${imports}
 
-export const ${exportName} = ${tableFn}('${exportName}', {
+export const ${exportName} = ${tableFn}('${snakeCaseTableName}', {
 ${idField},
   teamId: text('teamId').notNull(),
   userId: text('userId').notNull(),

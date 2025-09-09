@@ -1,0 +1,17 @@
+{
+  "logType": {
+    "type": "string",
+    "meta": {
+      "maxLength": 100
+    }
+  },
+  "message": {
+    "type": "text"
+  },
+  "metadata": {
+    "type": "json"
+  },
+  "eventId": {
+    "type": "number"
+  }
+}

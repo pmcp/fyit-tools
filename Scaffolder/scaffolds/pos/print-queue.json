@@ -1,0 +1,57 @@
+{
+  "orderId": {
+    "type": "number",
+    "meta": {
+      "required": true
+    }
+  },
+  "locationId": {
+    "type": "number"
+  },
+  "printerId": {
+    "type": "number"
+  },
+  "status": {
+    "type": "string",
+    "meta": {
+      "maxLength": 50
+    }
+  },
+  "items": {
+    "type": "json"
+  },
+  "total": {
+    "type": "decimal",
+    "meta": {
+      "precision": 10,
+      "scale": 2
+    }
+  },
+  "printMode": {
+    "type": "string",
+    "meta": {
+      "maxLength": 50
+    }
+  },
+  "isDuplicateOf": {
+    "type": "number"
+  },
+  "startedAt": {
+    "type": "date"
+  },
+  "completedAt": {
+    "type": "date"
+  },
+  "errorMessage": {
+    "type": "text"
+  },
+  "retryCount": {
+    "type": "number"
+  },
+  "eventId": {
+    "type": "number"
+  },
+  "printData": {
+    "type": "text"
+  }
+}

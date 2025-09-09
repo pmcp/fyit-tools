@@ -1,0 +1,33 @@
+{
+  "eventId": {
+    "type": "number",
+    "meta": {
+      "required": true
+    }
+  },
+  "name": {
+    "type": "string",
+    "meta": {
+      "required": true,
+      "maxLength": 255
+    }
+  },
+  "email": {
+    "type": "string",
+    "meta": {
+      "maxLength": 255
+    }
+  },
+  "notes": {
+    "type": "text"
+  },
+  "active": {
+    "type": "boolean"
+  },
+  "description": {
+    "type": "text"
+  },
+  "isGlobal": {
+    "type": "boolean"
+  }
+}

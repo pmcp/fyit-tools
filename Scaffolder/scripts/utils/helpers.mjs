@@ -4,6 +4,14 @@ export function pascal(s) {
   return String(s).replace(/(^|[_\-\s]+)([a-z])/g, (_, __, c) => c.toUpperCase())
 }
 
+export function toSnakeCase(str) {
+  return str
+    .replace(/([A-Z])/g, '_$1')
+    .replace(/^_/, '')
+    .replace(/-/g, '_')
+    .toLowerCase()
+}
+
 export function toCase(str) {
   const singular = str.endsWith('s') && str.length > 1 ? str.slice(0, -1) : str
   const plural = str.endsWith('s') ? str : str + 's'

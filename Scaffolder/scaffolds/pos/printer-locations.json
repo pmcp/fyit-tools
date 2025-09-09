@@ -1,0 +1,14 @@
+{
+  "printerId": {
+    "type": "number",
+    "meta": {
+      "required": true
+    }
+  },
+  "locationId": {
+    "type": "number",
+    "meta": {
+      "required": true
+    }
+  }
+}
