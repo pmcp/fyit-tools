@@ -2,6 +2,27 @@ export default {
   // Database dialect: 'pg' or 'sqlite'
   dialect: 'sqlite',
 
+  // i18n configuration
+  i18n: {
+    locales: ['en', 'nl', 'fr'], // Priority languages
+    defaultLocale: 'en',
+    fallbackLocale: 'en'
+  },
+
+  // Translation configuration
+  translations: {
+    // Collections that need translations
+    collections: {
+      products: ['name', 'description', 'remarkPrompt'],
+      categories: ['name', 'description'],
+      locations: ['name', 'description'],
+      events: ['name', 'description', 'terms', 'conditions'],
+      systemLogs: ['message', 'errorDescription', 'resolution'],
+      clients: ['notes', 'description'],
+      printers: ['name', 'statusMessage']
+    }
+  },
+
   // Collections to generate
   collections: [
     {
