@@ -96,13 +96,14 @@ const translationStatus = computed(() => {
   <div class="space-y-4">
     <!-- Language selector with status indicators -->
     <div class="flex items-center justify-between">
-      <UFieldGroup>
+      <UFieldGroup class="w-full">
         <UButton
           v-for="loc in locales"
           :key="typeof loc === 'string' ? loc : loc.code"
           :variant="editingLocale === (typeof loc === 'string' ? loc : loc.code) ? 'solid' : 'outline'"
           @click="editingLocale = typeof loc === 'string' ? loc : loc.code"
           size="sm"
+          class="w-full"
         >
           <span class="flex items-center gap-2">
             {{ (typeof loc === 'string' ? loc : loc.code).toUpperCase() }}
@@ -115,10 +116,6 @@ const translationStatus = computed(() => {
         </UButton>
       </UFieldGroup>
 
-      <USwitch
-        v-model="showAllLanguages"
-        label="Show all languages"
-      />
     </div>
 
     <!-- Single language edit mode -->
@@ -133,6 +130,7 @@ const translationStatus = computed(() => {
             :model-value="currentValues[field] || ''"
             @update:model-value="updateField(field, $event)"
             :placeholder="editingLocale !== 'en' ? defaultValues?.[field] || '' : ''"
+            class="w-full"
           />
           <UTextarea
             v-else
@@ -180,22 +178,22 @@ const translationStatus = computed(() => {
     </div>
 
     <!-- Quick actions -->
-    <div class="flex gap-2 pt-2 border-t">
-      <UButton
-        size="xs"
-        variant="ghost"
-        @click="copyToOtherLanguages"
-      >
-        Copy EN to all
-      </UButton>
-      <UButton
-        size="xs"
-        variant="ghost"
-        @click="clearLanguage(editingLocale)"
-        :disabled="editingLocale === 'en'"
-      >
-        Clear {{ editingLocale.toUpperCase() }}
-      </UButton>
-    </div>
+<!--    <div class="flex gap-2 pt-2 border-t">-->
+<!--      <UButton-->
+<!--        size="xs"-->
+<!--        variant="ghost"-->
+<!--        @click="copyToOtherLanguages"-->
+<!--      >-->
+<!--        Copy EN to all-->
+<!--      </UButton>-->
+<!--      <UButton-->
+<!--        size="xs"-->
+<!--        variant="ghost"-->
+<!--        @click="clearLanguage(editingLocale)"-->
+<!--        :disabled="editingLocale === 'en'"-->
+<!--      >-->
+<!--        Clear {{ editingLocale.toUpperCase() }}-->
+<!--      </UButton>-->
+<!--    </div>-->
   </div>
 </template>

@@ -18,6 +18,20 @@
       @submit="send(action, collection, state)"
       size="lg"
     >
+
+      <!-- Translation fields -->
+      <CrudTranslationField
+          v-model="state.translations"
+          :fields="['name', 'description', 'remarkPrompt']"
+          :default-values="{
+          name: state.name,
+          description: state.description,
+          remarkPrompt: state.remarkPrompt
+        }"
+          @update:english="(data) => { state[data.field] = data.value }"
+          label="Translations"
+      />
+
       <UFormField label="EventId" name="eventId">
         <UInput v-model.number="state.eventId" type="number" class="w-full" size="xl" />
       </UFormField>
@@ -50,18 +64,7 @@
         <UInput v-model.number="state.sortOrder" type="number" class="w-full" size="xl" />
       </UFormField>
 
-      <!-- Translation fields -->
-      <CrudTranslationField
-        v-model="state.translations"
-        :fields="['name', 'description', 'remarkPrompt']"
-        :default-values="{
-          name: state.name,
-          description: state.description,
-          remarkPrompt: state.remarkPrompt
-        }"
-        @update:english="(data) => { state[data.field] = data.value }"
-        label="Translations"
-      />
+
 
       <CrudButton
         :action="action"
