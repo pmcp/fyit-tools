@@ -315,7 +315,7 @@ export default defineNuxtConfig({
   }
 }
 
-async function writeScaffold({ layer, collection, fields, dialect, autoRelations, dryRun, noDb, force = false }) {
+async function writeScaffold({ layer, collection, fields, dialect, autoRelations, dryRun, noDb, force = false, config = null }) {
   const cases = toCase(collection)
   const base = path.resolve('layers', layer, 'collections', cases.plural)
   
@@ -417,7 +417,7 @@ async function writeScaffold({ layer, collection, fields, dialect, autoRelations
     },
     { 
       path: path.join(base, 'server', 'database', 'schema.ts'),
-      content: generateSchema(data, dialect)
+      content: generateSchema(data, dialect, config)
     },
     { 
       path: path.join(base, 'types.ts'),
@@ -499,7 +499,8 @@ async function main() {
               autoRelations: config.flags?.autoRelations || false,
               dryRun: false,
               noDb: config.flags?.noDb || false,
-              force: config.flags?.force || false
+              force: config.flags?.force || false,
+              config: config
             })
           }
         }
@@ -519,7 +520,8 @@ async function main() {
               autoRelations: config.flags?.autoRelations || false,
               dryRun: false,
               noDb: config.flags?.noDb || false,
-              force: config.flags?.force || false
+              force: config.flags?.force || false,
+              config: config
             })
           }
         }

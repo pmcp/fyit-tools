@@ -27,47 +27,47 @@ export default {
   collections: [
     {
       name: 'events',
-      fieldsFile: 'Scaffolder/pos/events.json'
+      fieldsFile: 'Scaffolder/scaffolds/pos/events.json'
     },
     {
       name: 'products',
-      fieldsFile: 'Scaffolder/pos/products.json'
+      fieldsFile: 'Scaffolder/scaffolds/pos/products.json'
     },
     {
       name: 'orders',
-      fieldsFile: 'Scaffolder/pos/orders.json'
+      fieldsFile: 'Scaffolder/scaffolds/pos/orders.json'
     },
     {
       name: 'locations',
-      fieldsFile: 'Scaffolder/pos/locations.json'
+      fieldsFile: 'Scaffolder/scaffolds/pos/locations.json'
     },
     {
       name: 'categories',
-      fieldsFile: 'Scaffolder/pos/categories.json'
+      fieldsFile: 'Scaffolder/scaffolds/pos/categories.json'
     },
     {
       name: 'clients',
-      fieldsFile: 'Scaffolder/pos/clients.json'
+      fieldsFile: 'Scaffolder/scaffolds/pos/clients.json'
     },
     {
       name: 'orderProducts',
-      fieldsFile: 'Scaffolder/pos/order-products.json'
+      fieldsFile: 'Scaffolder/scaffolds/pos/order-products.json'
     },
     {
       name: 'printers',
-      fieldsFile: 'Scaffolder/pos/printers.json'
+      fieldsFile: 'Scaffolder/scaffolds/pos/printers.json'
     },
     {
       name: 'printQueue',
-      fieldsFile: 'Scaffolder/pos/print-queue.json'
+      fieldsFile: 'Scaffolder/scaffolds/pos/print-queue.json'
     },
     {
       name: 'printerLocations',
-      fieldsFile: 'Scaffolder/pos/printer-locations.json'
+      fieldsFile: 'Scaffolder/scaffolds/pos/printer-locations.json'
     },
     {
       name: 'systemLogs',
-      fieldsFile: 'Scaffolder/pos/system-logs.json'
+      fieldsFile: 'Scaffolder/scaffolds/pos/system-logs.json'
     }
   ],
 

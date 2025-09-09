@@ -1,8 +1,8 @@
 // Generator for Drizzle schema
 import { toSnakeCase } from '../utils/helpers.mjs'
 
-export function generateSchema(data, dialect) {
-  const { plural, layer, layerPascalCase } = data
+export function generateSchema(data, dialect, config = null) {
+  const { plural, layer, layerPascalCase, singular } = data
   // Use layer-prefixed name for the export to avoid conflicts
   // Convert layer to camelCase to ensure valid JavaScript identifier
   const layerCamelCase = layer
@@ -10,6 +10,23 @@ export function generateSchema(data, dialect) {
     .map((part, index) => index === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1))
     .join('')
   const exportName = `${layerCamelCase}${plural.charAt(0).toUpperCase() + plural.slice(1)}`
+  
+  // Check if this collection needs translations
+  const needsTranslations = config?.translations?.collections?.[plural] || config?.translations?.collections?.[singular]
+  const translatableFields = needsTranslations || []
+  
+  // Build translations field if needed
+  let translationsField = ''
+  let translationsImport = ''
+  let translationsComment = ''
+  
+  if (needsTranslations && dialect === 'sqlite') {
+    // Build TypeScript type for translations
+    const typeFields = translatableFields.map(f => `      ${f}?: string`).join('\n')
+    translationsField = `,\n  // Note: No indexes on translations - measure performance first\n  // Add indexes only if queries exceed 50ms with real data\n  translations: text('translations', { mode: 'json' }).$type<{\n    [locale: string]: {\n${typeFields}\n    }\n  }>()`
+    
+    translationsComment = `\n// Note: This collection has translatable fields: ${translatableFields.join(', ')}\n// Translations are stored in a JSON field without indexes for performance baseline`
+  }
   
   const schemaFields = data.fields
     .filter(field => field.name !== 'id') // Filter out id field to avoid duplicates
@@ -68,13 +85,13 @@ import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core'`
   // Convert table name to snake_case for database
   const snakeCaseTableName = toSnakeCase(`${layer}_${plural}`)
 
-  return `${imports}
+  return `${imports}${translationsComment}
 
 export const ${exportName} = ${tableFn}('${snakeCaseTableName}', {
 ${idField},
   teamId: text('teamId').notNull(),
   userId: text('userId').notNull(),
-${schemaFields},
+${schemaFields}${translationsField},
   createdAt: ${dialect === 'sqlite' ? "integer('createdAt', { mode: 'timestamp' })" : "timestamp('createdAt', { withTimezone: true })"}.notNull().$default(() => new Date()),
   updatedAt: ${dialect === 'sqlite' ? "integer('updatedAt', { mode: 'timestamp' })" : "timestamp('updatedAt', { withTimezone: true })"}.notNull().$onUpdate(() => new Date())
 })`
