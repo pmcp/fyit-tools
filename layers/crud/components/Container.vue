@@ -1,169 +1,126 @@
 <!-- Container.vue -->
 <template>
-  <component
-    :is="modalComponent"
-    v-model:open="localOpen"
-    v-bind="modalProps"
+  <!-- Render a slideover for each crud state -->
+  <USlideover
+    v-for="(state, index) in crudStates"
+    :key="state.id"
+    v-model:open="state.isOpen"
+    :side="'right'"
+    :style="{ 
+      zIndex: 40 + (index * 10),
+      top: `${index * 40}px`,
+      height: `calc(100vh - ${index * 40}px)`
+    }"
+    :class="`crud-slideover-level-${index}`"
+    @update:open="(val) => handleSlideoverClose(state.id, val)"
   >
     <template #header>
       <div class="flex items-center justify-between w-full">
-        <TypoH2>
-          <span class="capitalize">{{ action }}</span> {{ cat }}
-        </TypoH2>
+        <div class="flex items-center gap-2">
+          <span v-if="index > 0" class="text-xs text-gray-500">
+            Level {{ index + 1 }}
+          </span>
+          <TypoH2>
+            <span class="capitalize">{{ state.action }}</span> 
+            {{ getCollectionName(state.collection) }}
+          </TypoH2>
+        </div>
         <UButton
           icon="i-heroicons-x-mark"
           variant="ghost"
           color="gray"
           size="xs"
-          @click.stop="close()"/>
+          @click.stop="close(state.id)"
+        />
       </div>
     </template>
     <template #body>
-      <div v-if="localOpen && activeCollection" class="w-full h-full">
-        <CrudLoading v-if="loading !== 'notLoading'" class="h-full w-full"/>
+      <div v-if="state.isOpen && state.collection" class="w-full h-full">
+        <CrudLoading v-if="state.loading !== 'notLoading'" class="h-full w-full"/>
         <div v-else>
           <CrudDynamicFormLoader
-            :key="`${activeCollection}-${action}-${activeItem?.id || 'new'}`"
-            :collection="activeCollection"
-            :loading="loading"
-            :action="action"
-            :items="items"
-            :activeItem="activeItem"
+            :key="`${state.collection}-${state.action}-${state.activeItem?.id || 'new'}-${state.id}`"
+            :collection="state.collection"
+            :loading="state.loading"
+            :action="state.action"
+            :items="state.items"
+            :activeItem="state.activeItem"
           />
         </div>
       </div>
     </template>
-  </component>
+  </USlideover>
 </template>
 
 <script setup lang="ts">
-import { USlideover, UModal } from '#components'
-import type { Component, Ref, ComputedRef } from 'vue'
+import { USlideover } from '#components'
+import type { Ref } from 'vue'
 
-// Type collections
+// Type definitions
 type CrudAction = 'create' | 'update' | 'delete' | null
 type LoadingState = 'notLoading' | 'create_send' | 'update_send' | 'delete_send' | 'create_open' | 'update_open' | 'delete_open'
-type ModalComponent = 'USlideover' | 'UModal'
 
-interface ModalConfig {
-  component: ModalComponent
-  props: Record<string, any>
-}
-
-interface CrudItem {
-  id?: string | number
-  optimisticId?: string
-  optimisticAction?: CrudAction
-  [key: string]: any
+interface CrudState {
+  id: string
+  action: CrudAction
+  collection: string | null
+  activeItem: any
+  items: any[]
+  loading: LoadingState
+  isOpen: boolean
 }
 
 interface CrudComposableReturn {
-  showCrud: Ref<boolean>
-  items: Ref<CrudItem[]>
-  activeItem: Ref<CrudItem>
-  activeCollection: Ref<string | null>
-  close: () => void
-  loading: Ref<LoadingState>
-  action: Ref<CrudAction>
+  crudStates: Ref<CrudState[]>
+  close: (stateId?: string) => void
+  closeAll: () => void
 }
 
 interface FormatCollectionsReturn {
   collectionWithCapitalSingular: (collection: string) => string
-  collectionWithCapital: (collection: string) => string
 }
 
-interface ComposableWithModalConfig {
-  modalConfig?: ModalConfig
-  [key: string]: any
-}
-
-type ComposableFunction = () => ComposableWithModalConfig
-
-// Use the typed composables - add crudStack
-const { showCrud, items, activeItem, activeCollection, close, loading, action, crudStack }: CrudComposableReturn & { crudStack: Ref<any[]> } = useCrud()
+// Use the composables
+const { crudStates, close, closeAll }: CrudComposableReturn = useCrud()
 const { collectionWithCapitalSingular }: FormatCollectionsReturn = useFormatCollections()
 
-// Local open state that mirrors showCrud
-const localOpen = computed<boolean>({
-  get: () => showCrud.value,
-  set: (value: boolean) => {
-    if (!value) {
-      close()
-    }
-  }
-})
-
-const cat = computed<string>(() =>
-  activeCollection.value
-    ? collectionWithCapitalSingular(activeCollection.value)
-    : ''
-)
-
-// Component map for modal types
-const componentMap: Record<ModalComponent, Component> = {
-  'USlideover': USlideover,
-  'UModal': UModal
+// Get formatted collection name
+const getCollectionName = (collection: string | null): string => {
+  return collection ? collectionWithCapitalSingular(collection) : ''
 }
 
-// Default modal configuration
-const DEFAULT_MODAL_CONFIG: ModalConfig = {
-  component: 'USlideover',
-  props: {}
+// Handle slideover close event
+const handleSlideoverClose = (stateId: string, isOpen: boolean): void => {
+  if (!isOpen) {
+    close(stateId)
+  }
 }
 
-// Dynamic modal configuration
-const modalConfig = ref<ModalConfig>({ ...DEFAULT_MODAL_CONFIG })
-
-// Check if this is a nested operation
-const isNested = computed(() => crudStack.value.length > 0)
-
-const modalComponent = computed<Component>(() => {
-  // Always use slideover - we'll control the side with props
-  return componentMap[modalConfig.value.component] || USlideover
-})
-
-const modalProps = computed<Record<string, any>>(() => {
-  // If nested, slide from left instead of default right
-  if (isNested.value) {
-    return {
-      ...modalConfig.value.props,
-      side: 'right'
-    }
-  }
-  return modalConfig.value.props || {}
-})
-
-// Function to load modal configuration for a collection
-const loadModalConfig = (collection: string | null): ModalConfig => {
-  if (!collection) return DEFAULT_MODAL_CONFIG
-
-  // Get the collection config from useCollections
-  const collections = useCollections()
-  const config = collections.getConfig(collection)
-
-  // Use modal config from collection if defined, otherwise use default
-  if (config?.modalConfig) {
-    return config.modalConfig
-  }
-
-  return DEFAULT_MODAL_CONFIG
-}
-
-// Watch showCrud to set modal configuration
-watch(showCrud, (newValue: boolean) => {
-  if (newValue && activeCollection.value) {
-    modalConfig.value = loadModalConfig(activeCollection.value)
-  } else {
-    modalConfig.value = { ...DEFAULT_MODAL_CONFIG }
-  }
-})
-
-// Clean up on unmount to prevent stale state issues
+// Clean up on unmount
 onBeforeUnmount(() => {
-  if (showCrud.value) {
-    close()
-  }
-  // Reset all state
-  modalConfig.value = { ...DEFAULT_MODAL_CONFIG }
+  closeAll()
 })
 </script>
+
+<style scoped>
+/* Optional: Add custom styles for different levels */
+.crud-slideover-level-0 {
+  /* First level styling */
+}
+
+.crud-slideover-level-1 {
+  /* Second level styling */
+}
+
+.crud-slideover-level-2 {
+  /* Third level styling */
+}
+
+.crud-slideover-level-3 {
+  /* Fourth level styling */
+}
+
+.crud-slideover-level-4 {
+  /* Fifth level styling */
+}
+</style>

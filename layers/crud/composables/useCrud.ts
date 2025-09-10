@@ -28,16 +28,17 @@ export default function () {
   })
 
 
-  // useState
-  const showCrud = useState('showCrud', () => false)
-  const loading = useState('loading', () => 'notLoading')
-  const action = useState('action', () => null)
-  const activeCollection = useState('activeCollection', () => null)
-  const items = useState('items', () => [])
-  const activeItem = useState('activeItem', () => {})
+  // useState - now using array of states for multiple slideovers
+  const crudStates = useState('crudStates', () => [])
+  const MAX_DEPTH = 5 // Maximum nesting depth
   
-  // Stack for nested crud operations
-  const crudStack = useState('crudStack', () => [])
+  // Computed values for backward compatibility
+  const showCrud = computed(() => crudStates.value.length > 0)
+  const loading = computed(() => crudStates.value[crudStates.value.length - 1]?.loading || 'notLoading')
+  const action = computed(() => crudStates.value[crudStates.value.length - 1]?.action || null)
+  const activeCollection = computed(() => crudStates.value[crudStates.value.length - 1]?.collection || null)
+  const items = computed(() => crudStates.value[crudStates.value.length - 1]?.items || [])
+  const activeItem = computed(() => crudStates.value[crudStates.value.length - 1]?.activeItem || {})
 
   // Simple vars - removed unused actions object
 
@@ -145,8 +146,13 @@ export default function () {
 
   async function send(action: string, collection: string, data: any): Promise<any> {
     if(useCrudError().foundErrors()) return;
-    loading.value = `${action}_send`
-
+    
+    // Find the state that initiated this send
+    const currentState = crudStates.value[crudStates.value.length - 1]
+    if (!currentState) return;
+    
+    currentState.loading = `${action}_send`
+    
     // Get test reference before async operations
     const collections = useCollections();
     const collectionRef = collections[collection as keyof typeof collections] as any;
@@ -216,8 +222,8 @@ export default function () {
 
       }
 
-      // Close after successful operation
-      close()
+      // Close the current state after successful operation
+      close(currentState?.id)
 
       // Return the response for the caller to use
       return res
@@ -252,7 +258,9 @@ export default function () {
       }
 
       // Keep the modal open on error so user can retry
-      loading.value = 'notLoading'
+      if (currentState) {
+        currentState.loading = 'notLoading'
+      }
 
     }
   }
@@ -260,23 +268,31 @@ export default function () {
   const open = async (actionIn: string, collection: string, ids: string[]): Promise<void> => {
     if(useCrudError().foundErrors()) return;
 
-    // Check if we're already in a crud operation (nested scenario)
-    if (showCrud.value) {
-      // Save current state to stack
-      crudStack.value.push({
-        action: action.value,
-        activeCollection: activeCollection.value,
-        activeItem: { ...activeItem.value },
-        items: [...items.value],
-        loading: loading.value
+    // Check if we've reached maximum depth
+    if (crudStates.value.length >= MAX_DEPTH) {
+      const toast = useToast()
+      toast.add({
+        title: 'Maximum depth reached',
+        description: 'Cannot open more than 5 nested forms',
+        icon: 'i-lucide-octagon-alert',
+        color: 'primary'
       })
+      return;
     }
 
-    action.value = actionIn
-    activeCollection.value = collection
+    // Create new state object
+    const newState = {
+      id: `crud-${Date.now()}-${Math.random()}`, // Unique ID for Vue key
+      action: actionIn,
+      collection: collection,
+      activeItem: {},
+      items: [],
+      loading: `${actionIn}_open` as any,
+      isOpen: true
+    }
 
-    loading.value = `${actionIn}_open`
-    showCrud.value = true
+    // Add new state to array
+    crudStates.value.push(newState)
 
     if (actionIn === 'update') {
       try {
@@ -291,8 +307,8 @@ export default function () {
           query: { ids: ids.join(',') }
         });
 
-        // For update, we expect a single item - store it in activeItem
-        activeItem.value = Array.isArray(response) ? response[0] : response
+        // For update, we expect a single item - store it in the state
+        newState.activeItem = Array.isArray(response) ? response[0] : response
       } catch (error) {
         toast.add({
           title: 'Uh oh! Something went wrong.',
@@ -300,65 +316,50 @@ export default function () {
           icon: 'i-lucide-octagon-alert',
           color: 'primary'
         })
-        close();
+        // Remove the state we just added
+        crudStates.value.pop();
         return;
       }
     }
 
     if(actionIn === 'create') {
       // For create, start with empty activeItem
-      activeItem.value = {}
+      newState.activeItem = {}
     }
 
     if(actionIn === 'delete') {
       // For delete, store IDs in items array
-      items.value = ids
+      newState.items = ids
     }
 
-    loading.value = 'notLoading'
+    newState.loading = 'notLoading'
   }
 
 
 
 
 
-  const close = (): void => {
-    // Check if we have a previous state in the stack
-    if (crudStack.value.length > 0) {
-      // Pop the previous state from stack
-      const previousState = crudStack.value.pop()
-      
-      // Restore the previous state
-      action.value = previousState.action
-      activeCollection.value = previousState.activeCollection
-      activeItem.value = previousState.activeItem
-      items.value = previousState.items
-      loading.value = previousState.loading
-      
-      // Keep showCrud as true since we're returning to previous operation
-      showCrud.value = true
+  const close = (stateId?: string): void => {
+    if (stateId) {
+      // Close specific state by ID
+      const index = crudStates.value.findIndex(s => s.id === stateId)
+      if (index !== -1) {
+        crudStates.value.splice(index, 1)
+      }
     } else {
-      // No stack - normal close behavior
-      // Set showCrud first - this is the single source of truth
-      showCrud.value = false
-      // Then reset all other state
-      loading.value = 'notLoading'
-      items.value = []
-      action.value = null
-      activeCollection.value = null
-      activeItem.value = {}
+      // Close the topmost state (backward compatibility)
+      crudStates.value.pop()
     }
+  }
+  
+  // New function to close all states
+  const closeAll = (): void => {
+    crudStates.value = []
   }
 
   // Reset function for navigation scenarios
   const reset = (): void => {
-    showCrud.value = false
-    loading.value = 'notLoading'
-    items.value = []
-    action.value = null
-    activeCollection.value = null
-    activeItem.value = {}
-    crudStack.value = []
+    crudStates.value = []
   }
 
   return {
@@ -369,10 +370,11 @@ export default function () {
     items,
     activeItem,
     activeCollection,
-    crudStack,
+    crudStates,
     send,
     open,
     close,
+    closeAll,
     reset,
     getCollection
   }
