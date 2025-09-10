@@ -79,8 +79,8 @@ interface ComposableWithModalConfig {
 
 type ComposableFunction = () => ComposableWithModalConfig
 
-// Use the typed composables
-const { showCrud, items, activeItem, activeCollection, close, loading, action }: CrudComposableReturn = useCrud()
+// Use the typed composables - add crudStack
+const { showCrud, items, activeItem, activeCollection, close, loading, action, crudStack }: CrudComposableReturn & { crudStack: Ref<any[]> } = useCrud()
 const { collectionWithCapitalSingular }: FormatCollectionsReturn = useFormatCollections()
 
 // Local open state that mirrors showCrud
@@ -114,11 +114,22 @@ const DEFAULT_MODAL_CONFIG: ModalConfig = {
 // Dynamic modal configuration
 const modalConfig = ref<ModalConfig>({ ...DEFAULT_MODAL_CONFIG })
 
+// Check if this is a nested operation
+const isNested = computed(() => crudStack.value.length > 0)
+
 const modalComponent = computed<Component>(() => {
+  // Always use slideover - we'll control the side with props
   return componentMap[modalConfig.value.component] || USlideover
 })
 
 const modalProps = computed<Record<string, any>>(() => {
+  // If nested, slide from left instead of default right
+  if (isNested.value) {
+    return {
+      ...modalConfig.value.props,
+      side: 'right'
+    }
+  }
   return modalConfig.value.props || {}
 })
 

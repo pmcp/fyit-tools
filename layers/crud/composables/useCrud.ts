@@ -35,6 +35,9 @@ export default function () {
   const activeCollection = useState('activeCollection', () => null)
   const items = useState('items', () => [])
   const activeItem = useState('activeItem', () => {})
+  
+  // Stack for nested crud operations
+  const crudStack = useState('crudStack', () => [])
 
   // Simple vars - removed unused actions object
 
@@ -257,6 +260,18 @@ export default function () {
   const open = async (actionIn: string, collection: string, ids: string[]): Promise<void> => {
     if(useCrudError().foundErrors()) return;
 
+    // Check if we're already in a crud operation (nested scenario)
+    if (showCrud.value) {
+      // Save current state to stack
+      crudStack.value.push({
+        action: action.value,
+        activeCollection: activeCollection.value,
+        activeItem: { ...activeItem.value },
+        items: [...items.value],
+        loading: loading.value
+      })
+    }
+
     action.value = actionIn
     activeCollection.value = collection
 
@@ -308,14 +323,31 @@ export default function () {
 
 
   const close = (): void => {
-    // Set showCrud first - this is the single source of truth
-    showCrud.value = false
-    // Then reset all other state
-    loading.value = 'notLoading'
-    items.value = []
-    action.value = null
-    activeCollection.value = null
-    activeItem.value = {}
+    // Check if we have a previous state in the stack
+    if (crudStack.value.length > 0) {
+      // Pop the previous state from stack
+      const previousState = crudStack.value.pop()
+      
+      // Restore the previous state
+      action.value = previousState.action
+      activeCollection.value = previousState.activeCollection
+      activeItem.value = previousState.activeItem
+      items.value = previousState.items
+      loading.value = previousState.loading
+      
+      // Keep showCrud as true since we're returning to previous operation
+      showCrud.value = true
+    } else {
+      // No stack - normal close behavior
+      // Set showCrud first - this is the single source of truth
+      showCrud.value = false
+      // Then reset all other state
+      loading.value = 'notLoading'
+      items.value = []
+      action.value = null
+      activeCollection.value = null
+      activeItem.value = {}
+    }
   }
 
   // Reset function for navigation scenarios
@@ -326,6 +358,7 @@ export default function () {
     action.value = null
     activeCollection.value = null
     activeItem.value = {}
+    crudStack.value = []
   }
 
   return {
@@ -336,6 +369,7 @@ export default function () {
     items,
     activeItem,
     activeCollection,
+    crudStack,
     send,
     open,
     close,
