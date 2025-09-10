@@ -1,7 +1,7 @@
 export default function () {
   // Known layer prefixes - add more as needed
   const layerPrefixes = ['shop', 'yassss', 'thisone', 'test']
-  
+
   // Strip layer prefix from collection name
   const stripLayerPrefix = (val: string): string => {
     // Find and remove layer prefix
@@ -15,7 +15,7 @@ export default function () {
     }
     return val
   }
-  
+
   // Convert camelCase to Title Case with spaces
   const camelToTitleCase = (val: string): string => {
     // Insert space before capital letters and capitalize first letter
@@ -27,14 +27,14 @@ export default function () {
     const stripped = stripLayerPrefix(val)
     return camelToTitleCase(stripped)
   }
-  
+
   const collectionWithCapitalSingular = (val: string): string => {
     const stripped = stripLayerPrefix(val)
     // Remove trailing 's' for singular (simple pluralization)
-    const singular = stripped.endsWith('es') 
-      ? stripped.slice(0, -2) 
-      : stripped.endsWith('s') 
-        ? stripped.slice(0, -1) 
+    const singular = stripped.endsWith('es')
+      ? stripped.slice(0, -2)
+      : stripped.endsWith('s')
+        ? stripped.slice(0, -1)
         : stripped
     return camelToTitleCase(singular)
   }

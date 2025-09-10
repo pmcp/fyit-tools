@@ -32,16 +32,34 @@
           label="Translations"
       />
 
-      <UFormField label="EventId" name="eventId">
-        <UInput v-model.number="state.eventId" type="number" class="w-full" size="xl" />
+      <UFormField label="Event" name="eventId">
+        <CrudEntitySelect
+          v-model="state.eventId"
+          label="Event"
+          entity-type="event"
+          collection="posEvents"
+          api-path="pos-events"
+        />
       </UFormField>
 
-      <UFormField label="CategoryId" name="categoryId">
-        <UInput v-model.number="state.categoryId" type="number" class="w-full" size="xl" />
+      <UFormField label="Category" name="categoryId">
+        <CrudEntitySelect
+          v-model="state.categoryId"
+          label="Category"
+          entity-type="category"
+          collection="posCategories"
+          api-path="pos-categories"
+        />
       </UFormField>
 
-      <UFormField label="LocationId" name="locationId">
-        <UInput v-model.number="state.locationId" type="number" class="w-full" size="xl" />
+      <UFormField label="Location" name="locationId">
+        <CrudEntitySelect
+          v-model="state.locationId"
+          label="Location"
+          entity-type="location"
+          collection="posLocations"
+          api-path="pos-locations"
+        />
       </UFormField>
 
       <UFormField label="Price" name="price">

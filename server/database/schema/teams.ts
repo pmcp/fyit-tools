@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid'
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, text, integer, unique } from 'drizzle-orm/sqlite-core'
 import { users } from './users'
 import { subscriptions } from './subscriptions'
 import { relations } from 'drizzle-orm'
@@ -59,6 +59,48 @@ export const teamInvites = sqliteTable('team_invites', {
     () => new Date(),
   ),
 })
+
+export const teamSettings = sqliteTable('team_settings', {
+  id: text('id')
+    .primaryKey()
+    .$default(() => nanoid()),
+  teamId: text('team_id')
+    .notNull()
+    .unique()
+    .references(() => teams.id, { onDelete: 'cascade' }),
+  translations: text('translations', { mode: 'json' }).$type<{
+    [locale: string]: {
+      [key: string]: string
+    }
+  }>(),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$default(
+    () => new Date(),
+  ),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$onUpdate(
+    () => new Date(),
+  ),
+})
+
+export const emailTemplates = sqliteTable('email_templates', {
+  id: text('id')
+    .primaryKey()
+    .$default(() => nanoid()),
+  teamId: text('team_id')
+    .notNull()
+    .references(() => teams.id, { onDelete: 'cascade' }),
+  type: text('type').notNull(), // 'order_confirmation', 'invoice', 'password_reset', etc.
+  translations: text('translations', { mode: 'json' }).$type<{
+    [locale: string]: {
+      subject: string
+      body: string
+    }
+  }>(),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$onUpdate(
+    () => new Date(),
+  ),
+}, (table) => ({
+  uniqueTeamType: unique().on(table.teamId, table.type)
+}))
 
 export const teamsRelations = relations(teams, ({ many, one }) => ({
   members: many(teamMembers),

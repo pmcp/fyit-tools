@@ -1,0 +1,1 @@
+I think claude added the server/utils/emails folder when we implemented translations, and I don't know if we need this. Or how it fits in the flow. There is already email stuff from the supersaas.
