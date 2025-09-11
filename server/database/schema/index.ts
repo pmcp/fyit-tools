@@ -19,3 +19,4 @@ export { posPrinters } from '../../../layers/pos/collections/printers/server/dat
 export { posPrintqueues } from '../../../layers/pos/collections/printqueues/server/database/schema'
 export { posPrinterlocations } from '../../../layers/pos/collections/printerlocations/server/database/schema'
 export { posSystemlogs } from '../../../layers/pos/collections/systemlogs/server/database/schema'
+export { translationsSystem } from '../../../layers/translations/collections/system/server/database/schema'

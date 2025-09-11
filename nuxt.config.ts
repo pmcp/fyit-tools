@@ -16,7 +16,8 @@ export default defineNuxtConfig({
     './layers/i18n',
     './layers/crud',
     './layers/typo',
-    './layers/pos'
+    './layers/pos',
+    './layers/translations'
   ],
 
   devtools: { enabled: true },

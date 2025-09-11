@@ -1,6 +1,6 @@
 <template>
   <UDropdownMenu
-    :items="items as DropdownMenuItem[]"
+    :items="(items as any) as DropdownMenuItem[]"
     :ui="{
       content: 'w-[240px]',
     }"
@@ -63,6 +63,7 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 
 const { user } = useUserSession()
 const { logout } = useAuth()
+const { t } = useI18n()
 const mobileMenu = useState('mobileMenu')
 const isSuperAdmin = computed(() => user.value?.superAdmin)
 const feedbackModal = ref(false)
@@ -70,7 +71,7 @@ async function signOut() {
   await logout()
   await navigateTo('/')
 }
-const items = ref([
+const items = computed(() => [
   [
     {
       slot: 'profile',
@@ -87,7 +88,7 @@ const items = ref([
   ],
   [
     {
-      label: 'Account Settings',
+      label: t('settings.userSettings'),
       icon: 'i-lucide-user-cog',
       to: '/dashboard/account-settings',
       onSelect: () => {
@@ -97,18 +98,18 @@ const items = ref([
   ],
   [
     {
-      label: 'Language',
+      label: t('forms.language'),
       icon: 'i-lucide-globe',
       slot: 'language',
       onSelect: (e) => e.preventDefault(),
     },
     {
-      label: 'Theme',
+      label: t('settings.theme'),
       icon: 'i-lucide-moon',
       children: [
         [
           {
-            label: 'Light',
+            label: t('settings.lightMode'),
             icon: 'i-lucide-sun',
             onSelect: () => {
               setColorMode('light')
@@ -116,7 +117,7 @@ const items = ref([
             },
           },
           {
-            label: 'Dark',
+            label: t('settings.darkMode'),
             icon: 'i-lucide-moon',
             onSelect: () => {
               setColorMode('dark')
@@ -126,7 +127,7 @@ const items = ref([
         ],
         [
           {
-            label: 'System',
+            label: t('settings.autoMode'),
             icon: 'i-lucide-monitor',
             onSelect: () => {
               setColorMode('system')
@@ -139,7 +140,7 @@ const items = ref([
   ],
   [
     {
-      label: 'Support',
+      label: t('navigation.help'),
       icon: 'i-lucide-life-buoy',
       onSelect: () => {
         feedbackModal.value = true
@@ -164,7 +165,7 @@ const items = ref([
     : []),
   [
     {
-      label: 'Logout',
+      label: t('auth.logout'),
       icon: 'i-lucide-log-out',
       onSelect: signOut,
       color: 'error' as const,
