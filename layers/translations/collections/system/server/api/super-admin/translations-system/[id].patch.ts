@@ -1,5 +1,4 @@
-import { translationsSystem } from '../../../database/schema'
-import { eq } from 'drizzle-orm'
+import { updateTranslationsSystem } from '../../../database/queries'
 
 export default defineEventHandler(async (event) => {
   // Check if user is super admin
@@ -31,25 +30,5 @@ export default defineEventHandler(async (event) => {
     updatedAt: new Date(),
   }
 
-  const result = await useDrizzle()
-    .update(translationsSystem)
-    .set(updateData)
-    .where(eq(translationsSystem.id, id))
-    .run()
-
-  if (result.changes === 0) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Translation not found',
-    })
-  }
-
-  // Return updated translation
-  const updated = await useDrizzle()
-    .select()
-    .from(translationsSystem)
-    .where(eq(translationsSystem.id, id))
-    .get()
-
-  return updated
+  return await updateTranslationsSystem(id, updateData)
 })

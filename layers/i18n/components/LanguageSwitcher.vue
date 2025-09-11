@@ -16,7 +16,7 @@
         <span class="flex-1">{{ locale.name }}</span>
         <UIcon
           v-if="selected"
-          name="i-heroicons-check-16-solid"
+          name="i-lucide-check"
           class="h-4 w-4 text-green-500"
         />
       </div>

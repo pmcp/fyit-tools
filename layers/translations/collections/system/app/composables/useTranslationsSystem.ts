@@ -17,7 +17,7 @@ export const translationsSystemColumns = [
 
 export const translationsSystemConfig = {
   name: 'translationsSystem',
-  apiPath: 'translations-workspace',
+  apiPath: 'translations-system',
   componentName: 'TranslationsSystemForm',
   schema: translationsSystemSchema,
   defaultValues: {

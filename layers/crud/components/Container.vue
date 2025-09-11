@@ -26,7 +26,7 @@
           </TypoH2>
         </div>
         <UButton
-          icon="i-heroicons-x-mark"
+          icon="i-lucide-x"
           variant="ghost"
           color="gray"
           size="xs"

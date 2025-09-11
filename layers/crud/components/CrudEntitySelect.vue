@@ -13,7 +13,7 @@
     />
 
     <UButton
-      icon="i-heroicons-plus"
+      icon="i-lucide-plus"
       color="gray"
       size="md"
       @click="open('create', collection)"

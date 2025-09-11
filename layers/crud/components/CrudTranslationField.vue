@@ -109,7 +109,7 @@ const translationStatus = computed(() => {
             {{ (typeof loc === 'string' ? loc : loc.code).toUpperCase() }}
             <UIcon
               v-if="translationStatus.find(s => s.locale === (typeof loc === 'string' ? loc : loc.code))?.complete"
-              name="i-heroicons-check-circle"
+              name="i-lucide-check-circle"
               class="text-green-500"
             />
           </span>

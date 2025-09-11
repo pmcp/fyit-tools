@@ -1,5 +1,4 @@
-import { translationsSystem } from '../../../database/schema'
-import { eq } from 'drizzle-orm'
+import { deleteTranslationsSystem } from '../../../database/queries'
 
 export default defineEventHandler(async (event) => {
   // Check if user is super admin
@@ -13,17 +12,5 @@ export default defineEventHandler(async (event) => {
 
   const id = getRouterParam(event, 'id')
 
-  const result = await useDrizzle()
-    .delete(translationsSystem)
-    .where(eq(translationsSystem.id, id))
-    .run()
-
-  if (result.changes === 0) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Translation not found',
-    })
-  }
-
-  return { success: true }
+  return await deleteTranslationsSystem(id)
 })

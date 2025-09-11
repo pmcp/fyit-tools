@@ -1,5 +1,4 @@
-import { translationsSystem } from '../../../database/schema'
-import { nanoid } from 'nanoid'
+import { createTranslationsSystem } from '../../../database/queries'
 
 export default defineEventHandler(async (event) => {
   // Check if user is super admin
@@ -31,24 +30,15 @@ export default defineEventHandler(async (event) => {
 
   // Create new translation
   const newTranslation = {
-    id: nanoid(),
-    teamId: 'system', // System translations don't belong to a specific team
     userId: user.id,
     keyPath: body.keyPath,
     category: body.category,
     values: body.values,
     description: body.description || null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   }
 
   try {
-    await useDrizzle()
-      .insert(translationsSystem)
-      .values(newTranslation)
-      .run()
-
-    return newTranslation
+    return await createTranslationsSystem(newTranslation)
   } catch (error) {
     if (error.message?.includes('UNIQUE constraint failed')) {
       throw createError({

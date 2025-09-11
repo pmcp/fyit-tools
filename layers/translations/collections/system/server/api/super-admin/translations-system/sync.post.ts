@@ -13,7 +13,8 @@ export default defineEventHandler(async (event) => {
   }
 
   // Fetch all translations from database
-  const translations = await useDrizzle()
+  const db = useDB()
+  const translations = await db
     .select()
     .from(translationsSystem)
     .all()

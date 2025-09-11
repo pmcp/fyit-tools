@@ -1,29 +1,24 @@
 import type { TranslationsSystem, NewTranslationsSystem } from '../../types'
+import { createError } from 'h3'
 
-export async function getAllTranslationsSystem(teamId: string) {
+export async function getAllTranslationsSystem() {
   const db = useDB()
 
   const systemtranslations = await db
     .select()
     .from(tables.translationsSystem)
-    .where(eq(tables.translationsSystem.teamId, teamId))
     .orderBy(desc(tables.translationsSystem.createdAt))
 
   return systemtranslations
 }
 
-export async function getTranslationsSystemByIds(teamId: string, systemIds: string[]) {
+export async function getTranslationsSystemByIds(systemIds: string[]) {
   const db = useDB()
 
   const systemtranslations = await db
     .select()
     .from(tables.translationsSystem)
-    .where(
-      and(
-        eq(tables.translationsSystem.teamId, teamId),
-        inArray(tables.translationsSystem.id, systemIds)
-      )
-    )
+    .where(inArray(tables.translationsSystem.id, systemIds))
     .orderBy(desc(tables.translationsSystem.createdAt))
 
   return systemtranslations
@@ -42,8 +37,6 @@ export async function createTranslationsSystem(data: NewTranslationsSystem) {
 
 export async function updateTranslationsSystem(
   systemId: string,
-  teamId: string,
-  userId: string,
   updates: Partial<TranslationsSystem>
 ) {
   const db = useDB()
@@ -51,13 +44,7 @@ export async function updateTranslationsSystem(
   const [systemtranslation] = await db
     .update(tables.translationsSystem)
     .set(updates)
-    .where(
-      and(
-        eq(tables.translationsSystem.id, systemId),
-        eq(tables.translationsSystem.teamId, teamId),
-        eq(tables.translationsSystem.userId, userId)
-      )
-    )
+    .where(eq(tables.translationsSystem.id, systemId))
     .returning()
 
   if (!systemtranslation) {
@@ -70,22 +57,12 @@ export async function updateTranslationsSystem(
   return systemtranslation
 }
 
-export async function deleteTranslationsSystem(
-  systemId: string,
-  teamId: string,
-  userId: string
-) {
+export async function deleteTranslationsSystem(systemId: string) {
   const db = useDB()
 
   const [deleted] = await db
     .delete(tables.translationsSystem)
-    .where(
-      and(
-        eq(tables.translationsSystem.id, systemId),
-        eq(tables.translationsSystem.teamId, teamId),
-        eq(tables.translationsSystem.userId, userId)
-      )
-    )
+    .where(eq(tables.translationsSystem.id, systemId))
     .returning()
 
   if (!deleted) {

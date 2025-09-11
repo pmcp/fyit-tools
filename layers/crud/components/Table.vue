@@ -20,11 +20,11 @@
 
     <!-- Filters -->
     <div class="flex items-center justify-between gap-3 px-4 py-3">
-      <UInput v-model="search" icon="i-heroicons-magnifying-glass-20-solid" placeholder="Search..." />
+      <UInput v-model="search" icon="i-lucide-search" placeholder="Search..." />
       <slot name="searchbar"/>
       <div class="flex items-center gap-1.5">
         <UButton
-          icon="i-heroicons-funnel"
+          icon="i-lucide-filter"
           color="gray"
           size="sm"
           :disabled="search === ''"
@@ -105,7 +105,7 @@
 
         <UPopover :content="{ side: 'bottom', align: 'start' }">
           <UButton
-            icon="i-heroicons-view-columns"
+            icon="i-lucide-columns-3"
             color="gray"
             size="xs"
           >
