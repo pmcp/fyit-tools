@@ -6,7 +6,7 @@
     :key="state.id"
     v-model:open="state.isOpen"
     :side="'right'"
-    :style="{ 
+    :style="{
       zIndex: 40 + (index * 10),
       top: `${index * 40}px`,
       height: `calc(100vh - ${index * 40}px)`
@@ -17,11 +17,11 @@
     <template #header>
       <div class="flex items-center justify-between w-full">
         <div class="flex items-center gap-2">
-          <span v-if="index > 0" class="text-xs text-gray-500">
-            Level {{ index + 1 }}
+          <span v-if="index > 0" class="text-md">
+            {{ state.action}} {{ getCollectionName(crudStates[index-1].collection)}} >
           </span>
           <TypoH2>
-            <span class="capitalize">{{ state.action }}</span> 
+            <span class="capitalize">{{ state.action }}</span>
             {{ getCollectionName(state.collection) }}
           </TypoH2>
         </div>
