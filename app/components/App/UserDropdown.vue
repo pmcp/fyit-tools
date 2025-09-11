@@ -43,6 +43,9 @@
         </div>
       </div>
     </template>
+    <template #language @click.stop>
+      <LanguageSwitcher />
+    </template>
   </UDropdownMenu>
   <UModal
     v-model:open="feedbackModal"
@@ -93,6 +96,12 @@ const items = ref([
     },
   ],
   [
+    {
+      label: 'Language',
+      icon: 'i-lucide-globe',
+      slot: 'language',
+      onSelect: (e) => e.preventDefault(),
+    },
     {
       label: 'Theme',
       icon: 'i-lucide-moon',
