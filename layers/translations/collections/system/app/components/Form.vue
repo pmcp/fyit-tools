@@ -26,9 +26,14 @@
         <UInput v-model="state.category" class="w-full" size="xl" />
       </UFormField>
 
-      <UFormField label="Values" name="values">
-        <UInput v-model="state.values" class="w-full" size="xl" />
-      </UFormField>
+      <!-- Translation values for different locales -->
+      <CrudTranslationField
+        v-model="translationValues"
+        :fields="['value']"
+        :default-values="{ value: englishValue }"
+        @update:english="(data) => { englishValue = data.value; updateValues() }"
+        label="Translations"
+      />
 
       <UFormField label="Description" name="description">
         <UTextarea v-model="state.description" class="w-full" size="xl" />
@@ -53,6 +58,10 @@ const { send } = useCrud()
 const props = defineProps<TranslationsSystemFormProps>()
 
 const { defaultValue, schema } = useTranslationsSystem()
+
+// Separate state for handling the translation field component
+const englishValue = ref('')
+const translationValues = ref<Record<string, any>>({})
 
 // Create a reactive form state with proper typing
 const state = reactive<TranslationsSystemFormData & { id?: string | null }>({
@@ -81,10 +90,46 @@ const getInitialValues = () => {
   }
 }
 
+// Helper to update the state.values from the translation component data
+function updateValues() {
+  const values: Record<string, string> = {
+    en: englishValue.value
+  }
+  
+  // Add other locale values
+  for (const [locale, data] of Object.entries(translationValues.value)) {
+    if (data && typeof data === 'object' && 'value' in data) {
+      values[locale] = data.value
+    }
+  }
+  
+  state.values = values
+}
+
+// Watch the translation values and update state.values
+watch([englishValue, translationValues], () => {
+  updateValues()
+}, { deep: true })
+
 // Initialize and watch for prop changes
 watchEffect(() => {
   const initialValues = getInitialValues()
   // Merge the values into the reactive state
   Object.assign(state, initialValues)
+  
+  // If we have existing values, parse them for the translation component
+  if (initialValues.values && typeof initialValues.values === 'object') {
+    // Extract English value
+    englishValue.value = initialValues.values.en || ''
+    
+    // Extract other locale values in the format expected by CrudTranslationField
+    const otherLocales: Record<string, any> = {}
+    for (const [locale, value] of Object.entries(initialValues.values)) {
+      if (locale !== 'en') {
+        otherLocales[locale] = { value }
+      }
+    }
+    translationValues.value = otherLocales
+  }
 })
 </script>

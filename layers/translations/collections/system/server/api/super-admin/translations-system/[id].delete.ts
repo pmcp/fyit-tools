@@ -1,4 +1,4 @@
-import { translationsSystemtranslations } from '../../../database/schema'
+import { translationsSystem } from '../../../database/schema'
 import { eq } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
@@ -14,8 +14,8 @@ export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
 
   const result = await useDrizzle()
-    .delete(translationsSystemtranslations)
-    .where(eq(translationsSystemtranslations.id, id))
+    .delete(translationsSystem)
+    .where(eq(translationsSystem.id, id))
     .run()
 
   if (result.changes === 0) {

@@ -1,4 +1,4 @@
-import { deleteTranslationsSystemTranslation } from '../../../../database/queries'
+import { deleteTranslationsSystem } from '../../../../database/queries'
 import { isTeamMember } from '@@/server/database/queries/teams'
 
 export default defineEventHandler(async (event) => {
@@ -9,5 +9,5 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, statusMessage: 'Unauthorized' })
   }
 
-  return await deleteTranslationsSystemTranslation(systemtranslationId, teamId, user.id)
+  return await deleteTranslationsSystem(systemtranslationId, teamId, user.id)
 })

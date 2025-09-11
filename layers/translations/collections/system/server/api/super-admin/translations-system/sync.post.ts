@@ -1,4 +1,4 @@
-import { translationsSystemtranslations } from '../../../database/schema'
+import { translationsSystem } from '../../../database/schema'
 import { writeFile } from 'fs/promises'
 import { join } from 'path'
 
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   // Fetch all translations from database
   const translations = await useDrizzle()
     .select()
-    .from(translationsSystemtranslations)
+    .from(translationsSystem)
     .all()
 
   // Group translations by language and category

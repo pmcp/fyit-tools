@@ -1,4 +1,4 @@
-import { translationsSystemtranslations } from '../../../database/schema'
+import { translationsSystem } from '../../../database/schema'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 import { nanoid } from 'nanoid'
@@ -52,7 +52,7 @@ export default defineEventHandler(async (event) => {
 
     // Clear existing translations
     await useDrizzle()
-      .delete(translationsSystemtranslations)
+      .delete(translationsSystem)
       .run()
 
     // Insert new translations
@@ -73,7 +73,7 @@ export default defineEventHandler(async (event) => {
 
     if (translations.length > 0) {
       await useDrizzle()
-        .insert(translationsSystemtranslations)
+        .insert(translationsSystem)
         .values(translations)
         .run()
     }

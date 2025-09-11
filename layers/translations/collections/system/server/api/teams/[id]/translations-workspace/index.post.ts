@@ -1,4 +1,4 @@
-import { createTranslationsSystemTranslation } from '../../../../database/queries'
+import { createTranslationsSystem } from '../../../../database/queries'
 import { isTeamMember } from '@@/server/database/queries/teams'
 
 export default defineEventHandler(async (event) => {
@@ -10,11 +10,11 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody(event)
-  
+
   // Exclude id field to let the database generate it
   const { id, ...dataWithoutId } = body
-  
-  return await createTranslationsSystemTranslation({
+
+  return await createTranslationsSystem({
     ...dataWithoutId,
     teamId,
     userId: user.id

@@ -36,7 +36,7 @@
     </template>
     <template #body>
       <div v-if="state.isOpen && state.collection" class="w-full h-full">
-        <CrudLoading v-if="state.loading !== 'notLoading'" class="h-full w-full"/>
+         <CrudLoading v-if="state.loading !== 'notLoading'" class="h-full w-full"/>
         <div v-else>
           <CrudDynamicFormLoader
             :key="`${state.collection}-${state.action}-${state.activeItem?.id || 'new'}-${state.id}`"

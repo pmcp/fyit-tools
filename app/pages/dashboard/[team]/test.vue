@@ -1,6 +1,4 @@
 <template>
-
   <PosProductsList />
-  <CrudContainer />
 </template>
 

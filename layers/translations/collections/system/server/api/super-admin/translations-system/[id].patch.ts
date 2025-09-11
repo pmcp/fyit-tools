@@ -1,4 +1,4 @@
-import { translationsSystemtranslations } from '../../../database/schema'
+import { translationsSystem } from '../../../database/schema'
 import { eq } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
@@ -32,9 +32,9 @@ export default defineEventHandler(async (event) => {
   }
 
   const result = await useDrizzle()
-    .update(translationsSystemtranslations)
+    .update(translationsSystem)
     .set(updateData)
-    .where(eq(translationsSystemtranslations.id, id))
+    .where(eq(translationsSystem.id, id))
     .run()
 
   if (result.changes === 0) {
@@ -47,8 +47,8 @@ export default defineEventHandler(async (event) => {
   // Return updated translation
   const updated = await useDrizzle()
     .select()
-    .from(translationsSystemtranslations)
-    .where(eq(translationsSystemtranslations.id, id))
+    .from(translationsSystem)
+    .where(eq(translationsSystem.id, id))
     .get()
 
   return updated

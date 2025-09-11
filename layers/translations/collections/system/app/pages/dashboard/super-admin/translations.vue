@@ -1,7 +1,5 @@
 <template>
-  <AppContainer title="System Translations">
-    <TranslationsSystemList />
-  </AppContainer>
+  <TranslationsSystemList />
 </template>
 
 <script setup lang="ts">

@@ -1,4 +1,4 @@
-import { translationsSystemtranslations } from '../../../database/schema'
+import { translationsSystem } from '../../../database/schema'
 
 export default defineEventHandler(async (event) => {
   // Check if user is super admin
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   // Fetch all system translations
   const translations = await useDrizzle()
     .select()
-    .from(translationsSystemtranslations)
+    .from(translationsSystem)
     .all()
 
   return translations

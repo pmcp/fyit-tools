@@ -1,4 +1,4 @@
-import { translationsSystemtranslations } from '../../../database/schema'
+import { translationsSystem } from '../../../database/schema'
 import { nanoid } from 'nanoid'
 
 export default defineEventHandler(async (event) => {
@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     await useDrizzle()
-      .insert(translationsSystemtranslations)
+      .insert(translationsSystem)
       .values(newTranslation)
       .run()
 

@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const translationsSystemSchema = z.object({
   keyPath: z.string().min(1, 'keyPath is required'),
   category: z.string().min(1, 'category is required'),
-  values: z.object({}).min(1, 'values is required'),
+  values: z.record(z.string()),
   description: z.string().optional()
 })
 
@@ -17,7 +17,7 @@ export const translationsSystemColumns = [
 
 export const translationsSystemConfig = {
   name: 'translationsSystem',
-  apiPath: 'translations-system',
+  apiPath: 'translations-workspace',
   componentName: 'TranslationsSystemForm',
   schema: translationsSystemSchema,
   defaultValues: {

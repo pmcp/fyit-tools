@@ -4,6 +4,10 @@
   <UApp :toaster="{ position: 'bottom-right' }">
     <NuxtPage />
   </UApp>
+
+  <!--  TODO: ONLY WHEN ADMIN OR HIGHER? -->
+  <CrudContainer />
+
 </template>
 
 <script lang="ts" setup>

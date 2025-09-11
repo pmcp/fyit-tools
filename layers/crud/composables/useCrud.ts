@@ -302,13 +302,24 @@ export default function () {
         const apiPath = config?.apiPath || collection
         
         // Use $fetch for API calls with proper error handling
-        const response = await $fetch(`/api/teams/${currentTeam.value.id}/${apiPath}/`, {
+        const response = await $fetch(`/api/teams/${currentTeam.value.id}/${apiPath}`, {
           method: 'GET',
           query: { ids: ids.join(',') }
         });
 
         // For update, we expect a single item - store it in the state
-        newState.activeItem = Array.isArray(response) ? response[0] : response
+        const activeItem = Array.isArray(response) ? response[0] : response
+        
+        // Find the state index and update it reactively
+        const stateIndex = crudStates.value.findIndex(s => s.id === newState.id)
+        if (stateIndex !== -1) {
+          crudStates.value[stateIndex] = {
+            ...crudStates.value[stateIndex],
+            activeItem: activeItem,
+            loading: 'notLoading'
+          }
+        }
+        return; // Exit early since we've already set loading to notLoading
       } catch (error) {
         toast.add({
           title: 'Uh oh! Something went wrong.',
@@ -332,7 +343,10 @@ export default function () {
       newState.items = ids
     }
 
-    newState.loading = 'notLoading'
+    // Only set loading to notLoading for non-update actions
+    if (actionIn !== 'update') {
+      newState.loading = 'notLoading'
+    }
   }
 
 

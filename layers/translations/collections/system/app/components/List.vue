@@ -19,15 +19,15 @@ const { columns } = useTranslationsSystem()
 const { currentTeam } = useTeam()
 const { translationsSystem: collectionTranslationsSystem } = useCollections()
 
-const { data: systemtranslations, refresh } = await useFetch(
-  `/api/teams/${currentTeam.value.id}/translations-system`,
+const { data: systemTranslations, refresh } = await useFetch(
+  `/api/teams/${currentTeam.value.id}/translations-workspace`,
   {
     watch: [currentTeam],
   },
 )
 
-// Directly assign the fetched systemtranslations to the collection
-if (systemtranslations.value) {
-  collectionTranslationsSystem.value = systemtranslations.value
+// Directly assign the fetched system translation to the collection
+if (systemTranslations.value) {
+  collectionTranslationsSystem.value = systemTranslations.value
 }
 </script>
