@@ -206,5 +206,7 @@
     "lightMode": "Lichte modus",
     "autoMode": "Automatisch"
   },
-  "testkeypath": "dutch"
+  "testkeypath": "dutch",
+  "a test": "asdf",
+  "asdf": "asdf"
 }

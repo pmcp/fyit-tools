@@ -206,5 +206,7 @@
     "lightMode": "Light Mode",
     "autoMode": "Auto"
   },
-  "testkeypath": "english"
+  "testkeypath": "english",
+  "a test": "asdf",
+  "asdf": "asdf"
 }

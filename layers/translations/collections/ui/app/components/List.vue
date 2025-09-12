@@ -10,22 +10,94 @@
             title="System Translations"
             :collection="'translationsUi'"
             createButton
-          />
+          >
+            <template #extraButtons>
+              <UModal>
+                <UButton
+                  variant="soft"
+                >
+                  Import
+                </UButton>
+                <UButton
+                  @click="syncTranslations"
+                  :loading="syncing"
+                  variant="soft"
+                >
+                  Sync to Locale Files
+                </UButton>
+                <template #header>
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold">Bulk Import Translations</h3>
 
+                  </div>
+                </template>
+                <template #content>
+                  <UCard>
+                    <div class="space-y-4">
+                    <UButton
+                      @click="showExample = !showExample"
+                      variant="ghost"
+                      size="sm"
+                      :icon="showExample ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+
+                    >
+                      {{ showExample ? 'Hide' : 'Show' }} Example
+                    </UButton>
+
+
+                    <!-- Example JSON -->
+                    <div v-if="showExample" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Example JSON format:</p>
+                      <pre class="text-xs overflow-x-auto"><code>{{ exampleJson }}</code></pre>
+                    </div>
+
+                    <!-- Import Textarea -->
+                    <UTextarea
+                      v-model="bulkImportJson"
+                      placeholder="Paste your JSON here..."
+                      :rows="10"
+                      class="font-mono text-sm w-full"
+                    />
+
+                    <!-- Import Button -->
+                    <div class="flex justify-end gap-2">
+                      <UButton
+                        @click="bulkImportJson = ''"
+                        variant="ghost"
+                        :disabled="!bulkImportJson || importing"
+                      >
+                        Clear
+                      </UButton>
+                      <UButton
+                        @click="handleBulkImport"
+                        :loading="importing"
+                        :disabled="!bulkImportJson"
+                        color="green"
+                      >
+                        Import Translations
+                      </UButton>
+                    </div>
+                  </div>
+                </UCard>
+                </template>
+              </UModal>
+
+            </template>
+          </CrudTableHeader>
       </template>
 
       <template #values-cell="{ row }">
         <div class="text-sm">
-          <CrudTranslationDisplay :translations="row.values" />
+          <CrudTranslationDisplay :translations="row.original.values" />
         </div>
       </template>
 
       <template #isOverrideable-cell="{ row }">
-        <UBadge 
-          :color="row.isOverrideable ? 'green' : 'gray'" 
+        <UBadge
+          :color="row.original.isOverrideable ? 'primary' : 'error'"
           variant="soft"
         >
-          {{ row.isOverrideable ? 'Yes' : 'No' }}
+          {{ row.original.isOverrideable ? 'Yes' : 'No' }}
         </UBadge>
       </template>
 
@@ -45,128 +117,60 @@
     </CrudTable>
 
     <!-- Overrides Modal -->
-    <UModal v-model="showOverridesModal">
-      <UCard>
-        <template #header>
-          <div class="flex items-center justify-between">
-            <h3 class="text-base font-semibold">Team Overrides</h3>
-            <UButton
-              color="gray"
-              variant="ghost"
-              icon="i-lucide-x"
-              size="sm"
-              @click="showOverridesModal = false"
-            />
-          </div>
-        </template>
+    <UModal v-model:open="showOverridesModal">
+      <template #content>
+        <UCard>
+          <template #header>
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-semibold">Team Overrides</h3>
+              <UButton
+                color="gray"
+                variant="ghost"
+                icon="i-lucide-x"
+                size="sm"
+                @click="showOverridesModal = false"
+              />
+            </div>
+          </template>
 
-        <div v-if="selectedTranslation" class="space-y-4">
-          <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded">
-            <p class="text-sm font-medium mb-2">System Translation: {{ selectedTranslation.keyPath }}</p>
-            <CrudTranslationDisplay :translations="selectedTranslation.values" />
-          </div>
+          <div v-if="selectedTranslation" class="space-y-4">
+            <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded">
+              <p class="text-sm font-medium mb-2">System Translation: {{ selectedTranslation.keyPath }}</p>
+              <CrudTranslationDisplay :translations="selectedTranslation.values" />
+            </div>
 
-          <div v-if="loadingOverrides" class="flex items-center justify-center py-8">
-            <UIcon name="i-lucide-loader-2" class="animate-spin w-5 h-5 mr-2" />
-            <span>Loading team overrides...</span>
-          </div>
+            <div v-if="loadingOverrides" class="flex items-center justify-center py-8">
+              <UIcon name="i-lucide-loader-2" class="animate-spin w-5 h-5 mr-2" />
+              <span>Loading team overrides...</span>
+            </div>
 
-          <div v-else-if="currentOverrides?.length" class="space-y-3">
-            <h4 class="font-semibold text-sm">Team Customizations:</h4>
-            <div 
-              v-for="override in currentOverrides" 
-              :key="override.id" 
-              class="border dark:border-gray-700 rounded p-3 space-y-2"
-            >
-              <div class="flex items-center justify-between">
-                <span class="font-medium text-sm">{{ override.teamName || 'Unknown Team' }}</span>
-                <span class="text-xs text-gray-500">
-                  Updated: {{ new Date(override.updatedAt).toLocaleDateString() }}
-                </span>
+            <div v-else-if="currentOverrides?.length" class="space-y-3">
+              <h4 class="font-semibold text-sm">Team Customizations:</h4>
+              <div
+                v-for="override in currentOverrides"
+                :key="override.id"
+                class="border dark:border-gray-700 rounded p-3 space-y-2"
+              >
+                <div class="flex items-center justify-between">
+                  <span class="font-medium text-sm">{{ override.teamName || 'Unknown Team' }}</span>
+                  <span class="text-xs text-gray-500">
+                    Updated: {{ new Date(override.updatedAt).toLocaleDateString() }}
+                  </span>
+                </div>
+                <CrudTranslationDisplay :translations="override.values" />
               </div>
-              <CrudTranslationDisplay :translations="override.values" />
+            </div>
+
+            <div v-else class="text-center py-8 text-gray-500">
+              No team overrides found for this translation.
             </div>
           </div>
-
-          <div v-else class="text-center py-8 text-gray-500">
-            No team overrides found for this translation.
-          </div>
-        </div>
-      </UCard>
+        </UCard>
+      </template>
     </UModal>
 
-    <div class="flex justify-end mt-4">
-      <UButton
-        @click="syncTranslations"
-        :loading="syncing"
-        color="blue"
-        variant="soft"
-        icon="i-lucide-refresh-cw"
-      >
-        Sync to Locale Files
-      </UButton>
-    </div>
 
-    <!-- Bulk Import Section -->
-<!--    <UCard>-->
-<!--      <template #header>-->
-<!--        <div class="flex items-center justify-between">-->
-<!--          <h3 class="text-lg font-semibold">Bulk Import Translations</h3>-->
-<!--          <UButton-->
-<!--            @click="showExample = !showExample"-->
-<!--            variant="ghost"-->
-<!--            size="sm"-->
-<!--            :icon="showExample ? 'i-lucide-eye-off' : 'i-lucide-eye'"-->
-<!--          >-->
-<!--            {{ showExample ? 'Hide' : 'Show' }} Example-->
-<!--          </UButton>-->
-<!--        </div>-->
-<!--      </template>-->
-<!--      <UButton-->
-<!--        @click="syncTranslations"-->
-<!--        :loading="syncing"-->
-<!--        color="blue"-->
-<!--        variant="soft"-->
-<!--        icon="i-lucide-refresh-cw"-->
-<!--      >-->
-<!--        Sync to Locale Files-->
-<!--      </UButton>-->
 
-<!--      <div class="space-y-4">-->
-<!--        &lt;!&ndash; Example JSON &ndash;&gt;-->
-<!--        <div v-if="showExample" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">-->
-<!--          <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Example JSON format:</p>-->
-<!--          <pre class="text-xs overflow-x-auto"><code>{{ exampleJson }}</code></pre>-->
-<!--        </div>-->
-
-<!--        &lt;!&ndash; Import Textarea &ndash;&gt;-->
-<!--        <UTextarea-->
-<!--          v-model="bulkImportJson"-->
-<!--          placeholder="Paste your JSON here..."-->
-<!--          :rows="10"-->
-<!--          class="font-mono text-sm"-->
-<!--        />-->
-
-<!--        &lt;!&ndash; Import Button &ndash;&gt;-->
-<!--        <div class="flex justify-end gap-2">-->
-<!--          <UButton-->
-<!--            @click="bulkImportJson = ''"-->
-<!--            variant="ghost"-->
-<!--            :disabled="!bulkImportJson || importing"-->
-<!--          >-->
-<!--            Clear-->
-<!--          </UButton>-->
-<!--          <UButton-->
-<!--            @click="handleBulkImport"-->
-<!--            :loading="importing"-->
-<!--            :disabled="!bulkImportJson"-->
-<!--            color="green"-->
-<!--          >-->
-<!--            Import Translations-->
-<!--          </UButton>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--    </UCard>-->
   </div>
 </template>
 
@@ -327,12 +331,12 @@ async function openOverridesModal(translation: any) {
   showOverridesModal.value = true
   loadingOverrides.value = true
   currentOverrides.value = []
-  
+
   try {
     const overrides = await $fetch(`/api/super-admin/translations-ui/overrides/${encodeURIComponent(translation.keyPath)}`, {
       query: { namespace: translation.namespace || 'ui' }
     })
-    
+
     currentOverrides.value = overrides
   } catch (error) {
     console.error('Failed to fetch overrides:', error)

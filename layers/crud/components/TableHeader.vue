@@ -1,15 +1,23 @@
 <template>
-  <TypoH2>
-    {{ title }}
-  </TypoH2>
-  <UButton
-    v-if="createButton"
-    color="gray"
-    size="md"
-    @click="handleCreate"
-  >
-    <span>Create <span class="hidden md:inline" >{{ useFormatCollections().collectionWithCapitalSingular(collection) }}</span></span>
-  </UButton>
+  <UDashboardNavbar :title="collection || 'Data'">
+    <template #left>
+      <TypoH2>
+        {{ title }}
+      </TypoH2>
+    </template>
+    <template #right>
+      <slot name="extraButtons" />
+      <UButton
+        v-if="createButton"
+        color="primary"
+        size="md"
+        @click="handleCreate"
+      >
+        <span>Create <span class="hidden md:inline" >{{ useFormatCollections().collectionWithCapitalSingular(collection) }}</span></span>
+      </UButton>
+    </template>
+  </UDashboardNavbar>
+
 </template>
 <script setup>
 const { open } = useCrud()

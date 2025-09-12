@@ -1,49 +1,85 @@
 
 <template>
-  <UCard
-    class="w-full h-full flex flex-col"
-    :ui="{
-      base: 'flex flex-col h-full',
-      ring: '',
-      divide: 'divide-y divide-gray-200 dark:divide-gray-700',
-      header: { padding: 'px-4 py-5' },
-      body: { padding: '', base: 'flex-1 overflow-auto w-full divide-y divide-gray-200 dark:divide-gray-700' },
-      footer: { padding: 'p-4' }
-    }"
-  >
+  <UDashboardPanel :id="collection || 'crud-table'">
     <template #header>
-      <div class="flex items-center justify-between">
-        <slot name="header"></slot>
-      </div>
-
+      <slot name="header"></slot>
     </template>
 
-    <!-- Filters -->
-    <div class="flex items-center justify-between gap-3 px-4 py-3">
-      <UInput v-model="search" icon="i-lucide-search" placeholder="Search..." />
-      <slot name="searchbar"/>
-      <div class="flex items-center gap-1.5">
-        <UButton
-          icon="i-lucide-filter"
-          color="gray"
-          size="sm"
-          :disabled="search === ''"
-          @click="resetFilters"
-        >
-          Reset
-        </UButton>
-      </div>
-    </div>
+    <template #body>
 
-    <UTable
-      ref="table"
-      v-model="selectedRows"
-      v-model:sort="sort"
-      v-model:column-visibility="columnVisibility"
-      :data="slicedRows"
-      :columns="columnsTable"
-      class="w-full"
-    >
+      <!-- Filters -->
+      <div class="flex items-center justify-between gap-3 px-4 py-3">
+        <div class="flex items-center gap-1.5">
+          <UInput v-model="search" icon="i-lucide-search" placeholder="Search..." class="max-w-sm" />
+<!--          <UButton-->
+<!--            icon="i-lucide-filter"-->
+<!--            color="neutral"-->
+<!--            variant="subtle"-->
+<!--            size="sm"-->
+<!--            :disabled="search === ''"-->
+<!--            @click="resetFilters"-->
+<!--          >-->
+<!--            Reset-->
+<!--          </UButton>-->
+        </div>
+
+
+        <div class="flex items-center gap-1.5">
+          <UButton
+            icon="i-lucide-trash"
+            :color="selectedRows.length > 0 ? 'error' : 'neutral'"
+            variant="subtle"
+            size="sm"
+            :disabled="selectedRows.length === 0"
+            @click="open('delete', collection, selectedRows.map(row => row.id))"
+          >
+            Delete <span v-if="selectedRows.length > 0">{{ selectedRows.length }} <span>item<span v-if="selectedRows.length > 1">s</span></span></span>
+          </UButton>
+          <UDropdownMenu
+          :items="
+            table?.tableApi
+              ?.getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => ({
+                label: upperFirst(column.id),
+                type: 'checkbox' as const,
+                checked: column.getIsVisible(),
+                onUpdateChecked(checked: boolean) {
+                  table?.tableApi?.getColumn(column.id)?.toggleVisibility(!!checked)
+                },
+                onSelect(e?: Event) {
+                  e?.preventDefault()
+                }
+              }))
+          "
+          :content="{ align: 'end' }"
+        >
+            <UButton
+              label="Display"
+              color="neutral"
+              variant="outline"
+              trailing-icon="i-lucide-settings-2"
+            />
+          </UDropdownMenu>
+        </div>
+      </div>
+
+      <UTable
+        ref="table"
+        v-model:row-selection="rowSelection"
+        v-model:sort="sort"
+        v-model:column-visibility="columnVisibility"
+        :data="slicedRows"
+        :columns="columnsTable"
+        class="shrink-0"
+        :ui="{
+          base: 'table-fixed border-separate border-spacing-0',
+          thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
+          tbody: '[&>tr]:last:[&>td]:border-b-0',
+          th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
+          td: 'border-b border-default'
+        }"
+      >
       <template #expanded="{ row }">
         <pre>{{ row }}</pre>
       </template>
@@ -73,96 +109,41 @@
         />
       </template>
 
-      <template #expand-cell="{ row }">
-        <UButton
-          color="gray"
-          variant="ghost"
-          icon="i-lucide-chevron-down"
-          size="xs"
-          square
-          @click="toggleExpanded(row.id)"
-          :class="expanded.includes(row.id) ? 'rotate-180' : ''"
-          class="transition-transform"
-        />
-      </template>
+<!--      <template #expand-cell="{ row }">-->
+<!--        <UButton-->
+<!--          color="gray"-->
+<!--          variant="ghost"-->
+<!--          icon="i-lucide-chevron-down"-->
+<!--          size="xs"-->
+<!--          square-->
+<!--          @click="toggleExpanded(row.id)"-->
+<!--          :class="expanded.includes(row.id) ? 'rotate-180' : ''"-->
+<!--          class="transition-transform"-->
+<!--        />-->
+<!--      </template>-->
 
-    </UTable>
-
-    <!-- Header and Action buttons -->
-    <div class="flex justify-between items-center w-full px-4 py-3">
-      <div class="flex items-center gap-1.5">
-        <span class="text-sm leading-5">Rows per page:</span>
-        <USelect
-          v-model="pageCount"
-          :options="[
-            { label: '3', value: 3 },
-            { label: '5', value: 5 },
-            { label: '10', value: 10 },
-            { label: '20', value: 20 },
-            { label: '30', value: 30 },
-            { label: '40', value: 40 }
-          ]"
-          class="me-2 w-20"
-          size="xs"
-        />
-      </div>
+      </UTable>
 
 
-      <div class="flex gap-1.5 items-center">
 
-        <UButton
-          v-if="selectedRows.length > 0"
-          icon="i-ph-trash-duotone"
-          color="rose"
-          variant="soft"
-          size="xs"
-          @click="open('delete', collection, selectedRows.map(row => row.id))"
-        >
-
-          Delete {{ selectedRows.length }} <span>item<span v-if="selectedRows.length > 1">s</span></span>
-        </UButton>
-
-
-        <UDropdownMenu
-          :items="
-            table?.tableApi
-              ?.getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => ({
-                label: upperFirst(column.id),
-                type: 'checkbox' as const,
-                checked: column.getIsVisible(),
-                onUpdateChecked(checked: boolean) {
-                  table?.tableApi?.getColumn(column.id)?.toggleVisibility(!!checked)
-                },
-                onSelect(e?: Event) {
-                  e?.preventDefault()
-                }
-              }))
-          "
-          :content="{ align: 'end' }"
-        >
-          <UButton
-            label="Columns"
-            icon="i-lucide-columns-3"
-            color="gray"
+      <!-- Number of rows & Pagination -->
+      <div class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto">
+        <div class="flex items-center gap-1.5">
+          <span class="text-sm text-muted">Rows per page:</span>
+          <USelect
+            label="Rows per page"
+            v-model="pageCount"
+            :items="[
+              { label: '5', value: 5 },
+              { label: '10', value: 10 },
+              { label: '20', value: 20 },
+              { label: '30', value: 30 },
+              { label: '40', value: 40 }
+            ]"
+            class="w-20"
             size="xs"
           />
-        </UDropdownMenu>
-
-
-
-
-      </div>
-    </div>
-
-
-
-    <!-- Number of rows & Pagination -->
-    <template #footer>
-      <div class="flex flex-wrap justify-between items-center">
-        <div>
-          <span class="text-sm leading-5">
+          <span class="text-sm text-muted">
             Showing
             <span class="font-medium">{{ pageFrom }}</span>
             to
@@ -173,18 +154,23 @@
           </span>
         </div>
 
-        <UPagination
-          v-model="page"
-          :items-per-page="pageCount"
-          :total="pageTotalToShow"
-        />
+        <div class="flex items-center gap-1.5">
+          <UPagination
+            v-model="page"
+            :items-per-page="pageCount"
+            :total="pageTotalToShow"
+          />
+        </div>
       </div>
     </template>
-  </UCard>
+  </UDashboardPanel>
 </template>
 
 <script lang="ts" setup>
 import { upperFirst } from 'scule'
+
+const UCheckbox = resolveComponent('UCheckbox')
+
 const props = defineProps({
   columns: {
     type: Array,
@@ -206,6 +192,24 @@ const expanded = ref<(string | number)[]>([])
 const table = useTemplateRef('table')
 
 const allColumns = [
+  {
+    id: 'select',
+    header: ({ table }) =>
+      h(UCheckbox, {
+        'modelValue': table.getIsSomePageRowsSelected()
+          ? 'indeterminate'
+          : table.getIsAllPageRowsSelected(),
+        'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
+          table.toggleAllPageRowsSelected(!!value),
+        'ariaLabel': 'Select all'
+      }),
+    cell: ({ row }) =>
+      h(UCheckbox, {
+        'modelValue': row.getIsSelected(),
+        'onUpdate:modelValue': (value: boolean | 'indeterminate') => row.toggleSelected(!!value),
+        'ariaLabel': 'Select row'
+      })
+  },
   ...props.columns,
   {
     accessorKey: 'created_at',
@@ -248,7 +252,11 @@ const columnsTable = computed(() => {
 })
 
 // ROWS
-const selectedRows = useState('selectedRows', () => [])
+const rowSelection = ref({})
+const selectedRows = computed(() => {
+  if (!table.value?.tableApi) return []
+  return table.value.tableApi.getFilteredSelectedRowModel().rows.map(row => row.original)
+})
 
 
 
