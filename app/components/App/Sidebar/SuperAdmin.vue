@@ -29,7 +29,7 @@ const links = [
     to: '/dashboard/super-admin/teams',
   },
   {
-    label: 'System Translations',
+    label: 'Translations',
     icon: 'i-lucide-globe',
     to: '/dashboard/super-admin/translations',
   },

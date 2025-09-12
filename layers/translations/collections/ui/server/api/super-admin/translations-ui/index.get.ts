@@ -1,5 +1,4 @@
-import { isNull, desc } from 'drizzle-orm'
-import { getAllTranslationsUi } from '../../../database/queries'
+import { getAllSystemTranslationsWithOverrideCounts } from '../../../database/queries'
 
 export default defineEventHandler(async (event) => {
   // Check if user is super admin
@@ -11,13 +10,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Fetch all app translations (system-level only, teamId=null)
-  const db = useDB()
-  const translations = await db
-    .select()
-    .from(tables.translationsUi)
-    .where(isNull(tables.translationsUi.teamId))
-    .orderBy(desc(tables.translationsUi.createdAt))
-  
-  return translations
+  // Fetch all system translations with override counts
+  return await getAllSystemTranslationsWithOverrideCounts()
 })

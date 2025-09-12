@@ -13,6 +13,7 @@ export const translationsUiColumns = [
   { accessorKey: 'category', header: 'Category' },
   { accessorKey: 'values', header: 'Values' },
   { accessorKey: 'isOverrideable', header: 'Overrideable' },
+  { accessorKey: 'overrideCount', header: 'Overrides' },
   { accessorKey: 'description', header: 'Description' },
   { accessorKey: 'actions', header: 'Actions' }
 ]

@@ -1,13 +1,13 @@
 
 <template>
   <UCard
-    class="w-full h-full"
+    class="w-full h-full flex flex-col"
     :ui="{
-      base: '',
+      base: 'flex flex-col h-full',
       ring: '',
       divide: 'divide-y divide-gray-200 dark:divide-gray-700',
       header: { padding: 'px-4 py-5' },
-      body: { padding: '', base: 'min-h-[50vh] w-full divide-y divide-gray-200 dark:divide-gray-700' },
+      body: { padding: '', base: 'flex-1 overflow-auto w-full divide-y divide-gray-200 dark:divide-gray-700' },
       footer: { padding: 'p-4' }
     }"
   >
@@ -36,13 +36,13 @@
     </div>
 
     <UTable
+      ref="table"
       v-model="selectedRows"
-      v-model:expand="expanded"
-      v-model:sorting="sorting"
+      v-model:sort="sort"
+      v-model:column-visibility="columnVisibility"
       :data="slicedRows"
-      :columns="allColumns"
-      sort-mode="manual"
-      class="overflow-x-auto"
+      :columns="columnsTable"
+      class="w-full"
     >
       <template #expanded="{ row }">
         <pre>{{ row }}</pre>
@@ -55,21 +55,34 @@
 
       <!-- Default column slots -->
       <template #created_at-cell="{ row }">
-        {{ useDateFormat(row.date, 'DD-MM-YYYY') }}
+        {{ row.original.createdAt ? useDateFormat(row.original.createdAt, 'DD-MM-YYYY') : '' }}
       </template>
 
       <template #updated_at-cell="{ row }">
-        {{ useDateFormat(row.date, 'DD-MM-YYYY') }}
+        {{ row.original.updatedAt ? useDateFormat(row.original.updatedAt, 'DD-MM-YYYY') : '' }}
       </template>
 
       <template #actions-cell="{ row }">
         <CrudMiniButtons
           delete
-          @delete="open('delete', collection, [row.original.id])"
+          @delete="open('delete', collection, [row.id])"
           :delete-loading="row.optimisticAction === 'delete'"
           update
-          @update="open('update', collection, [row.original.id])"
+          @update="open('update', collection, [row.id])"
           :update-loading="row.optimisticAction === 'update' || row.optimisticAction === 'create'"
+        />
+      </template>
+
+      <template #expand-cell="{ row }">
+        <UButton
+          color="gray"
+          variant="ghost"
+          icon="i-lucide-chevron-down"
+          size="xs"
+          square
+          @click="toggleExpanded(row.id)"
+          :class="expanded.includes(row.id) ? 'rotate-180' : ''"
+          class="transition-transform"
         />
       </template>
 
@@ -81,7 +94,14 @@
         <span class="text-sm leading-5">Rows per page:</span>
         <USelect
           v-model="pageCount"
-          :options="[3, 5, 10, 20, 30, 40]"
+          :options="[
+            { label: '3', value: 3 },
+            { label: '5', value: 5 },
+            { label: '10', value: 10 },
+            { label: '20', value: 20 },
+            { label: '30', value: 30 },
+            { label: '40', value: 40 }
+          ]"
           class="me-2 w-20"
           size="xs"
         />
@@ -103,26 +123,32 @@
         </UButton>
 
 
-        <UPopover :content="{ side: 'bottom', align: 'start' }">
+        <UDropdownMenu
+          :items="
+            table?.tableApi
+              ?.getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => ({
+                label: upperFirst(column.id),
+                type: 'checkbox' as const,
+                checked: column.getIsVisible(),
+                onUpdateChecked(checked: boolean) {
+                  table?.tableApi?.getColumn(column.id)?.toggleVisibility(!!checked)
+                },
+                onSelect(e?: Event) {
+                  e?.preventDefault()
+                }
+              }))
+          "
+          :content="{ align: 'end' }"
+        >
           <UButton
+            label="Columns"
             icon="i-lucide-columns-3"
             color="gray"
             size="xs"
-          >
-            Columns
-          </UButton>
-
-          <template #content>
-            <UCommandPalette
-              v-model="selectedColumns"
-              multiple
-              placeholder="Search columns..."
-              :groups="[{ id: 'labels', excludeSelectColumn }]"
-              :ui="{ input: '[&>input]:h-8 [&>input]:text-sm' }"
-            />
-
-          </template>
-        </UPopover>
+          />
+        </UDropdownMenu>
 
 
 
@@ -147,26 +173,18 @@
           </span>
         </div>
 
-<!--        <UPagination-->
-<!--          v-model="page"-->
-<!--          :page-count="Number(pageTo)"-->
-<!--          :total="pageTotalToShow"-->
-<!--          :ui="{-->
-<!--            wrapper: 'flex items-center gap-1',-->
-<!--            rounded: '!rounded-full min-w-[32px] justify-center',-->
-<!--            default: {-->
-<!--              activeButton: {-->
-<!--                variant: 'outline',-->
-<!--              }-->
-<!--            }-->
-<!--          }"-->
-<!--        />-->
+        <UPagination
+          v-model="page"
+          :items-per-page="pageCount"
+          :total="pageTotalToShow"
+        />
       </div>
     </template>
   </UCard>
 </template>
 
 <script lang="ts" setup>
+import { upperFirst } from 'scule'
 const props = defineProps({
   columns: {
     type: Array,
@@ -182,65 +200,35 @@ const props = defineProps({
   }
 })
 
-const expanded = ref({ 1: true })
+const expanded = ref<(string | number)[]>([])
 
-const sorting = ref([
-  {
-    id: 'created_at',
-    desc: false
-  }
-])
-import { h, resolveComponent } from 'vue'
-import type { TableColumn } from '@nuxt/ui'
-
-const UButton = resolveComponent('UButton')
-const UBadge = resolveComponent('UBadge')
+// Table ref for accessing table API
+const table = useTemplateRef('table')
 
 const allColumns = [
   ...props.columns,
   {
     accessorKey: 'created_at',
-    header: ({ column }) => {
-      const isSorted = column.getIsSorted()
-
-      return h(UButton, {
-        color: 'neutral',
-        variant: 'ghost',
-        label: 'Created At',
-        icon: isSorted
-          ? isSorted === 'asc'
-            ? 'i-lucide-arrow-up-narrow-wide'
-            : 'i-lucide-arrow-down-wide-narrow'
-          : 'i-lucide-arrow-up-down',
-        class: '-mx-2.5',
-        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
-      })
-    }
-
+    id: 'created_at',
+    header: 'Created At',
+    sortable: true
   },
   {
     accessorKey: 'updated_at',
-    header: 'Updated At'
+    id: 'updated_at',
+    header: 'Updated At',
+    sortable: true
   },
   {
-    id: 'expand',
-    cell: ({ row }) =>
-      h(UButton, {
-        color: 'neutral',
-        variant: 'ghost',
-        icon: 'i-lucide-chevron-down',
-        square: true,
-        'aria-label': 'Expand',
-        ui: {
-          leadingIcon: [
-            'transition-transform',
-            row.getIsExpanded() ? 'duration-200 rotate-180' : ''
-          ]
-        },
-        onClick: () => row.toggleExpanded()
-      })
+    accessorKey: 'actions',
+    id: 'actions',
+    header: 'Actions'
   },
-
+  {
+    accessorKey: 'expand',
+    id: 'expand',
+    header: ''
+  }
 ]
 
 
@@ -249,11 +237,15 @@ const { open } = useCrud()
 
 
 // COLUMNS
-const columnsToShow = computed(() => props.columns.filter(column => column.key !== 'id'))
-const selectedColumns = ref(columnsToShow.value)
-// const selectedColumns = ref(props.columns)
-const columnsTable = computed(() => props.columns.filter(column => selectedColumns.value.includes(column)))
-const excludeSelectColumn = computed(() => props.columns.filter(v => v.key !== 'select'))
+// Initialize column visibility - hide 'id' column by default
+const columnVisibility = ref<Record<string, boolean>>({
+  id: false
+})
+
+const columnsTable = computed(() => {
+  // Return all columns, visibility will be handled by the table component
+  return allColumns
+})
 
 // ROWS
 const selectedRows = useState('selectedRows', () => [])
@@ -262,10 +254,13 @@ const selectedRows = useState('selectedRows', () => [])
 
 
 // PAGINATION
-const sort = ref({ column: 'id', direction: 'asc' as const })
+const sort = ref({ column: 'created_at', direction: 'desc' as 'asc' | 'desc' })
 const page = ref(1)
-const pageCount = ref(3)
-const itemCountFromServer = computed(() => useCrud().pagination.value[props.collection] ? useUserSettings().pagination.value[props.collection].totalItems : 0)
+const pageCount = ref(10)
+const itemCountFromServer = computed(() => {
+  const crudPagination = useCrud().pagination.value
+  return crudPagination[props.collection]?.totalItems || props.rows.length
+})
 const pageTotalFiltered = computed(() => searchedRows.value.length)
 
 const pageTotalToShow = computed(() => {
@@ -298,16 +293,26 @@ const searchedRows = computed(() => {
 })
 
 const slicedRows = computed(() => {
+  console.log('searchedRows:', searchedRows.value)
+  console.log('props.rows:', props.rows)
   if(!searchedRows.value || !Array.isArray(searchedRows.value) || searchedRows.value.length === 0) return []
   return searchedRows.value.slice((page.value - 1) * pageCount.value, (page.value) * pageCount.value)
 })
 
 
-// EXPAND ITEMS
-const expand = ref({
-  openedRows: [],
-  row: {}
-})
+// Expand toggle function
+const toggleExpanded = (rowId: string | number) => {
+  const index = expanded.value.indexOf(rowId)
+  if (index > -1) {
+    expanded.value.splice(index, 1)
+  } else {
+    expanded.value.push(rowId)
+  }
+}
 
+// Watch for pageCount changes to reset page
+watch(pageCount, () => {
+  page.value = 1
+})
 
 </script>

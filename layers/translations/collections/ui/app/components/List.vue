@@ -16,19 +16,84 @@
 
       <template #values-cell="{ row }">
         <div class="text-sm">
-          <CrudTranslationDisplay :translations="row.original.values" />
+          <CrudTranslationDisplay :translations="row.values" />
         </div>
       </template>
 
       <template #isOverrideable-cell="{ row }">
         <UBadge 
-          :color="row.original.isOverrideable ? 'green' : 'gray'" 
+          :color="row.isOverrideable ? 'green' : 'gray'" 
           variant="soft"
         >
-          {{ row.original.isOverrideable ? 'Yes' : 'No' }}
+          {{ row.isOverrideable ? 'Yes' : 'No' }}
         </UBadge>
       </template>
+
+      <template #overrideCount-cell="{ row }">
+        <UButton
+          v-if="row.overrideCount > 0"
+          @click="openOverridesModal(row)"
+          variant="soft"
+          color="blue"
+          size="xs"
+        >
+          {{ row.overrideCount }} {{ row.overrideCount === 1 ? 'team' : 'teams' }}
+        </UButton>
+        <span v-else class="text-gray-400 text-sm">None</span>
+      </template>
+
     </CrudTable>
+
+    <!-- Overrides Modal -->
+    <UModal v-model="showOverridesModal">
+      <UCard>
+        <template #header>
+          <div class="flex items-center justify-between">
+            <h3 class="text-base font-semibold">Team Overrides</h3>
+            <UButton
+              color="gray"
+              variant="ghost"
+              icon="i-lucide-x"
+              size="sm"
+              @click="showOverridesModal = false"
+            />
+          </div>
+        </template>
+
+        <div v-if="selectedTranslation" class="space-y-4">
+          <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded">
+            <p class="text-sm font-medium mb-2">System Translation: {{ selectedTranslation.keyPath }}</p>
+            <CrudTranslationDisplay :translations="selectedTranslation.values" />
+          </div>
+
+          <div v-if="loadingOverrides" class="flex items-center justify-center py-8">
+            <UIcon name="i-lucide-loader-2" class="animate-spin w-5 h-5 mr-2" />
+            <span>Loading team overrides...</span>
+          </div>
+
+          <div v-else-if="currentOverrides?.length" class="space-y-3">
+            <h4 class="font-semibold text-sm">Team Customizations:</h4>
+            <div 
+              v-for="override in currentOverrides" 
+              :key="override.id" 
+              class="border dark:border-gray-700 rounded p-3 space-y-2"
+            >
+              <div class="flex items-center justify-between">
+                <span class="font-medium text-sm">{{ override.teamName || 'Unknown Team' }}</span>
+                <span class="text-xs text-gray-500">
+                  Updated: {{ new Date(override.updatedAt).toLocaleDateString() }}
+                </span>
+              </div>
+              <CrudTranslationDisplay :translations="override.values" />
+            </div>
+          </div>
+
+          <div v-else class="text-center py-8 text-gray-500">
+            No team overrides found for this translation.
+          </div>
+        </div>
+      </UCard>
+    </UModal>
 
     <div class="flex justify-end mt-4">
       <UButton
@@ -118,6 +183,12 @@ const syncing = ref(false)
 const importing = ref(false)
 const showExample = ref(false)
 const bulkImportJson = ref('')
+
+// State for overrides modal
+const showOverridesModal = ref(false)
+const selectedTranslation = ref<any>(null)
+const currentOverrides = ref<any[]>([])
+const loadingOverrides = ref(false)
 
 const exampleJson = `{
   "translations": [
@@ -247,6 +318,33 @@ async function handleBulkImport() {
     })
   } finally {
     importing.value = false
+  }
+}
+
+// Open modal and fetch team overrides
+async function openOverridesModal(translation: any) {
+  selectedTranslation.value = translation
+  showOverridesModal.value = true
+  loadingOverrides.value = true
+  currentOverrides.value = []
+  
+  try {
+    const overrides = await $fetch(`/api/super-admin/translations-ui/overrides/${encodeURIComponent(translation.keyPath)}`, {
+      query: { namespace: translation.namespace || 'ui' }
+    })
+    
+    currentOverrides.value = overrides
+  } catch (error) {
+    console.error('Failed to fetch overrides:', error)
+    toast.add({
+      title: 'Error',
+      description: 'Failed to load team overrides',
+      color: 'red',
+      icon: 'i-lucide-circle-x'
+    })
+    currentOverrides.value = []
+  } finally {
+    loadingOverrides.value = false
   }
 }
 </script>

@@ -39,9 +39,7 @@
         <UTextarea v-model="state.description" class="w-full" size="xl" />
       </UFormField>
 
-      <UFormField label="Can be overridden by teams" name="isOverrideable">
-        <UToggle v-model="state.isOverrideable" size="lg" />
-      </UFormField>
+      <USwitch label="Can be overridden by teams" v-model="state.isOverrideable" size="lg" />
 
       <CrudButton
         :action="action"
@@ -100,14 +98,14 @@ function updateValues() {
   const values: Record<string, string> = {
     en: englishValue.value
   }
-  
+
   // Add other locale values
   for (const [locale, data] of Object.entries(translationValues.value)) {
     if (data && typeof data === 'object' && 'value' in data) {
       values[locale] = data.value
     }
   }
-  
+
   state.values = values
 }
 
@@ -121,12 +119,12 @@ watchEffect(() => {
   const initialValues = getInitialValues()
   // Merge the values into the reactive state
   Object.assign(state, initialValues)
-  
+
   // If we have existing values, parse them for the translation component
   if (initialValues.values && typeof initialValues.values === 'object') {
     // Extract English value
     englishValue.value = initialValues.values.en || ''
-    
+
     // Extract other locale values in the format expected by CrudTranslationField
     const otherLocales: Record<string, any> = {}
     for (const [locale, value] of Object.entries(initialValues.values)) {

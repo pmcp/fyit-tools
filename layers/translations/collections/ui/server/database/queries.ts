@@ -1,6 +1,6 @@
 import type { TranslationsUi, NewTranslationsUi } from '../../types'
 import { createError } from 'h3'
-import { and, eq, isNull, or } from 'drizzle-orm'
+import { and, eq, isNull, or, not, count, desc } from 'drizzle-orm'
 
 export async function getAllTranslationsUi() {
   const db = useDB()
@@ -207,4 +207,69 @@ export async function resolveTranslation(
     value: keyPath,
     translation: null
   }
+}
+
+// Get team overrides for a specific system translation
+export async function getTeamOverridesForTranslation(
+  keyPath: string,
+  namespace: string = 'ui'
+) {
+  const db = useDB()
+  
+  const overrides = await db
+    .select({
+      id: tables.translationsUi.id,
+      teamId: tables.translationsUi.teamId,
+      teamName: tables.teams.name,
+      values: tables.translationsUi.values,
+      updatedAt: tables.translationsUi.updatedAt
+    })
+    .from(tables.translationsUi)
+    .leftJoin(tables.teams, eq(tables.translationsUi.teamId, tables.teams.id))
+    .where(
+      and(
+        eq(tables.translationsUi.keyPath, keyPath),
+        eq(tables.translationsUi.namespace, namespace),
+        not(isNull(tables.translationsUi.teamId))
+      )
+    )
+    .orderBy(tables.teams.name)
+  
+  return overrides
+}
+
+// Get all system translations with override counts
+export async function getAllSystemTranslationsWithOverrideCounts() {
+  const db = useDB()
+  
+  // Get system translations
+  const systemTranslations = await db
+    .select()
+    .from(tables.translationsUi)
+    .where(isNull(tables.translationsUi.teamId))
+    .orderBy(desc(tables.translationsUi.createdAt))
+  
+  // Get override counts for each system translation
+  const overrideCounts = await db
+    .select({
+      keyPath: tables.translationsUi.keyPath,
+      namespace: tables.translationsUi.namespace,
+      count: count(tables.translationsUi.id).as('count')
+    })
+    .from(tables.translationsUi)
+    .where(not(isNull(tables.translationsUi.teamId)))
+    .groupBy(tables.translationsUi.keyPath, tables.translationsUi.namespace)
+  
+  // Merge the data
+  const translationsWithCounts = systemTranslations.map(translation => {
+    const overrideData = overrideCounts.find(
+      oc => oc.keyPath === translation.keyPath && oc.namespace === translation.namespace
+    )
+    return {
+      ...translation,
+      overrideCount: overrideData?.count || 0
+    }
+  })
+  
+  return translationsWithCounts
 }
