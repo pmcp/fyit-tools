@@ -1,4 +1,4 @@
-import { createTranslationsSystem } from '../../../database/queries'
+import { createTranslationsUi } from '../../../database/queries'
 
 export default defineEventHandler(async (event) => {
   // Check if user is super admin
@@ -28,22 +28,25 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Create new translation
+  // Create new translation (system level - no teamId)
   const newTranslation = {
     userId: user.id,
+    teamId: null, // System-level translation
+    namespace: 'ui',
     keyPath: body.keyPath,
     category: body.category,
     values: body.values,
     description: body.description || null,
+    isOverrideable: body.isOverrideable !== undefined ? body.isOverrideable : true,
   }
 
   try {
-    return await createTranslationsSystem(newTranslation)
+    return await createTranslationsUi(newTranslation)
   } catch (error) {
     if (error.message?.includes('UNIQUE constraint failed')) {
       throw createError({
         statusCode: 409,
-        statusMessage: 'A translation with this keyPath already exists',
+        statusMessage: 'A translation with this keyPath and namespace already exists',
       })
     }
     throw error

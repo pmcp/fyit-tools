@@ -1,14 +1,14 @@
 <template>
   <div class="space-y-6">
     <CrudTable
-      collection="translationsSystem"
+      collection="translationsUi"
       :columns="columns"
-      :rows="collectionTranslationsSystem"
+      :rows="collectionTranslationsUi"
     >
       <template #header>
           <CrudTableHeader
             title="System Translations"
-            :collection="'translationsSystem'"
+            :collection="'translationsUi'"
             createButton
           />
 
@@ -18,6 +18,15 @@
         <div class="text-sm">
           <CrudTranslationDisplay :translations="row.original.values" />
         </div>
+      </template>
+
+      <template #isOverrideable-cell="{ row }">
+        <UBadge 
+          :color="row.original.isOverrideable ? 'green' : 'gray'" 
+          variant="soft"
+        >
+          {{ row.original.isOverrideable ? 'Yes' : 'No' }}
+        </UBadge>
       </template>
     </CrudTable>
 
@@ -99,9 +108,9 @@
 <script setup lang="ts">
 import TranslationDisplay from "../../../../../crud/components/TranslationDisplay.vue";
 
-const { columns } = useTranslationsSystem()
+const { columns } = useTranslationsUi()
 const { currentTeam } = useTeam()
-const { translationsSystem: collectionTranslationsSystem } = useCollections()
+const { translationsUi: collectionTranslationsUi } = useCollections()
 const toast = useToast()
 
 // State for sync and import
@@ -136,7 +145,7 @@ const exampleJson = `{
 }`
 
 const { data: systemTranslations, refresh } = await useFetch(
-  `/api/super-admin/translations-system`,
+  `/api/super-admin/translations-ui`,
   {
     watch: [currentTeam],
   },
@@ -144,14 +153,14 @@ const { data: systemTranslations, refresh } = await useFetch(
 
 // Directly assign the fetched system translation to the collection
 if (systemTranslations.value) {
-  collectionTranslationsSystem.value = systemTranslations.value
+  collectionTranslationsUi.value = systemTranslations.value
 }
 
 // Sync translations to locale files
 async function syncTranslations() {
   syncing.value = true
   try {
-    const result = await $fetch('/api/super-admin/translations-system/sync', {
+    const result = await $fetch('/api/super-admin/translations-ui/sync', {
       method: 'POST'
     })
 
@@ -192,7 +201,7 @@ async function handleBulkImport() {
     // Process each translation
     for (const translation of data.translations) {
       try {
-        await $fetch('/api/super-admin/translations-system', {
+        await $fetch('/api/super-admin/translations-ui', {
           method: 'POST',
           body: translation
         })

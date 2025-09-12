@@ -38,4 +38,7 @@ const flags: Record<string, string> = {
   nl: '🦁',
   fr: '🐔'
 }
+
+// define props
+
 </script>

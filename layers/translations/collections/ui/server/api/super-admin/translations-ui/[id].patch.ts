@@ -1,4 +1,4 @@
-import { updateTranslationsSystem } from '../../../database/queries'
+import { updateTranslationsUi } from '../../../database/queries'
 
 export default defineEventHandler(async (event) => {
   // Check if user is super admin
@@ -27,8 +27,25 @@ export default defineEventHandler(async (event) => {
   const updateData = {
     ...(body.values && { values: body.values }),
     ...(body.description !== undefined && { description: body.description }),
+    ...(body.namespace !== undefined && { namespace: body.namespace }),
+    ...(body.isOverrideable !== undefined && { isOverrideable: body.isOverrideable }),
     updatedAt: new Date(),
   }
 
-  return await updateTranslationsSystem(id, updateData)
+  // Ensure we're only updating system translations (teamId=null)
+  const db = useDB()
+  const existing = await db
+    .select()
+    .from(tables.translationsUi)
+    .where(eq(tables.translationsUi.id, id))
+    .get()
+  
+  if (!existing || existing.teamId !== null) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'System translation not found',
+    })
+  }
+
+  return await updateTranslationsUi(id, updateData)
 })

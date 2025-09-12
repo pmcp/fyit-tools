@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-wrap gap-1.5">
+  <div class="flex  gap-1.5">
     <template v-for="lang in languages" :key="lang">
-      <UPopover 
+      <UPopover
         v-if="getTranslationLength(lang) > 0 && getTranslationLength(lang) <= 200"
       >
         <template #default="{ open }">
@@ -12,7 +12,7 @@
             class="cursor-pointer"
           />
         </template>
-        
+
         <template #content>
           <div class="p-3 max-w-sm">
             <div class="flex items-center justify-between mb-2">
@@ -50,10 +50,12 @@
       />
     </template>
 
-    <UModal v-model:open="modalOpen" :title="`Translation - ${selectedLang?.toUpperCase()}`">
-      <template #default>
-
-        <div class="p-6 space-y-4">
+    <UModal
+      v-model:open="modalOpen"
+      :title="`Translation - ${selectedLang?.toUpperCase()}`"
+    >
+      <template #body>
+        <div class="space-y-4">
           <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
             <div class="flex items-center justify-between mb-3">
               <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Content</span>
@@ -97,7 +99,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  languages: () => ['en', 'fr', 'nl', 'de', 'es', 'it']
+  languages: () => []
 })
 
 const modalOpen = ref(false)
@@ -112,14 +114,14 @@ const languages = computed(() => {
   if (props.languages && props.languages.length > 0) {
     return props.languages
   }
-  
+
   // Otherwise use i18n configured locales
   if (locales.value && locales.value.length > 0) {
-    return locales.value.map(locale => 
+    return locales.value.map(locale =>
       typeof locale === 'string' ? locale : locale.code
     )
   }
-  
+
   // Fallback to translation keys if available
   return Object.keys(props.translations || {})
 })
@@ -146,21 +148,21 @@ const openModal = (lang: string) => {
 
 const copyToClipboard = async (text: string) => {
   if (!text) {
-    toast.add({ 
+    toast.add({
       title: 'No text to copy',
       color: 'error'
     })
     return
   }
-  
+
   try {
     await copy(text)
-    toast.add({ 
+    toast.add({
       title: 'Copied to clipboard',
       color: 'success'
     })
   } catch (error) {
-    toast.add({ 
+    toast.add({
       title: 'Failed to copy text',
       color: 'error'
     })

@@ -39,6 +39,10 @@
         <UTextarea v-model="state.description" class="w-full" size="xl" />
       </UFormField>
 
+      <UFormField label="Can be overridden by teams" name="isOverrideable">
+        <UToggle v-model="state.isOverrideable" size="lg" />
+      </UFormField>
+
       <CrudButton
         :action="action"
         :collection="collection"
@@ -50,26 +54,27 @@
 </template>
 
 <script setup lang="ts">
-import type { TranslationsSystemFormProps, TranslationsSystemFormData } from '../../types'
+import type { TranslationsUiFormProps, TranslationsUiFormData } from '../../types'
 import { z } from 'zod'
 
 const { send } = useCrud()
 
-const props = defineProps<TranslationsSystemFormProps>()
+const props = defineProps<TranslationsUiFormProps>()
 
-const { defaultValue, schema } = useTranslationsSystem()
+const { defaultValue, schema } = useTranslationsUi()
 
 // Separate state for handling the translation field component
 const englishValue = ref('')
 const translationValues = ref<Record<string, any>>({})
 
 // Create a reactive form state with proper typing
-const state = reactive<TranslationsSystemFormData & { id?: string | null }>({
+const state = reactive<TranslationsUiFormData & { id?: string | null }>({
   id: null,
   keyPath: '',
   category: '',
   values: '',
-  description: ''
+  description: '',
+  isOverrideable: true
 })
 
 // Compute what the initial values should be based on props

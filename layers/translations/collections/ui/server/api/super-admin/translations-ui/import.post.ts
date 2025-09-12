@@ -1,7 +1,6 @@
-import { translationsSystem } from '../../../database/schema'
+import { deleteAllTranslationsUi, bulkCreateTranslationsUi } from '../../../database/queries'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
-import { nanoid } from 'nanoid'
 
 export default defineEventHandler(async (event) => {
   // Check if user is super admin
@@ -14,7 +13,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const localesDir = join(process.cwd(), 'layers', 'i18n', 'locales')
-  
+
   try {
     // Read all locale files
     const locales = {}
@@ -30,7 +29,7 @@ export default defineEventHandler(async (event) => {
     function extractKeys(obj, prefix = '', locale) {
       for (const [key, value] of Object.entries(obj)) {
         const fullKey = prefix ? `${prefix}.${key}` : key
-        
+
         if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
           extractKeys(value, fullKey, locale)
         } else {
@@ -51,37 +50,30 @@ export default defineEventHandler(async (event) => {
     }
 
     // Clear existing translations
-    await useDrizzle()
-      .delete(translationsSystem)
-      .run()
+    await deleteAllTranslationsUi()
 
-    // Insert new translations
+    // Prepare translations for insertion
     const translations = []
     for (const [keyPath, data] of keyPaths.entries()) {
       translations.push({
-        id: nanoid(),
-        teamId: 'system',
+        teamId: null, // System-level translation
         userId: user.id,
+        namespace: 'ui',
         keyPath,
         category: data.category.split('.')[0], // Use first part as category
         values: data.values,
         description: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        isOverrideable: true
       })
     }
 
-    if (translations.length > 0) {
-      await useDrizzle()
-        .insert(translationsSystem)
-        .values(translations)
-        .run()
-    }
+    // Bulk insert translations
+    const inserted = await bulkCreateTranslationsUi(translations)
 
     return {
       success: true,
       message: 'Translations imported successfully',
-      imported: translations.length,
+      imported: inserted.length,
     }
   } catch (error) {
     throw createError({

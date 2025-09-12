@@ -7,6 +7,8 @@
 
   <!--  TODO: ONLY WHEN ADMIN OR HIGHER? -->
   <CrudContainer />
+  
+  <LanguageSwitcherIsland />
 
 </template>
 

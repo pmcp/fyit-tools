@@ -1,6 +1,5 @@
 <template>
-  {{ $t('navigation.backToDashboard') }}
-  <TranslationsSystemList />
+  <TranslationsUiList />
 </template>
 
 <script setup lang="ts">

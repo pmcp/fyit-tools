@@ -13,6 +13,6 @@ export default defineNuxtConfig({
     ]
   },
   extends: [
-    './collections/system'
+    './collections/ui'
   ]
 })

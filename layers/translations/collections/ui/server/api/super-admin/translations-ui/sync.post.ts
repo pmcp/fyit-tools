@@ -1,4 +1,5 @@
-import { translationsSystem } from '../../../database/schema'
+import { translationsUi } from '../../../database/schema'
+import { isNull } from 'drizzle-orm'
 import { writeFile, readFile } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
@@ -13,11 +14,12 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Fetch all translations from database
+  // Fetch only system translations (teamId = null) from database
   const db = useDB()
   const translations = await db
     .select()
-    .from(translationsSystem)
+    .from(translationsUi)
+    .where(isNull(translationsUi.teamId))
     .all()
 
   const localesDir = join(process.cwd(), 'layers', 'i18n', 'locales')

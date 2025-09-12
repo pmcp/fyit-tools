@@ -8,7 +8,7 @@ export default defineNuxtConfig({
     dirs: [
       {
         path: join(currentDir, 'app/components'),
-        prefix: 'TranslationsSystem',
+        prefix: 'TranslationsUi',
         global: true
       }
     ]
