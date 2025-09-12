@@ -13,23 +13,15 @@
           />
 
       </template>
-    </CrudTable>
 
-    <!-- Bulk Import Section -->
-    <UCard>
-      <template #header>
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-semibold">Bulk Import Translations</h3>
-          <UButton
-            @click="showExample = !showExample"
-            variant="ghost"
-            size="sm"
-            :icon="showExample ? 'i-lucide-eye-off' : 'i-lucide-eye'"
-          >
-            {{ showExample ? 'Hide' : 'Show' }} Example
-          </UButton>
+      <template #values-cell="{ row }">
+        <div class="text-sm">
+          <CrudTranslationDisplay :translations="row.original.values" />
         </div>
       </template>
+    </CrudTable>
+
+    <div class="flex justify-end mt-4">
       <UButton
         @click="syncTranslations"
         :loading="syncing"
@@ -39,46 +31,74 @@
       >
         Sync to Locale Files
       </UButton>
+    </div>
 
-      <div class="space-y-4">
-        <!-- Example JSON -->
-        <div v-if="showExample" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Example JSON format:</p>
-          <pre class="text-xs overflow-x-auto"><code>{{ exampleJson }}</code></pre>
-        </div>
+    <!-- Bulk Import Section -->
+<!--    <UCard>-->
+<!--      <template #header>-->
+<!--        <div class="flex items-center justify-between">-->
+<!--          <h3 class="text-lg font-semibold">Bulk Import Translations</h3>-->
+<!--          <UButton-->
+<!--            @click="showExample = !showExample"-->
+<!--            variant="ghost"-->
+<!--            size="sm"-->
+<!--            :icon="showExample ? 'i-lucide-eye-off' : 'i-lucide-eye'"-->
+<!--          >-->
+<!--            {{ showExample ? 'Hide' : 'Show' }} Example-->
+<!--          </UButton>-->
+<!--        </div>-->
+<!--      </template>-->
+<!--      <UButton-->
+<!--        @click="syncTranslations"-->
+<!--        :loading="syncing"-->
+<!--        color="blue"-->
+<!--        variant="soft"-->
+<!--        icon="i-lucide-refresh-cw"-->
+<!--      >-->
+<!--        Sync to Locale Files-->
+<!--      </UButton>-->
 
-        <!-- Import Textarea -->
-        <UTextarea
-          v-model="bulkImportJson"
-          placeholder="Paste your JSON here..."
-          :rows="10"
-          class="font-mono text-sm"
-        />
+<!--      <div class="space-y-4">-->
+<!--        &lt;!&ndash; Example JSON &ndash;&gt;-->
+<!--        <div v-if="showExample" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">-->
+<!--          <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Example JSON format:</p>-->
+<!--          <pre class="text-xs overflow-x-auto"><code>{{ exampleJson }}</code></pre>-->
+<!--        </div>-->
 
-        <!-- Import Button -->
-        <div class="flex justify-end gap-2">
-          <UButton
-            @click="bulkImportJson = ''"
-            variant="ghost"
-            :disabled="!bulkImportJson || importing"
-          >
-            Clear
-          </UButton>
-          <UButton
-            @click="handleBulkImport"
-            :loading="importing"
-            :disabled="!bulkImportJson"
-            color="green"
-          >
-            Import Translations
-          </UButton>
-        </div>
-      </div>
-    </UCard>
+<!--        &lt;!&ndash; Import Textarea &ndash;&gt;-->
+<!--        <UTextarea-->
+<!--          v-model="bulkImportJson"-->
+<!--          placeholder="Paste your JSON here..."-->
+<!--          :rows="10"-->
+<!--          class="font-mono text-sm"-->
+<!--        />-->
+
+<!--        &lt;!&ndash; Import Button &ndash;&gt;-->
+<!--        <div class="flex justify-end gap-2">-->
+<!--          <UButton-->
+<!--            @click="bulkImportJson = ''"-->
+<!--            variant="ghost"-->
+<!--            :disabled="!bulkImportJson || importing"-->
+<!--          >-->
+<!--            Clear-->
+<!--          </UButton>-->
+<!--          <UButton-->
+<!--            @click="handleBulkImport"-->
+<!--            :loading="importing"-->
+<!--            :disabled="!bulkImportJson"-->
+<!--            color="green"-->
+<!--          >-->
+<!--            Import Translations-->
+<!--          </UButton>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </UCard>-->
   </div>
 </template>
 
 <script setup lang="ts">
+import TranslationDisplay from "../../../../../crud/components/TranslationDisplay.vue";
+
 const { columns } = useTranslationsSystem()
 const { currentTeam } = useTeam()
 const { translationsSystem: collectionTranslationsSystem } = useCollections()
@@ -139,14 +159,14 @@ async function syncTranslations() {
       title: 'Success',
       description: `Synced ${result.synced} translations to locale files`,
       color: 'green',
-      icon: 'i-lucide-check-circle'
+      icon: 'i-lucide-circle-check'
     })
   } catch (error) {
     toast.add({
       title: 'Error',
       description: error.data?.statusMessage || 'Failed to sync translations',
       color: 'red',
-      icon: 'i-lucide-x-circle'
+      icon: 'i-lucide-circle-x'
     })
   } finally {
     syncing.value = false
@@ -200,7 +220,7 @@ async function handleBulkImport() {
       title: successCount > 0 ? 'Import Complete' : 'Import Failed',
       description: message,
       color: successCount > 0 ? 'green' : 'orange',
-      icon: successCount > 0 ? 'i-lucide-check-circle' : 'i-lucide-triangle-alert'
+      icon: successCount > 0 ? 'i-lucide-circle-check' : 'i-lucide-triangle-alert'
     })
 
     // Refresh the table if any were added
@@ -214,7 +234,7 @@ async function handleBulkImport() {
       title: 'Import Error',
       description: error.message || 'Invalid JSON format',
       color: 'red',
-      icon: 'i-lucide-x-circle'
+      icon: 'i-lucide-circle-x'
     })
   } finally {
     importing.value = false

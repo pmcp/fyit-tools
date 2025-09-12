@@ -13,8 +13,19 @@ import {
 
 export default function () {
   const toast = useToast()
+  const route = useRoute()
   // TODO
   const { currentTeam } = useTeam()
+  
+  // Helper function to get the correct API base path
+  const getApiBasePath = (apiPath: string) => {
+    // Check if we're in super-admin context
+    if (route.path.includes('/super-admin/')) {
+      return `/api/super-admin/${apiPath}`
+    }
+    // Default to team-based path
+    return `/api/teams/${currentTeam.value.id}/${apiPath}`
+  }
 
   const pagination = useState('pagination', () => {
     return {
@@ -65,8 +76,16 @@ export default function () {
     const collectionRef = collections[collection];
 
     try {
+      // Get the correct API path based on context
+      const collections = useCollections();
+      const config = collections.getConfig(collection)
+      const apiPath = config?.apiPath || collection
+      const fullApiPath = route.path.includes('/super-admin/') 
+        ? `/api/super-admin/${apiPath}`
+        : `/api/${collection}`
+      
       // Use $fetch for API calls with proper error handling
-      const res = await $fetch(`/api/${collection}`, {
+      const res = await $fetch(fullApiPath, {
         method: 'GET',
         query: query,
         credentials: 'include'
@@ -165,7 +184,8 @@ export default function () {
 
     try {
       let res;
-      const baseUrl = `/api/teams/${currentTeam.value.id}/${apiPath}`
+      // Use the correct API base path based on context
+      const baseUrl = getApiBasePath(apiPath)
 
       // Use functional API helpers
       if (action === 'update') {
@@ -301,8 +321,11 @@ export default function () {
         const config = collections.getConfig(collection)
         const apiPath = config?.apiPath || collection
         
+        // Use the correct API base path based on context
+        const fullApiPath = getApiBasePath(apiPath)
+        
         // Use $fetch for API calls with proper error handling
-        const response = await $fetch(`/api/teams/${currentTeam.value.id}/${apiPath}`, {
+        const response = await $fetch(fullApiPath, {
           method: 'GET',
           query: { ids: ids.join(',') }
         });

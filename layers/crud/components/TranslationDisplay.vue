@@ -1,21 +1,22 @@
 <template>
   <div class="flex flex-wrap gap-1.5">
-    <template v-for="(lang, index) in languages" :key="lang">
+    <template v-for="lang in languages" :key="lang">
       <UPopover 
         v-if="getTranslationLength(lang) > 0 && getTranslationLength(lang) <= 200"
-        :content="{ side: 'top', align: 'center' }"
       >
-        <UBadge
-          :label="lang.toUpperCase()"
-          :color="translations[lang] ? 'primary' : 'neutral'"
-          variant="subtle"
-          class="cursor-pointer hover:opacity-80 transition-opacity"
-        />
+        <template #default="{ open }">
+          <UBadge
+            :label="lang.toUpperCase()"
+            :color="translations[lang] ? 'primary' : 'neutral'"
+            variant="subtle"
+            class="cursor-pointer"
+          />
+        </template>
         
         <template #content>
           <div class="p-3 max-w-sm">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-medium text-muted">{{ lang.toUpperCase() }}</span>
+              <span class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ lang.toUpperCase() }}</span>
               <UButton
                 icon="i-lucide-copy"
                 size="xs"
@@ -25,7 +26,7 @@
               />
             </div>
             <p class="text-sm break-words">{{ translations[lang] || 'No translation' }}</p>
-            <div class="text-xs text-muted mt-2">
+            <div class="text-xs text-gray-500 dark:text-gray-400 mt-2">
               {{ getCharCount(lang) }} characters
             </div>
           </div>
@@ -37,7 +38,6 @@
         :label="lang.toUpperCase()"
         color="neutral"
         variant="subtle"
-        class="opacity-50"
       />
 
       <UBadge
@@ -45,29 +45,18 @@
         :label="lang.toUpperCase()"
         :color="translations[lang] ? 'primary' : 'neutral'"
         variant="subtle"
-        class="cursor-pointer hover:opacity-80 transition-opacity"
+        class="cursor-pointer"
         @click="openModal(lang)"
       />
     </template>
 
-    <UModal v-model="modalOpen" :ui="{ width: 'max-w-2xl' }">
-      <div class="p-6">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold">
-            Translation - {{ selectedLang?.toUpperCase() }}
-          </h3>
-          <UButton
-            icon="i-lucide-x"
-            color="neutral"
-            variant="ghost"
-            @click="modalOpen = false"
-          />
-        </div>
+    <UModal v-model:open="modalOpen" :title="`Translation - ${selectedLang?.toUpperCase()}`">
+      <template #default>
 
-        <div class="space-y-4">
-          <div class="bg-muted/10 rounded-lg p-4">
+        <div class="p-6 space-y-4">
+          <div class="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
             <div class="flex items-center justify-between mb-3">
-              <span class="text-sm font-medium text-muted">Content</span>
+              <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Content</span>
               <UButton
                 icon="i-lucide-copy"
                 label="Copy"
@@ -82,7 +71,7 @@
             </p>
           </div>
 
-          <div class="flex gap-4 text-sm text-muted">
+          <div class="flex gap-4 text-sm text-gray-500 dark:text-gray-400">
             <div>
               <span class="font-medium">Characters:</span>
               {{ getCharCount(selectedLang) }}
@@ -93,7 +82,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </template>
     </UModal>
   </div>
 </template>
@@ -101,7 +90,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useClipboard } from '@vueuse/core'
-import { toast } from 'vue-sonner'
 
 interface Props {
   translations: Record<string, string>
@@ -115,20 +103,25 @@ const props = withDefaults(defineProps<Props>(), {
 const modalOpen = ref(false)
 const selectedLang = ref<string | null>(null)
 const { copy } = useClipboard()
+const toast = useToast()
+const { locales } = useI18n()
 
-const availableLanguages = computed(() => {
+// Get available languages from i18n config or props
+const languages = computed(() => {
+  // If custom languages provided via props, use those
   if (props.languages && props.languages.length > 0) {
     return props.languages
   }
-  return Object.keys(props.translations || {})
-})
-
-const languages = computed(() => {
-  const langs = availableLanguages.value
-  if (langs.length === 0) {
-    return props.languages
+  
+  // Otherwise use i18n configured locales
+  if (locales.value && locales.value.length > 0) {
+    return locales.value.map(locale => 
+      typeof locale === 'string' ? locale : locale.code
+    )
   }
-  return langs
+  
+  // Fallback to translation keys if available
+  return Object.keys(props.translations || {})
 })
 
 const getTranslationLength = (lang: string): number => {
@@ -153,15 +146,24 @@ const openModal = (lang: string) => {
 
 const copyToClipboard = async (text: string) => {
   if (!text) {
-    toast.error('No text to copy')
+    toast.add({ 
+      title: 'No text to copy',
+      color: 'error'
+    })
     return
   }
   
   try {
     await copy(text)
-    toast.success('Copied to clipboard')
+    toast.add({ 
+      title: 'Copied to clipboard',
+      color: 'success'
+    })
   } catch (error) {
-    toast.error('Failed to copy text')
+    toast.add({ 
+      title: 'Failed to copy text',
+      color: 'error'
+    })
   }
 }
 </script>

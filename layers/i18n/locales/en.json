@@ -69,7 +69,8 @@
     "billing": "Billing",
     "notifications": "Notifications",
     "help": "Help",
-    "home": "Home"
+    "home": "Home",
+    "backToDashboard": "!!Back to Dashboard!!"
   },
   "messages": {
     "success": "Operation successful",
@@ -204,5 +205,6 @@
     "darkMode": "Dark Mode",
     "lightMode": "Light Mode",
     "autoMode": "Auto"
-  }
+  },
+  "testkeypath": "english"
 }

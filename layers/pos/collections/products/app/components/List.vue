@@ -11,15 +11,6 @@
         createButton
       />
     </template>
-    <template #name-data="{ row }">
-      {{ t(row, 'name') }}
-    </template>
-    <template #description-data="{ row }">
-      {{ t(row, 'description') }}
-    </template>
-    <template #remarkPrompt-data="{ row }">
-      {{ t(row, 'remarkPrompt') }}
-    </template>
   </CrudTable>
 </template>
 

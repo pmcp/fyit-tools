@@ -1,4 +1,5 @@
 <template>
+  {{ $t('navigation.backToDashboard') }}
   <TranslationsSystemList />
 </template>
 

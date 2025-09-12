@@ -69,7 +69,8 @@
     "billing": "Facturatie",
     "notifications": "Meldingen",
     "help": "Help",
-    "home": "Home"
+    "home": "Home",
+    "backToDashboard": "Terug naar Dashboard"
   },
   "messages": {
     "success": "Operatie succesvol",
@@ -204,5 +205,6 @@
     "darkMode": "Donkere modus",
     "lightMode": "Lichte modus",
     "autoMode": "Automatisch"
-  }
+  },
+  "testkeypath": "dutch"
 }

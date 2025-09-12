@@ -1,6 +1,7 @@
 import { translationsSystem } from '../../../database/schema'
-import { writeFile } from 'fs/promises'
+import { writeFile, readFile } from 'fs/promises'
 import { join } from 'path'
+import { existsSync } from 'fs'
 
 export default defineEventHandler(async (event) => {
   // Check if user is super admin
@@ -19,13 +20,29 @@ export default defineEventHandler(async (event) => {
     .from(translationsSystem)
     .all()
 
-  // Group translations by language and category
-  const locales = {
+  const localesDir = join(process.cwd(), 'layers', 'i18n', 'locales')
+  
+  // Load existing locale files
+  const existingLocales = {
     en: {},
     nl: {},
     fr: {},
   }
+  
+  for (const locale of ['en', 'nl', 'fr']) {
+    const filePath = join(localesDir, `${locale}.json`)
+    if (existsSync(filePath)) {
+      try {
+        const content = await readFile(filePath, 'utf-8')
+        existingLocales[locale] = JSON.parse(content)
+      } catch (error) {
+        console.warn(`Failed to read existing ${locale}.json:`, error)
+        existingLocales[locale] = {}
+      }
+    }
+  }
 
+  // Merge database translations with existing ones
   for (const translation of translations) {
     const { category, keyPath, values } = translation
     
@@ -35,7 +52,7 @@ export default defineEventHandler(async (event) => {
     for (const locale of ['en', 'nl', 'fr']) {
       if (!values[locale]) continue
       
-      let current = locales[locale]
+      let current = existingLocales[locale]
       
       // Navigate/create the nested structure
       for (let i = 0; i < keys.length - 1; i++) {
@@ -45,16 +62,14 @@ export default defineEventHandler(async (event) => {
         current = current[keys[i]]
       }
       
-      // Set the final value
+      // Set the final value (this will override existing value if present)
       current[keys[keys.length - 1]] = values[locale]
     }
   }
 
-  // Write to JSON files
-  const localesDir = join(process.cwd(), 'layers', 'i18n', 'locales')
-  
+  // Write merged content back to JSON files
   try {
-    for (const [locale, content] of Object.entries(locales)) {
+    for (const [locale, content] of Object.entries(existingLocales)) {
       const filePath = join(localesDir, `${locale}.json`)
       await writeFile(filePath, JSON.stringify(content, null, 2), 'utf-8')
     }

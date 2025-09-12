@@ -69,7 +69,8 @@
     "billing": "Facturation",
     "notifications": "Notifications",
     "help": "Aide",
-    "home": "Accueil"
+    "home": "Accueil",
+    "backToDashboard": "Retour au tableau de bord"
   },
   "messages": {
     "success": "Opération réussie",
@@ -204,5 +205,6 @@
     "darkMode": "Mode sombre",
     "lightMode": "Mode clair",
     "autoMode": "Automatique"
-  }
+  },
+  "testkeypath": "french"
 }
