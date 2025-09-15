@@ -1,5 +1,5 @@
-import { eq, and, isNull } from 'drizzle-orm'
 import { isTeamMember } from '@@/server/utils/teams'
+import { getTeamBySlug, getSystemTranslationByKeyPath } from '../../../../database/queries'
 
 export default defineEventHandler(async (event) => {
   const teamSlug = getRouterParam(event, 'id')
@@ -14,21 +14,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const db = useDB()
-
   // Verify team and access
-  const team = await db
-    .select()
-    .from(tables.teams)
-    .where(eq(tables.teams.slug, teamSlug))
-    .get()
-
-  if (!team) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Team not found'
-    })
-  }
+  const team = await getTeamBySlug(teamSlug)
 
   const hasAccess = await isTeamMember(team.id, user.id)
   if (!hasAccess) {
@@ -39,16 +26,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Fetch the specific system translation
-  const translation = await db
-    .select()
-    .from(tables.translationsUi)
-    .where(
-      and(
-        eq(tables.translationsUi.keyPath, keyPath),
-        isNull(tables.translationsUi.teamId)
-      )
-    )
-    .get()
+  const translation = await getSystemTranslationByKeyPath(keyPath)
 
   if (!translation) {
     throw createError({

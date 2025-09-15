@@ -13,6 +13,7 @@
     }"
     :class="`crud-slideover-level-${index}`"
     @update:open="(val) => handleSlideoverClose(state.id, val)"
+    @after:leave="() => handleAfterLeave(state.id)"
   >
     <template #header>
       <div class="flex items-center justify-between w-full">
@@ -74,6 +75,7 @@ interface CrudComposableReturn {
   crudStates: Ref<CrudState[]>
   close: (stateId?: string) => void
   closeAll: () => void
+  removeState: (stateId: string) => void
 }
 
 interface FormatCollectionsReturn {
@@ -81,7 +83,7 @@ interface FormatCollectionsReturn {
 }
 
 // Use the composables
-const { crudStates, close, closeAll }: CrudComposableReturn = useCrud()
+const { crudStates, close, closeAll, removeState }: CrudComposableReturn = useCrud()
 const { collectionWithCapitalSingular }: FormatCollectionsReturn = useFormatCollections()
 
 // Get formatted collection name
@@ -89,11 +91,20 @@ const getCollectionName = (collection: string | null): string => {
   return collection ? collectionWithCapitalSingular(collection) : ''
 }
 
-// Handle slideover close event
+// Handle slideover close event - just update the open state
 const handleSlideoverClose = (stateId: string, isOpen: boolean): void => {
   if (!isOpen) {
-    close(stateId)
+    // Find the state and set isOpen to false to trigger animation
+    const state = crudStates.value.find(s => s.id === stateId)
+    if (state) {
+      state.isOpen = false
+    }
   }
+}
+
+// Handle after leave animation complete - actually remove the state
+const handleAfterLeave = (stateId: string): void => {
+  removeState(stateId)
 }
 
 // Clean up on unmount

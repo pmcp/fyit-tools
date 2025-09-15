@@ -1,5 +1,5 @@
 import { isTeamMember } from '@@/server/utils/teams'
-import { getTeamBySlug, getTeamTranslations } from '../../../../database/queries'
+import { getTeamBySlug, getSystemTranslationsWithTeamOverrides } from '../../../../database/queries'
 
 export default defineEventHandler(async (event) => {
   const teamSlug = getRouterParam(event, 'id') // This is actually the slug from the URL
@@ -20,13 +20,6 @@ export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const locale = query.locale as string | undefined
 
-  // Fetch team-specific translations
-  const translations = await getTeamTranslations(team.id)
-
-  // Filter by locale if provided
-  if (locale) {
-    return translations.filter(t => t.values && locale in t.values)
-  }
-
-  return translations
+  // Get system translations with team overrides using the centralized query
+  return await getSystemTranslationsWithTeamOverrides(team.id, locale)
 })

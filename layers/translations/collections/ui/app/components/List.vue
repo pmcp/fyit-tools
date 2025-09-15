@@ -3,7 +3,10 @@
     <CrudTable
       collection="translationsUi"
       :columns="columns"
-      :rows="collectionTranslationsUi"
+      :rows="translationsItems"
+      :server-pagination="true"
+      :pagination-data="pagination"
+      :refresh-fn="refresh"
     >
       <template #header>
           <CrudTableHeader
@@ -88,7 +91,7 @@
 
       <template #values-cell="{ row }">
         <div class="text-sm">
-          <CrudTranslationDisplay :translations="row.original.values" />
+          <TranslationsDisplay :translations="row.original.values" />
         </div>
       </template>
 
@@ -113,25 +116,6 @@
         </UButton>
         <span v-else class="text-gray-400 text-sm">None</span>
       </template>
-
-      <template #actions-cell="{ row }">
-        <div class="flex items-center gap-2">
-          <UButton
-            @click="editTranslation(row)"
-            icon="i-lucide-pencil"
-            size="xs"
-            variant="soft"
-          />
-          <UButton
-            @click="deleteTranslationConfirm(row)"
-            icon="i-lucide-trash"
-            size="xs"
-            variant="soft"
-            color="red"
-          />
-        </div>
-      </template>
-
     </CrudTable>
 
     <!-- Overrides Modal -->
@@ -154,7 +138,7 @@
           <div v-if="selectedTranslation" class="space-y-4">
             <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded">
               <p class="text-sm font-medium mb-2">System Translation: {{ selectedTranslation.keyPath }}</p>
-              <CrudTranslationDisplay :translations="selectedTranslation.values" />
+              <TranslationsDisplay :translations="selectedTranslation.values" />
             </div>
 
             <div v-if="loadingOverrides" class="flex items-center justify-center py-8">
@@ -175,7 +159,7 @@
                     Updated: {{ new Date(override.updatedAt).toLocaleDateString() }}
                   </span>
                 </div>
-                <CrudTranslationDisplay :translations="override.values" />
+                <TranslationsDisplay :translations="override.values" />
               </div>
             </div>
 
@@ -193,12 +177,14 @@
 </template>
 
 <script setup lang="ts">
-import TranslationDisplay from "../../../../../crud/components/TranslationDisplay.vue";
-
-const { columns } = useTranslationsUi()
+const { columns, defaultPagination } = useTranslationsUi()
 const { currentTeam } = useTeam()
-const { translationsUi: collectionTranslationsUi } = useCollections()
 const toast = useToast()
+const route = useRoute()
+
+// Use the standard collection composable for pagination
+// This returns computed items directly from the collections store
+const { items: translationsItems, pagination, refresh, pending } = useCollection('translationsUi')
 
 // State for sync and import
 const syncing = ref(false)
@@ -243,18 +229,6 @@ const exampleJson = `{
     }
   }
 }`
-
-const { data: systemTranslations, refresh } = await useFetch(
-  `/api/super-admin/translations-ui`,
-  {
-    watch: [currentTeam],
-  },
-)
-
-// Directly assign the fetched system translation to the collection
-if (systemTranslations.value) {
-  collectionTranslationsUi.value = systemTranslations.value
-}
 
 // Sync translations to locale files
 async function syncTranslations() {

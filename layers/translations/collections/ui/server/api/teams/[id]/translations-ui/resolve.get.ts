@@ -1,26 +1,13 @@
-import { and, eq, isNull } from 'drizzle-orm'
 import { isTeamMember } from '@@/server/utils/teams'
+import { getTeamBySlug, resolveTranslation } from '../../../../database/queries'
 
 export default defineEventHandler(async (event) => {
   const teamSlug = getRouterParam(event, 'id') // This is actually the slug from the URL
   const { user } = await requireUserSession(event)
-  
-  const db = useDB()
-  
-  // First, get the team by slug to get the actual team ID
-  const team = await db
-    .select()
-    .from(tables.teams)
-    .where(eq(tables.teams.slug, teamSlug))
-    .get()
-    
-  if (!team) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Team not found'
-    })
-  }
-  
+
+  // Get the team by slug
+  const team = await getTeamBySlug(teamSlug)
+
   // Check if user has access to this team
   const hasAccess = await isTeamMember(team.id, user.id)
   if (!hasAccess) {
@@ -42,62 +29,17 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // First, try to get team-specific translation
-  const teamTranslation = await db
-    .select()
-    .from(tables.translationsUi)
-    .where(
-      and(
-        eq(tables.translationsUi.teamId, team.id),
-        eq(tables.translationsUi.keyPath, keyPath),
-        eq(tables.translationsUi.namespace, namespace)
-      )
-    )
-    .get()
+  // Use the existing resolveTranslation function
+  const result = await resolveTranslation(team.id, keyPath, namespace, locale)
 
-  if (teamTranslation?.values?.[locale]) {
-    return {
-      source: 'team',
-      keyPath,
-      namespace,
-      locale,
-      value: teamTranslation.values[locale],
-      translation: teamTranslation
-    }
-  }
-
-  // Fall back to system translation
-  const systemTranslation = await db
-    .select()
-    .from(tables.translationsUi)
-    .where(
-      and(
-        isNull(tables.translationsUi.teamId),
-        eq(tables.translationsUi.keyPath, keyPath),
-        eq(tables.translationsUi.namespace, namespace)
-      )
-    )
-    .get()
-
-  if (systemTranslation?.values?.[locale]) {
-    return {
-      source: 'system',
-      keyPath,
-      namespace,
-      locale,
-      value: systemTranslation.values[locale],
-      translation: systemTranslation,
-      isOverrideable: systemTranslation.isOverrideable
-    }
-  }
-
-  // No translation found, return the key itself
+  // Format the response to match the expected output
   return {
-    source: 'none',
+    source: result.source,
     keyPath,
     namespace,
     locale,
-    value: keyPath,
-    translation: null
+    value: result.value,
+    translation: result.translation,
+    ...(result.translation?.isOverrideable !== undefined && { isOverrideable: result.translation.isOverrideable })
   }
 })

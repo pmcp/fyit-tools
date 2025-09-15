@@ -63,7 +63,7 @@
       </UFormField>
 
       <!-- Translation fields -->
-      <CrudTranslationField
+      <TranslationsInput
         v-model="state.translations"
         :fields="['name', 'statusMessage']"
         :default-values="{

@@ -10,33 +10,32 @@ import {
   apiDelete
 } from '../utils/functional';
 
+// Default pagination settings for all collections
+const DEFAULT_PAGINATION = {
+  currentPage: 1,
+  pageSize: 10,
+  sortBy: 'createdAt',
+  sortDirection: 'desc' as const
+}
+
 
 export default function () {
   const toast = useToast()
   const route = useRoute()
   // TODO
   const { currentTeam } = useTeam()
-  
+
   // Helper function to get the correct API base path
   const getApiBasePath = (apiPath: string) => {
     // Check if we're in super-admin context
     if (route.path.includes('/super-admin/')) {
       return `/api/super-admin/${apiPath}`
     }
-    // Default to team-based path
-    return `/api/teams/${currentTeam.value.id}/${apiPath}`
+    // Default to team-based path using route params
+    return `/api/teams/${route.params.team}/${apiPath}`
   }
 
-  const pagination = useState('pagination', () => {
-    return {
-      locations: {
-        currentPage: 1,
-        pageSize: 100,
-        totalItems: 0,
-        totalPages: 0
-      }
-    }
-  })
+  const pagination = useState('pagination', () => ({}))
 
 
   // useState - now using array of states for multiple slideovers
@@ -64,12 +63,8 @@ export default function () {
   }
 
 
-  async function getCollection(collection: string, query: any, pagination: boolean) {
+  async function getCollection(collection: string, query: any = {}, usePagination: boolean = false) {
     if(useCrudError().foundErrors()) return;
-
-    if (pagination) query.pagination = useUserSettings().pagination.value[collection]
-
-    const { handleApiError } = useApiErrorHandler();
 
     // Get test reference before async operations
     const collections = useCollections();
@@ -77,13 +72,20 @@ export default function () {
 
     try {
       // Get the correct API path based on context
-      const collections = useCollections();
       const config = collections.getConfig(collection)
       const apiPath = config?.apiPath || collection
-      const fullApiPath = route.path.includes('/super-admin/') 
+      const fullApiPath = route.path.includes('/super-admin/')
         ? `/api/super-admin/${apiPath}`
-        : `/api/${collection}`
-      
+        : `/api/teams/${route.params.team}/${apiPath}`
+
+      // Add pagination parameters if requested
+      if (usePagination && pagination.value[collection]) {
+        query.page = pagination.value[collection].currentPage || 1
+        query.limit = pagination.value[collection].pageSize || 10
+        query.sortBy = pagination.value[collection].sortBy
+        query.sortDirection = pagination.value[collection].sortDirection
+      }
+
       // Use $fetch for API calls with proper error handling
       const res = await $fetch(fullApiPath, {
         method: 'GET',
@@ -91,17 +93,43 @@ export default function () {
         credentials: 'include'
       })
 
-      // Set collection with received items only when fetching a full collection
-      if(res && res.items && collectionRef) {
+      // Check if response has pagination structure
+      if(res && res.items && res.pagination) {
+        // Paginated response
+        if(collectionRef) {
+          collectionRef.value = res.items
+        }
+        // Update pagination state for this collection
+        pagination.value[collection] = {
+          ...pagination.value[collection],
+          ...res.pagination
+        }
+        return res;
+      } else if(res && Array.isArray(res)) {
+        // Non-paginated response (backward compatibility)
+        if(collectionRef) {
+          collectionRef.value = res
+        }
+        // Clear pagination for this collection
+        if(pagination.value[collection]) {
+          delete pagination.value[collection]
+        }
+        return res;
+      } else if(res && res.items && collectionRef) {
+        // Has items but no pagination
         collectionRef.value = res.items
+        return res;
       }
-
-      // TODO: Fix Set pagination for collection
-      if(pagination) useUserSettings().pagination.value[collection] = res.pagination
 
       return res;
     } catch (error) {
-      handleApiError(error, `fetching ${collection}`);
+      const errorMessage = error.data?.message || error.data || `Error fetching ${collection}`;
+      toast.add({
+        title: 'Uh oh! Something went wrong.',
+        description: errorMessage,
+        icon: 'i-lucide-octagon-alert',
+        color: 'primary'
+      })
 
       // Set empty collection on error to prevent UI issues
       if (collectionRef) {
@@ -146,15 +174,38 @@ export default function () {
     }
 
     if (action === 'update') {
+      console.log('[optimisticUpdate] UPDATE action:', { collection, data, currentItems: collectionItems.value?.length })
+
+      // Log the item BEFORE update
+      const originalItem = collectionItems.value.find(item => item.id === data.id)
+      console.log('[optimisticUpdate] Original item before update:', originalItem)
+      console.log('[optimisticUpdate] Update data being applied:', data)
+
       const { collection: newCollection, optimisticItem } = applyOptimisticUpdate(
         collectionItems.value,
         data.id,
         data
       )
 
+      console.log('[optimisticUpdate] After applyOptimisticUpdate:', {
+        optimisticItem,
+        optimisticId: optimisticItem?.optimisticId,
+        newCollectionLength: newCollection.length
+      })
+
       if (optimisticItem) {
         collectionItems.value = newCollection
-        activeItem.value = optimisticItem
+        console.log('[optimisticUpdate] Updated collection store with optimistic item')
+
+        // Verify the update in the store
+        const updatedItem = collectionItems.value.find(item => item.id === data.id)
+        console.log('[optimisticUpdate] Item in store after optimistic update:', updatedItem)
+
+        // Update the actual state, not the computed property
+        const currentState = crudStates.value[crudStates.value.length - 1]
+        if (currentState) {
+          currentState.activeItem = optimisticItem
+        }
       }
 
       return optimisticItem
@@ -189,8 +240,10 @@ export default function () {
 
       // Use functional API helpers
       if (action === 'update') {
+        console.log('[send] UPDATE - Sending to API:', { baseUrl, id: data.id, data })
         // Send the entire data object, not just specific fields
         res = await apiPatch(`${baseUrl}/${data.id}`)(data)
+        console.log('[send] UPDATE - API Response:', res)
       }
 
       if (action === 'create') {
@@ -210,11 +263,33 @@ export default function () {
       if(action === 'create' || action === 'update') {
         // Use functional helper to replace optimistic item with server response
         if (optimisticItem && optimisticItem.optimisticId) {
+          console.log('[send] Before replaceByOptimisticId:', {
+            optimisticId: optimisticItem.optimisticId,
+            optimisticItem,
+            serverResponse: res,
+            collectionLength: collectionRef.value.length
+          })
+
+          const itemBeforeReplace = collectionRef.value.find(item => item.optimisticId === optimisticItem.optimisticId)
+          console.log('[send] Item with optimisticId in collection:', itemBeforeReplace)
+
           collectionRef.value = replaceByOptimisticId(
             collectionRef.value,
             optimisticItem.optimisticId,
             res
           )
+
+          console.log('[send] After replaceByOptimisticId:', {
+            collectionLength: collectionRef.value.length
+          })
+
+          const itemAfterReplace = collectionRef.value.find(item => item.id === res.id)
+          console.log('[send] Item after replacement:', itemAfterReplace)
+        } else {
+          console.log('[send] NOT replacing - no optimisticItem or optimisticId:', {
+            hasOptimisticItem: !!optimisticItem,
+            optimisticId: optimisticItem?.optimisticId
+          })
         }
       }
 
@@ -242,8 +317,12 @@ export default function () {
 
       }
 
-      // Close the current state after successful operation
-      close(currentState?.id)
+      // Trigger closing animation instead of immediately removing state
+      if (currentState) {
+        currentState.isOpen = false
+      }
+
+      // No longer need to trigger refresh - components will auto-fetch on mount
 
       // Return the response for the caller to use
       return res
@@ -320,19 +399,43 @@ export default function () {
         const collections = useCollections()
         const config = collections.getConfig(collection)
         const apiPath = config?.apiPath || collection
-        
+
         // Use the correct API base path based on context
         const fullApiPath = getApiBasePath(apiPath)
-        
+
+        console.log('[CRUD Update] Fetching item for edit:', {
+          collection,
+          apiPath,
+          fullApiPath,
+          ids: ids.join(',')
+        })
+
         // Use $fetch for API calls with proper error handling
         const response = await $fetch(fullApiPath, {
           method: 'GET',
           query: { ids: ids.join(',') }
         });
 
-        // For update, we expect a single item - store it in the state
-        const activeItem = Array.isArray(response) ? response[0] : response
-        
+        console.log('[CRUD Update] Response received:', {
+          response,
+          isArray: Array.isArray(response),
+          hasItems: response?.items !== undefined,
+          hasPagination: response?.pagination !== undefined
+        })
+
+        // Check if response is paginated
+        let activeItem;
+        if (response?.items && response?.pagination) {
+          // Response is paginated, extract items
+          console.log('[CRUD Update] Paginated response detected, extracting items')
+          activeItem = Array.isArray(response.items) ? response.items[0] : response.items
+        } else {
+          // Regular response
+          activeItem = Array.isArray(response) ? response[0] : response
+        }
+
+        console.log('[CRUD Update] Active item extracted:', activeItem)
+
         // Find the state index and update it reactively
         const stateIndex = crudStates.value.findIndex(s => s.id === newState.id)
         if (stateIndex !== -1) {
@@ -344,6 +447,7 @@ export default function () {
         }
         return; // Exit early since we've already set loading to notLoading
       } catch (error) {
+        console.error('[CRUD Update] Error fetching item:', error)
         toast.add({
           title: 'Uh oh! Something went wrong.',
           description: String(error),
@@ -378,20 +482,38 @@ export default function () {
 
   const close = (stateId?: string): void => {
     if (stateId) {
-      // Close specific state by ID
-      const index = crudStates.value.findIndex(s => s.id === stateId)
-      if (index !== -1) {
-        crudStates.value.splice(index, 1)
+      // Find the state and set isOpen to false to trigger animation
+      const state = crudStates.value.find(s => s.id === stateId)
+      if (state) {
+        state.isOpen = false
       }
     } else {
       // Close the topmost state (backward compatibility)
-      crudStates.value.pop()
+      const topState = crudStates.value[crudStates.value.length - 1]
+      if (topState) {
+        topState.isOpen = false
+      }
     }
   }
-  
+
+  // New function to actually remove the state from the array (called after animation)
+  const removeState = (stateId: string): void => {
+    const index = crudStates.value.findIndex(s => s.id === stateId)
+    if (index !== -1) {
+      crudStates.value.splice(index, 1)
+    }
+  }
+
   // New function to close all states
   const closeAll = (): void => {
-    crudStates.value = []
+    // Set all states to closed to trigger animations
+    crudStates.value.forEach(state => {
+      state.isOpen = false
+    })
+    // After a delay, clear all states (fallback in case after:leave doesn't fire)
+    setTimeout(() => {
+      crudStates.value = []
+    }, 300)
   }
 
   // Reset function for navigation scenarios
@@ -399,8 +521,40 @@ export default function () {
     crudStates.value = []
   }
 
+  // Function to update pagination for a collection
+  function setPagination(collection: string, paginationData: any) {
+    console.log('[useCrud] setPagination called:', { collection, paginationData })
+    const oldValue = pagination.value[collection]
+    pagination.value[collection] = {
+      ...pagination.value[collection],
+      ...paginationData
+    }
+    console.log('[useCrud] pagination state updated from:', oldValue, 'to:', pagination.value[collection])
+  }
+
+  // Function to get pagination for a collection
+  function getPagination(collection: string) {
+    return pagination.value[collection] || {
+      currentPage: 1,
+      pageSize: 10,
+      totalItems: 0,
+      totalPages: 0
+    }
+  }
+
+  // Function to get default pagination for a collection
+  function getDefaultPagination(collection: string) {
+    // Try to get collection-specific defaults first
+    const collections = useCollections()
+    const config = collections.getConfig?.(collection)
+
+    // Return collection-specific defaults or global defaults
+    return config?.defaultPagination || DEFAULT_PAGINATION
+  }
+
+
   return {
-    pagination,
+    pagination, // Already exported - the reactive state
     showCrud,
     loading,
     action,
@@ -412,8 +566,12 @@ export default function () {
     open,
     close,
     closeAll,
+    removeState,
     reset,
-    getCollection
+    getCollection,
+    setPagination,
+    getPagination,
+    getDefaultPagination
   }
 
 }

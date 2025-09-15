@@ -1,8 +1,8 @@
 import { eq } from 'drizzle-orm'
 import { teamSettings } from '@@/server/database/schema/teams'
-import en from '../../locales/en.json'
-import nl from '../../locales/nl.json'
-import fr from '../../locales/fr.json'
+import en from '#layers/translations/i18n/locales/en.json'
+import nl from '#layers/translations/i18n/locales/nl.json'
+import fr from '#layers/translations/i18n/locales/fr.json'
 
 const systemTranslations: Record<string, any> = { en, nl, fr }
 

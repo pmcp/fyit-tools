@@ -1,49 +1,62 @@
 <template>
   <div class="space-y-6">
+    {{ t('navigation.teamTranslations') }}
     <CrudTable
-      :collection="'translationsUi'"
-      :columns="columns"
-      :rows="teamTranslations"
+      collection="translationsUi"
+      :columns="enhancedColumns"
+      :rows="enhancedTranslations"
+      :server-pagination="true"
+      :pagination-data="pagination"
+      :refresh-fn="refresh"
+      :hide-default-columns="{
+        created_at: true,
+        updated_at: true,
+        actions: false
+      }"
     >
       <template #header>
         <CrudTableHeader
           title="Team Translation Overrides"
           :collection="'translationsUi'"
-          createButton
         />
       </template>
 
-      <template #values-cell="{ row }">
+      <template #systemValues-cell="{ row }">
         <div class="text-sm">
-          <CrudTranslationDisplay :translations="row.values" />
+          <TranslationsDisplay :translations="row.original.systemValues" />
+        </div>
+      </template>
+
+      <template #teamValues-cell="{ row }">
+        <div v-if="row.original.hasOverride" class="text-sm">
+          <TranslationsDisplay :translations="row.original.teamValues" />
+        </div>
+        <div v-else class="text-gray-500 italic text-sm">
+          (using system)
         </div>
       </template>
 
       <template #isOverrideable-cell="{ row }">
         <UBadge
-          v-if="row.isOverrideable !== undefined"
-          :color="row.isOverrideable ? 'primary' : 'gray'"
+          v-if="row.original.isOverrideable !== undefined"
+          :color="row.original.isOverrideable ? 'primary' : 'gray'"
           variant="soft"
         >
-          {{ row.isOverrideable ? 'Yes' : 'No' }}
+          {{ row.original.isOverrideable ? 'Yes' : 'No' }}
         </UBadge>
       </template>
 
       <template #actions-cell="{ row }">
         <div class="flex items-center gap-2">
           <UButton
-            @click="editTranslation(row)"
+            @click="editTranslation(row.original)"
             icon="i-lucide-pencil"
             size="xs"
             variant="soft"
-          />
-          <UButton
-            @click="deleteTranslationConfirm(row)"
-            icon="i-lucide-trash"
-            size="xs"
-            variant="soft"
-            color="red"
-          />
+            :color="row.original.hasOverride ? 'orange' : 'primary'"
+          >
+            {{ row.original.hasOverride ? 'Edit' : 'Override' }}
+          </UButton>
         </div>
       </template>
     </CrudTable>
@@ -52,98 +65,88 @@
 </template>
 
 <script setup lang="ts">
-import { z } from 'zod'
+const { t } = useT()
+const { columns } = useTranslationsUi()
+const { open, crudStates } = useCrud()
 
-const route = useRoute()
-const toast = useToast()
-
-// Team ID from route
-const teamId = computed(() => route.params.team as string)
-
-// Translation schema
-const translationSchema = z.object({
-  keyPath: z.string().min(1, 'Key path is required'),
-  category: z.string().min(1, 'Category is required'),
-  values: z.record(z.string()),
-  description: z.string().optional(),
-})
-
-// State
-const loading = ref(false)
-const saving = ref(false)
-const teamTranslations = ref<any[]>([])
-const showEditModal = ref(false)
-const editingTranslation = ref<any>(null)
-const formState = ref({
-  keyPath: '',
-  category: '',
-  values: {},
-  description: '',
-})
-
-// Languages from i18n config
-const { locales } = useI18n()
-const languages = computed(() => locales.value.map(l => typeof l === 'string' ? l : l.code))
-
-// Table columns
-const columns = [
-  { accessorKey: 'keyPath', header: 'Key Path' },
+// Enhanced columns for the new table view
+const enhancedColumns = [
+  { accessorKey: 'keyPath', header: 'KeyPath' },
   { accessorKey: 'category', header: 'Category' },
-  { accessorKey: 'values', header: 'Values' },
-  { accessorKey: 'isOverrideable', header: 'Overrideable' },
-  { accessorKey: 'description', header: 'Description' },
-  { accessorKey: 'actions', header: 'Actions' },
+  { accessorKey: 'systemValues', header: 'System Values' },
+  { accessorKey: 'teamValues', header: 'Your Override' },
 ]
 
-// Fetch team translations
-async function fetchTranslations() {
+// Custom data fetching for the with-system endpoint
+const enhancedTranslations = ref([])
+const loading = ref(false)
+const error = ref(null)
+
+// Simple pagination state
+const pagination = ref({
+  currentPage: 1,
+  pageSize: 50,
+  total: 0
+})
+
+// Fetch function
+const refresh = async () => {
   loading.value = true
+  error.value = null
   try {
-    const data = await $fetch(`/api/teams/${teamId.value}/translations-ui`)
-    teamTranslations.value = data
-  } catch (error) {
-    console.error('Failed to fetch translations:', error)
-    toast.add({
-      title: 'Error',
-      description: 'Failed to load translations',
-      color: 'red',
-      icon: 'i-lucide-circle-x'
-    })
+    const route = useRoute()
+    const teamSlug = route.params.id || route.params.team
+
+    if (!teamSlug) {
+      throw new Error('Team slug not found in route parameters')
+    }
+
+    const data = await $fetch(`/api/teams/${teamSlug}/translations-ui/with-system`)
+    enhancedTranslations.value = data || []
+    pagination.value.total = enhancedTranslations.value.length
+  } catch (e) {
+    error.value = e
+    console.error('Failed to fetch translations:', e)
   } finally {
     loading.value = false
   }
 }
 
-// Edit translation
-function editTranslation(translation: any) {
-  editingTranslation.value = translation
-  formState.value = {
-    keyPath: translation.keyPath,
-    category: translation.category || '',
-    values: { ...translation.values },
-    description: translation.description || '',
-  }
+// Auto-fetch on mount
+onMounted(() => refresh())
 
-  // Initialize empty values for missing languages
-  languages.value.forEach(lang => {
-    if (!formState.value.values[lang]) {
-      formState.value.values[lang] = ''
+// Smart edit function that handles both creating overrides and editing existing ones
+const editTranslation = async (translation: any) => {
+  if (translation.hasOverride) {
+    // Edit existing team override
+    open('update', 'translationsUi', [translation.overrideId])
+  } else {
+    // Create new team override - pre-fill with system data
+    open('create', 'translationsUi', [])
+
+    // Pre-fill the form data after opening
+    await nextTick()
+    const currentState = crudStates.value[crudStates.value.length - 1]
+    if (currentState) {
+      currentState.activeItem = {
+        keyPath: translation.keyPath,
+        category: translation.category,
+        values: { ...translation.systemValues }, // Start with system values
+        description: '', // Team can add custom description
+        isOverrideable: translation.isOverrideable
+      }
     }
-  })
-
-  showEditModal.value = true
+  }
 }
 
-
-// Initialize
-onMounted(() => {
-  fetchTranslations()
-})
-
-// Watch for team changes
-watch(() => teamId.value, () => {
-  if (teamId.value) {
-    fetchTranslations()
+// Watch for CRUD operations completing and refresh the list
+watch(
+  () => crudStates.value.length,
+  (newLength, oldLength) => {
+    // If a CRUD state was removed (operation completed), refresh the list
+    if (newLength < oldLength) {
+      refresh()
+    }
   }
-})
+)
 </script>

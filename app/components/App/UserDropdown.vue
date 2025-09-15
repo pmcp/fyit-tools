@@ -44,7 +44,7 @@
       </div>
     </template>
     <template #language @click.stop>
-      <LanguageSwitcher />
+      <TranslationsLanguageSwitcher />
     </template>
   </UDropdownMenu>
   <UModal
@@ -63,7 +63,7 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 
 const { user } = useUserSession()
 const { logout } = useAuth()
-const { t } = useI18n()
+const { t } = useT()
 const mobileMenu = useState('mobileMenu')
 const isSuperAdmin = computed(() => user.value?.superAdmin)
 const feedbackModal = ref(false)

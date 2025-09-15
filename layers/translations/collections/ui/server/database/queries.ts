@@ -25,6 +25,28 @@ export async function getTranslationsUiByIds(uiIds: string[]) {
   return translations
 }
 
+// Get system translations by IDs (teamId = null)
+export async function getSystemTranslationsByIds(uiIds: string[]) {
+  const db = useDB()
+
+  if (uiIds.length === 0) {
+    return []
+  }
+
+  const translations = await db
+    .select()
+    .from(tables.translationsUi)
+    .where(
+      and(
+        inArray(tables.translationsUi.id, uiIds),
+        isNull(tables.translationsUi.teamId)
+      )
+    )
+    .orderBy(desc(tables.translationsUi.createdAt))
+
+  return translations
+}
+
 export async function createTranslationsUi(data: NewTranslationsUi) {
   const db = useDB()
 
@@ -204,7 +226,7 @@ export async function resolveTranslation(
     .from(tables.translationsUi)
     .where(
       and(
-        isNull(translationsUi.teamId),
+        isNull(tables.translationsUi.teamId),
         eq(tables.translationsUi.keyPath, keyPath),
         eq(tables.translationsUi.namespace, namespace)
       )
@@ -478,4 +500,139 @@ export async function upsertTranslation(
 
     return { action: 'created', translation: created }
   }
+}
+
+// Get team by slug
+export async function getTeamBySlug(slug: string) {
+  const db = useDB()
+
+  const team = await db
+    .select()
+    .from(tables.teams)
+    .where(eq(tables.teams.slug, slug))
+    .get()
+
+  if (!team) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Team not found'
+    })
+  }
+
+  return team
+}
+
+// Verify translation belongs to team
+export async function verifyTeamTranslation(translationId: string, teamId: string) {
+  const db = useDB()
+
+  const existing = await db
+    .select()
+    .from(tables.translationsUi)
+    .where(
+      and(
+        eq(tables.translationsUi.id, translationId),
+        eq(tables.translationsUi.teamId, teamId)
+      )
+    )
+    .get()
+
+  if (!existing) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Translation not found or does not belong to this team',
+    })
+  }
+
+  return existing
+}
+
+// Get system translation by keyPath and namespace
+export async function getSystemTranslationByKeyPath(keyPath: string, namespace: string = 'ui') {
+  const db = useDB()
+
+  return await db
+    .select()
+    .from(tables.translationsUi)
+    .where(
+      and(
+        isNull(tables.translationsUi.teamId),
+        eq(tables.translationsUi.keyPath, keyPath),
+        eq(tables.translationsUi.namespace, namespace)
+      )
+    )
+    .get()
+}
+
+// Get system translations with team overrides
+export async function getSystemTranslationsWithTeamOverrides(teamId: string, locale?: string) {
+  const db = useDB()
+
+  // First, get all overrideable system translations
+  const systemTranslations = await db
+    .select({
+      keyPath: tables.translationsUi.keyPath,
+      category: tables.translationsUi.category,
+      namespace: tables.translationsUi.namespace,
+      systemValues: tables.translationsUi.values,
+      systemId: tables.translationsUi.id,
+      isOverrideable: tables.translationsUi.isOverrideable,
+    })
+    .from(tables.translationsUi)
+    .where(
+      and(
+        isNull(tables.translationsUi.teamId), // Only system translations
+        eq(tables.translationsUi.isOverrideable, true) // Only overrideable ones
+      )
+    )
+    .orderBy(tables.translationsUi.keyPath)
+
+  // Then, get all team overrides for this team
+  const teamOverrides = await db
+    .select({
+      keyPath: tables.translationsUi.keyPath,
+      namespace: tables.translationsUi.namespace,
+      teamValues: tables.translationsUi.values,
+      overrideId: tables.translationsUi.id,
+      overrideDescription: tables.translationsUi.description,
+      overrideUpdatedAt: tables.translationsUi.updatedAt,
+    })
+    .from(tables.translationsUi)
+    .where(eq(tables.translationsUi.teamId, teamId))
+
+  // Create a lookup map for team overrides
+  const overrideMap = new Map()
+  for (const override of teamOverrides) {
+    const key = `${override.keyPath}:${override.namespace}`
+    overrideMap.set(key, override)
+  }
+
+  // Combine system translations with team overrides
+  const enhancedTranslations = systemTranslations.map(systemTranslation => {
+    const key = `${systemTranslation.keyPath}:${systemTranslation.namespace}`
+    const override = overrideMap.get(key)
+
+    return {
+      keyPath: systemTranslation.keyPath,
+      category: systemTranslation.category,
+      namespace: systemTranslation.namespace,
+      systemValues: systemTranslation.systemValues,
+      systemId: systemTranslation.systemId,
+      isOverrideable: systemTranslation.isOverrideable,
+      teamValues: override?.teamValues || null,
+      hasOverride: override !== undefined,
+      overrideId: override?.overrideId || null,
+      overrideDescription: override?.overrideDescription || null,
+      overrideUpdatedAt: override?.overrideUpdatedAt || null,
+    }
+  })
+
+  // Filter by locale if provided
+  if (locale) {
+    return enhancedTranslations.filter(t =>
+      t.systemValues && locale in t.systemValues
+    )
+  }
+
+  return enhancedTranslations
 }

@@ -1,27 +1,13 @@
-import { and, eq } from 'drizzle-orm'
 import { isTeamAdmin } from '@@/server/utils/teams'
-import { createTranslationsUi } from '../../../../database/queries'
+import { createTranslationsUi, getTeamBySlug, getSystemTranslationByKeyPath } from '../../../../database/queries'
 
 export default defineEventHandler(async (event) => {
   const teamSlug = getRouterParam(event, 'id') // This is actually the slug from the URL
   const { user } = await requireUserSession(event)
-  
-  const db = useDB()
-  
-  // First, get the team by slug to get the actual team ID
-  const team = await db
-    .select()
-    .from(tables.teams)
-    .where(eq(tables.teams.slug, teamSlug))
-    .get()
-    
-  if (!team) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Team not found'
-    })
-  }
-  
+
+  // Get the team by slug
+  const team = await getTeamBySlug(teamSlug)
+
   // Check if user is admin of this team
   const hasAccess = await isTeamAdmin(team.id, user.id)
   if (!hasAccess) {
@@ -42,17 +28,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Check if this is overriding a system translation
-  const systemTranslation = await db
-    .select()
-    .from(tables.translationsUi)
-    .where(
-      and(
-        isNull(tables.translationsUi.teamId),
-        eq(tables.translationsUi.keyPath, body.keyPath),
-        eq(tables.translationsUi.namespace, body.namespace || 'app')
-      )
-    )
-    .get()
+  const systemTranslation = await getSystemTranslationByKeyPath(body.keyPath, body.namespace || 'app')
 
   // If system translation exists and is not overrideable, reject
   if (systemTranslation && !systemTranslation.isOverrideable) {

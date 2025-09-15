@@ -13,18 +13,20 @@ export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')
   const body = await readBody(event)
 
-  // Validate values if provided
+  // Validate values if provided - ensure at least English is present
   if (body.values) {
-    if (!body.values.en || !body.values.nl || !body.values.fr) {
+    if (!body.values.en) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Values must include en, nl, and fr translations',
+        statusMessage: 'English translation is required',
       })
     }
   }
 
   // Update translation
   const updateData = {
+    ...(body.keyPath && { keyPath: body.keyPath }),
+    ...(body.category && { category: body.category }),
     ...(body.values && { values: body.values }),
     ...(body.description !== undefined && { description: body.description }),
     ...(body.namespace !== undefined && { namespace: body.namespace }),

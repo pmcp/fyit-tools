@@ -19,10 +19,10 @@
       size="lg"
     >
 
-      <!-- Team Context: Select from overrideable system translations -->
-      <UFormField 
-        v-if="isTeamContext && !state?.id" 
-        label="Select System Translation to Override" 
+      <!-- Team Mode: Select from overrideable system translations -->
+      <UFormField
+        v-if="mode === 'team' && !state?.id"
+        label="Select System Translation to Override"
         name="systemTranslation"
       >
         <USelectMenu
@@ -51,31 +51,31 @@
         </USelectMenu>
       </UFormField>
 
-      <!-- Super Admin Context: Direct KeyPath input -->
-      <UFormField 
-        v-if="!isTeamContext || state?.id" 
-        label="KeyPath" 
+      <!-- System Mode: Direct KeyPath input -->
+      <UFormField
+        v-if="mode === 'system' || state?.id"
+        label="KeyPath"
         name="keyPath"
       >
-        <UInput 
-          v-model="state.keyPath" 
-          class="w-full" 
-          size="xl" 
-          :disabled="isTeamContext && !!state?.id"
+        <UInput
+          v-model="state.keyPath"
+          class="w-full"
+          size="xl"
+          :disabled="mode === 'team' && !!state?.id"
         />
       </UFormField>
 
       <!-- Category: Hidden for team editing -->
-      <UFormField 
-        v-if="!isTeamContext || !state?.id"
-        label="Category" 
+      <UFormField
+        v-if="mode === 'system' || !state?.id"
+        label="Category"
         name="category"
       >
         <UInput v-model="state.category" class="w-full" size="xl" />
       </UFormField>
-      
-      <!-- Show system translation info for team context -->
-      <div v-if="isTeamContext && state?.id && systemTranslationData" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+
+      <!-- Show system translation info for team mode -->
+      <div v-if="mode === 'team' && state?.id && systemTranslationData" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <h4 class="text-sm font-semibold mb-2">System Translation</h4>
         <div class="space-y-1 text-sm">
           <div><span class="font-medium">Category:</span> {{ systemTranslationData.category }}</div>
@@ -84,32 +84,38 @@
       </div>
 
       <!-- Translation values for different locales -->
-      <CrudTranslationField
-        v-model="translationValues"
-        :fields="['value']"
-        :default-values="{ value: englishValue }"
-        @update:english="(data) => { englishValue = data.value; updateValues() }"
+      <UFormField
         label="Translations"
-      />
-
-      <UFormField 
-        :label="isTeamContext && state?.id ? 'Team Override Description' : 'Description'" 
-        name="description"
+        name="values"
+        :required="true"
+        #default="{ error }"
       >
-        <UTextarea 
-          v-model="state.description" 
-          class="w-full" 
-          size="xl"
-          :placeholder="isTeamContext && state?.id ? 'Optional team-specific description' : ''"
+        <TranslationsInput
+          v-model="state.values"
+          :fields="['value']"
+          label="Translations"
+          :error="error"
         />
       </UFormField>
 
-      <!-- Hide override switch for team context -->
-      <USwitch 
-        v-if="!isTeamContext"
-        label="Can be overridden by teams" 
-        v-model="state.isOverrideable" 
-        size="lg" 
+      <UFormField
+        :label="mode === 'team' && state?.id ? 'Team Override Description' : 'Description'"
+        name="description"
+      >
+        <UTextarea
+          v-model="state.description"
+          class="w-full"
+          size="xl"
+          :placeholder="mode === 'team' && state?.id ? 'Optional team-specific description' : ''"
+        />
+      </UFormField>
+
+      <!-- Hide override switch for team mode -->
+      <USwitch
+        v-if="mode === 'system'"
+        label="Can be overridden by teams"
+        v-model="state.isOverrideable"
+        size="lg"
       />
 
       <CrudButton
@@ -125,20 +131,25 @@
 <script setup lang="ts">
 import type { TranslationsUiFormProps, TranslationsUiFormData } from '../../types'
 
+interface Props extends TranslationsUiFormProps {
+  mode?: 'system' | 'team'
+}
 
 const { send } = useCrud()
+const toast = useToast()
 
-const props = defineProps<TranslationsUiFormProps>()
+const props = withDefaults(defineProps<Props>(), {
+  mode: 'system'
+})
 
 const { defaultValue, schema } = useTranslationsUi()
 
-// Determine which endpoint to use based on context
+// Determine which endpoint to use based on mode
 const route = useRoute()
 const teamSlug = route.params.team as string | undefined
-const isTeamContext = computed(() => !!teamSlug)
 
-const endpoint = computed(() => 
-  teamSlug 
+const endpoint = computed(() =>
+  props.mode === 'team' && teamSlug
     ? `/api/teams/${teamSlug}/translations-ui/system`
     : `/api/super-admin/translations-ui`
 )
@@ -148,11 +159,11 @@ const { data: systemTranslations, refresh } = await useFetch(endpoint.value)
 const selectedSystemTranslation = ref<any>(null)
 const loadingSystemTranslations = ref(false)
 
-// For team context editing: fetch the system translation
+// For team mode editing: fetch the system translation
 const systemTranslationData = ref<any>(null)
 const fetchSystemTranslation = async (keyPath: string) => {
-  if (!isTeamContext.value || !keyPath || !teamSlug) return
-  
+  if (props.mode !== 'team' || !keyPath || !teamSlug) return
+
   try {
     const data = await $fetch(`/api/teams/${teamSlug}/translations-ui/system-by-keypath`, {
       query: { keyPath }
@@ -164,16 +175,12 @@ const fetchSystemTranslation = async (keyPath: string) => {
 }
 
 
-// Separate state for handling the translation field component
-const englishValue = ref('')
-const translationValues = ref<Record<string, any>>({})
-
-// Create a reactive form state with proper typing
+// Create a reactive form state with proper typing and proper values structure
 const state = reactive<TranslationsUiFormData & { id?: string | null }>({
   id: null,
   keyPath: '',
   category: '',
-  values: '',
+  values: { en: '' }, // Initialize as object with at least English
   description: '',
   isOverrideable: true
 })
@@ -196,76 +203,53 @@ const getInitialValues = () => {
   }
 }
 
-// Helper to update the state.values from the translation component data
-function updateValues() {
-  const values: Record<string, string> = {
-    en: englishValue.value
-  }
-
-  // Add other locale values
-  for (const [locale, data] of Object.entries(translationValues.value)) {
-    if (data && typeof data === 'object' && 'value' in data) {
-      values[locale] = data.value
-    }
-  }
-
-  state.values = values
-}
-
-// Watch the translation values and update state.values
-watch([englishValue, translationValues], () => {
-  updateValues()
-}, { deep: true })
-
 // Watch for system translation selection (for team overrides)
 watch(selectedSystemTranslation, (newTranslation) => {
-  if (newTranslation && isTeamContext.value) {
+  if (newTranslation && props.mode === 'team') {
     // Pre-populate form with system translation data
     state.keyPath = newTranslation.keyPath
     state.category = newTranslation.category || ''
     state.description = newTranslation.description || ''
-    
-    // Pre-populate translation values
+
+    // Pre-populate translation values directly
     if (newTranslation.values && typeof newTranslation.values === 'object') {
-      // Extract English value
-      englishValue.value = newTranslation.values.en || ''
-      
-      // Extract other locale values
-      const otherLocales: Record<string, any> = {}
-      for (const [locale, value] of Object.entries(newTranslation.values)) {
-        if (locale !== 'en') {
-          otherLocales[locale] = { value }
-        }
-      }
-      translationValues.value = otherLocales
+      state.values = { ...newTranslation.values }
     }
   }
 })
 
-// Initialize and watch for prop changes
-watchEffect(async () => {
-  const initialValues = getInitialValues()
-  // Merge the values into the reactive state
-  Object.assign(state, initialValues)
+// Initialize state once when component mounts
+const initialValues = getInitialValues()
+Object.assign(state, initialValues)
 
-  // If we have existing values, parse them for the translation component
-  if (initialValues.values && typeof initialValues.values === 'object') {
-    // Extract English value
-    englishValue.value = initialValues.values.en || ''
+// Ensure values is always an object
+if (!state.values || typeof state.values !== 'object') {
+  state.values = { en: '' }
+}
 
-    // Extract other locale values in the format expected by CrudTranslationField
-    const otherLocales: Record<string, any> = {}
-    for (const [locale, value] of Object.entries(initialValues.values)) {
-      if (locale !== 'en') {
-        otherLocales[locale] = { value }
+// Ensure description is never null (convert to empty string)
+if (state.description === null || state.description === undefined) {
+  state.description = ''
+}
+
+// Watch for activeItem changes (for pre-filling)
+watch(
+  () => props.activeItem,
+  (newActiveItem) => {
+    if (newActiveItem && Object.keys(newActiveItem).length > 0) {
+      Object.assign(state, newActiveItem)
+
+      // Ensure values is always an object
+      if (!state.values || typeof state.values !== 'object') {
+        state.values = { en: '' }
       }
     }
-    translationValues.value = otherLocales
-  }
-  
-  // Fetch system translation data for team context
-  if (isTeamContext.value && state.id && state.keyPath) {
-    await fetchSystemTranslation(state.keyPath)
-  }
-})
+  },
+  { immediate: false, deep: true }
+)
+
+// Fetch system translation data if needed (only for team mode editing)
+if (props.mode === 'team' && state.id && state.keyPath) {
+  fetchSystemTranslation(state.keyPath)
+}
 </script>

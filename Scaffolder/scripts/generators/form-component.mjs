@@ -39,11 +39,11 @@ export function generateFormComponent(data, config = {}) {
     }
   }).join('\n\n')
   
-  // Add CrudTranslationField if there are translatable fields
+  // Add TranslationsInput if there are translatable fields
   const translationField = hasTranslations ? `
 
       <!-- Translation fields -->
-      <CrudTranslationField
+      <TranslationsInput
         v-model="state.translations"
         :fields="[${translatableFieldNames.map(f => `'${f}'`).join(', ')}]"
         :default-values="{

@@ -13,7 +13,6 @@ export default defineNuxtConfig({
 
 
   extends: [
-    './layers/i18n',
     './layers/crud',
     './layers/typo',
     './layers/pos',

@@ -40,10 +40,31 @@ export const replaceByOptimisticId = <T extends OptimisticItem>(
   collection: T[],
   optimisticId: string,
   replacement: T
-): T[] =>
-  collection.map(item =>
-    item.optimisticId === optimisticId ? replacement : item
-  )
+): T[] => {
+  console.log('[replaceByOptimisticId] Looking for optimisticId:', optimisticId)
+  console.log('[replaceByOptimisticId] Replacement object:', replacement)
+
+  let foundMatch = false
+  const result = collection.map(item => {
+    const isMatch = item.optimisticId === optimisticId
+    if (isMatch) {
+      console.log('[replaceByOptimisticId] FOUND MATCH! Replacing:', item, 'with:', replacement)
+      foundMatch = true
+      return replacement
+    }
+    return item
+  })
+
+  if (!foundMatch) {
+    console.log('[replaceByOptimisticId] NO MATCH FOUND for optimisticId:', optimisticId)
+    console.log('[replaceByOptimisticId] Items checked:', collection.map(item => ({
+      id: item.id,
+      optimisticId: item.optimisticId
+    })))
+  }
+
+  return result
+}
 
 export const findInCollection = <T extends { id: string | number }>(
   collection: T[],

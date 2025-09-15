@@ -20,11 +20,11 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Validate values has all required languages
-  if (!body.values.en || !body.values.nl || !body.values.fr) {
+  // Validate values has at least the default language (English)
+  if (!body.values.en) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Values must include en, nl, and fr translations',
+      statusMessage: 'English translation is required',
     })
   }
 

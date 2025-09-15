@@ -64,22 +64,32 @@
         </div>
       </div>
 
-      <UTable
-        ref="table"
-        v-model:row-selection="rowSelection"
-        v-model:sort="sort"
-        v-model:column-visibility="columnVisibility"
-        :data="slicedRows"
-        :columns="columnsTable"
-        class="shrink-0"
-        :ui="{
-          base: 'table-fixed border-separate border-spacing-0',
-          thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
-          tbody: '[&>tr]:last:[&>td]:border-b-0',
-          th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
-          td: 'border-b border-default'
-        }"
-      >
+      <div class="relative">
+        <!-- Loading overlay -->
+        <div v-if="loadingPage" class="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center">
+          <div class="flex items-center gap-2">
+            <UIcon name="i-lucide-loader-2" class="animate-spin" />
+            <span class="text-sm">Loading...</span>
+          </div>
+        </div>
+
+        <UTable
+          ref="table"
+          v-model:row-selection="rowSelection"
+          v-model:sort="sort"
+          v-model:column-visibility="columnVisibility"
+          :data="slicedRows"
+          :columns="columnsTable"
+          class="shrink-0"
+          :class="{ 'opacity-50': loadingPage }"
+          :ui="{
+            base: 'table-fixed border-separate border-spacing-0',
+            thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
+            tbody: '[&>tr]:last:[&>td]:border-b-0',
+            th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
+            td: 'border-b border-default'
+          }"
+        >
       <template #expanded="{ row }">
         <pre>{{ row }}</pre>
       </template>
@@ -101,10 +111,10 @@
       <template #actions-cell="{ row }">
         <CrudMiniButtons
           delete
-          @delete="open('delete', collection, [row.id])"
+          @delete="open('delete', collection, [row.original.id])"
           :delete-loading="row.optimisticAction === 'delete'"
           update
-          @update="open('update', collection, [row.id])"
+          @update="open('update', collection, [row.original.id])"
           :update-loading="row.optimisticAction === 'update' || row.optimisticAction === 'create'"
         />
       </template>
@@ -122,7 +132,8 @@
 <!--        />-->
 <!--      </template>-->
 
-      </UTable>
+        </UTable>
+      </div>
 
 
 
@@ -156,9 +167,14 @@
 
         <div class="flex items-center gap-1.5">
           <UPagination
-            v-model="page"
+            :page="page"
             :items-per-page="pageCount"
             :total="pageTotalToShow"
+            :disabled="loadingPage"
+            @update:page="(val) => {
+              console.log('[Table] UPagination page update:', val)
+              page = val
+            }"
           />
         </div>
       </div>
@@ -183,6 +199,26 @@ const props = defineProps({
   collection: {
     type: String,
     default: ''
+  },
+  serverPagination: {
+    type: Boolean,
+    default: false
+  },
+  paginationData: {
+    type: Object,
+    default: null
+  },
+  refreshFn: {
+    type: Function,
+    default: null
+  },
+  hideDefaultColumns: {
+    type: Object,
+    default: () => ({
+      created_at: false,
+      updated_at: false,
+      actions: false
+    })
   }
 })
 
@@ -191,53 +227,72 @@ const expanded = ref<(string | number)[]>([])
 // Table ref for accessing table API
 const table = useTemplateRef('table')
 
-const allColumns = [
-  {
-    id: 'select',
-    header: ({ table }) =>
-      h(UCheckbox, {
-        'modelValue': table.getIsSomePageRowsSelected()
-          ? 'indeterminate'
-          : table.getIsAllPageRowsSelected(),
-        'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
-          table.toggleAllPageRowsSelected(!!value),
-        'ariaLabel': 'Select all'
-      }),
-    cell: ({ row }) =>
-      h(UCheckbox, {
-        'modelValue': row.getIsSelected(),
-        'onUpdate:modelValue': (value: boolean | 'indeterminate') => row.toggleSelected(!!value),
-        'ariaLabel': 'Select row'
-      })
-  },
-  ...props.columns,
-  {
-    accessorKey: 'created_at',
-    id: 'created_at',
-    header: 'Created At',
-    sortable: true
-  },
-  {
-    accessorKey: 'updated_at',
-    id: 'updated_at',
-    header: 'Updated At',
-    sortable: true
-  },
-  {
-    accessorKey: 'actions',
-    id: 'actions',
-    header: 'Actions'
-  },
-  {
+const allColumns = computed(() => {
+  const columns = [
+    {
+      id: 'select',
+      header: ({ table }) =>
+        h(UCheckbox, {
+          'modelValue': table.getIsSomePageRowsSelected()
+            ? 'indeterminate'
+            : table.getIsAllPageRowsSelected(),
+          'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
+            table.toggleAllPageRowsSelected(!!value),
+          'ariaLabel': 'Select all'
+        }),
+      cell: ({ row }) =>
+        h(UCheckbox, {
+          'modelValue': row.getIsSelected(),
+          'onUpdate:modelValue': (value: boolean | 'indeterminate') => row.toggleSelected(!!value),
+          'ariaLabel': 'Select row'
+        })
+    },
+    ...props.columns
+  ]
+
+  // Conditionally add default columns based on hideDefaultColumns prop
+  if (!props.hideDefaultColumns?.created_at) {
+    columns.push({
+      accessorKey: 'created_at',
+      id: 'created_at',
+      header: 'Created At',
+      sortable: true
+    })
+  }
+
+  if (!props.hideDefaultColumns?.updated_at) {
+    columns.push({
+      accessorKey: 'updated_at',
+      id: 'updated_at',
+      header: 'Updated At',
+      sortable: true
+    })
+  }
+
+  if (!props.hideDefaultColumns?.actions) {
+    columns.push({
+      accessorKey: 'actions',
+      id: 'actions',
+      header: 'Actions'
+    })
+  }
+
+  // Always add expand column (usually hidden anyway)
+  columns.push({
     accessorKey: 'expand',
     id: 'expand',
     header: ''
-  }
-]
+  })
+
+  return columns
+})
 
 
 // ACTIONS
-const { open } = useCrud()
+const { open, getCollection, setPagination, getPagination } = useCrud()
+
+// Loading state for pagination
+const loadingPage = ref(false)
 
 
 // COLUMNS
@@ -248,7 +303,7 @@ const columnVisibility = ref<Record<string, boolean>>({
 
 const columnsTable = computed(() => {
   // Return all columns, visibility will be handled by the table component
-  return allColumns
+  return allColumns.value
 })
 
 // ROWS
@@ -265,13 +320,35 @@ const selectedRows = computed(() => {
 const sort = ref({ column: 'created_at', direction: 'desc' as 'asc' | 'desc' })
 const page = ref(1)
 const pageCount = ref(10)
-const itemCountFromServer = computed(() => {
-  const crudPagination = useCrud().pagination.value
-  return crudPagination[props.collection]?.totalItems || props.rows.length
+
+// Initialize pagination from server if available
+const serverPaginationData = computed(() => {
+  if (!props.serverPagination) return null
+  // Use passed pagination data if available, otherwise fall back to getPagination
+  return props.paginationData || getPagination(props.collection)
 })
+
+// Use server pagination data if available
+if (serverPaginationData.value) {
+  page.value = serverPaginationData.value.currentPage || 1
+  pageCount.value = serverPaginationData.value.pageSize || 10
+}
+
+const itemCountFromServer = computed(() => {
+  if (props.serverPagination && serverPaginationData.value) {
+    return serverPaginationData.value.totalItems || 0
+  }
+  return props.rows.length
+})
+
 const pageTotalFiltered = computed(() => searchedRows.value.length)
 
 const pageTotalToShow = computed(() => {
+  // For server pagination, always use server count
+  if (props.serverPagination) {
+    return itemCountFromServer.value
+  }
+  // For client-side pagination with search
   if(search.value === '') return itemCountFromServer.value
   return pageTotalFiltered.value
 })
@@ -280,7 +357,13 @@ const pageFrom = computed(() => {
   if(pageTotalToShow.value === 0) return 0
   return (page.value - 1) * pageCount.value + 1
 })
-const pageTo = computed(() => Math.min(page.value * Number(pageCount.value), pageTotalToShow.value))
+const pageTo = computed(() => {
+  if (props.serverPagination) {
+    // For server pagination, calculate based on actual rows returned
+    return Math.min(page.value * pageCount.value, itemCountFromServer.value)
+  }
+  return Math.min(page.value * Number(pageCount.value), pageTotalToShow.value)
+})
 
 
 
@@ -301,8 +384,20 @@ const searchedRows = computed(() => {
 })
 
 const slicedRows = computed(() => {
-  console.log('searchedRows:', searchedRows.value)
-  console.log('props.rows:', props.rows)
+  // For server pagination, use rows directly (already paginated from server)
+  if (props.serverPagination) {
+    // When searching locally on server-paginated data
+    if (search.value !== '') {
+      return props.rows.filter((row) => {
+        return Object.values(row).some((value) => {
+          return String(value).toLowerCase().includes(search.value.toLowerCase())
+        })
+      })
+    }
+    return props.rows
+  }
+
+  // For client-side pagination
   if(!searchedRows.value || !Array.isArray(searchedRows.value) || searchedRows.value.length === 0) return []
   return searchedRows.value.slice((page.value - 1) * pageCount.value, (page.value) * pageCount.value)
 })
@@ -318,9 +413,55 @@ const toggleExpanded = (rowId: string | number) => {
   }
 }
 
-// Watch for pageCount changes to reset page
-watch(pageCount, () => {
-  page.value = 1
+// Function to update pagination and fetch new data
+async function fetchPage(newPage: number) {
+  console.log('[Table] fetchPage called with:', { newPage, collection: props.collection })
+  if (!props.serverPagination || !props.collection) return
+
+  loadingPage.value = true
+  try {
+    // Update pagination state
+    setPagination(props.collection, {
+      currentPage: newPage,
+      pageSize: pageCount.value,
+      sortBy: sort.value.column,
+      sortDirection: sort.value.direction
+    })
+
+    // Use refresh function if provided (from useCollection)
+    if (props.refreshFn) {
+      await props.refreshFn()
+    } else {
+      // Fallback to direct getCollection
+      await getCollection(props.collection, {}, true)
+    }
+  } finally {
+    loadingPage.value = false
+  }
+}
+
+// Watch for page changes (server pagination)
+watch(page, async (newPage, oldPage) => {
+  console.log('[Table] page watch triggered:', { newPage, oldPage, serverPagination: props.serverPagination })
+  if (props.serverPagination && newPage !== oldPage) {
+    await fetchPage(newPage)
+  }
 })
+
+// Watch for pageCount changes
+watch(pageCount, async (newPageCount, oldPageCount) => {
+  page.value = 1
+  if (props.serverPagination && newPageCount !== oldPageCount) {
+    await fetchPage(1)
+  }
+})
+
+// Watch for sort changes (server pagination)
+watch(sort, async (newSort, oldSort) => {
+  if (props.serverPagination && (newSort.column !== oldSort.column || newSort.direction !== oldSort.direction)) {
+    page.value = 1
+    await fetchPage(1)
+  }
+}, { deep: true })
 
 </script>

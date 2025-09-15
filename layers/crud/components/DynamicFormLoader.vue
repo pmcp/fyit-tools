@@ -35,13 +35,32 @@ const currentComponent = computed(() => {
   return resolveComponent(componentMap[props.collection])
 })
 
+// Determine mode based on route context
+const route = useRoute()
+const mode = computed(() => {
+  // Only set mode for translationsUi collection
+  if (props.collection === 'translationsUi') {
+    return route.path.includes('/super-admin/') ? 'system' : 'team'
+  }
+  return undefined
+})
+
 // Combine all props to pass through to the dynamic component
-const componentProps = computed(() => ({
-  collection: props.collection,
-  loading: props.loading,
-  action: props.action,
-  items: props.items,
-  activeItem: props.activeItem,
-  ...useAttrs() // Also include any additional attrs that might be passed
-}))
+const componentProps = computed(() => {
+  const baseProps = {
+    collection: props.collection,
+    loading: props.loading,
+    action: props.action,
+    items: props.items,
+    activeItem: props.activeItem,
+    ...useAttrs() // Also include any additional attrs that might be passed
+  }
+
+  // Add mode prop for translationsUi collection
+  if (mode.value !== undefined) {
+    baseProps.mode = mode.value
+  }
+
+  return baseProps
+})
 </script>
