@@ -1,5 +1,6 @@
 <template>
   <ul class="space-y-1">
+
     <template v-if="isAccountSettings">
       <li v-for="link in accountLinks" :key="link.to">
         <AppSidebarLink v-bind="link" />
@@ -41,6 +42,11 @@ const teamNavLinks = computed(() => [
     label: 'Posts',
     icon: 'i-lucide-file-text',
     to: `/dashboard/${props.teamSlug}/posts`,
+  },
+  {
+    label: 'Team Translations',
+    icon: 'i-lucide-languages',
+    to: `/dashboard/${props.teamSlug}/translations`,
   },
 ])
 

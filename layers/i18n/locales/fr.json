@@ -30,7 +30,9 @@
     "loading": "Chargement...",
     "noData": "Aucune donnée disponible",
     "yes": "Oui",
-    "no": "Non"
+    "no": "Non",
+    "hideExample": "Masquer l'exemple",
+    "showExample": "Afficher l'exemple"
   },
   "auth": {
     "login": "Connexion",
@@ -44,13 +46,15 @@
     "resetPassword": "Réinitialiser le mot de passe",
     "register": "S'enregistrer",
     "rememberMe": "Se souvenir de moi",
-    "dontHaveAccount": "Pas encore de compte?",
-    "alreadyHaveAccount": "Déjà un compte?",
+    "dontHaveAccount": "Vous n'avez pas de compte?",
+    "alreadyHaveAccount": "Vous avez déjà un compte?",
     "verifyEmail": "Vérifier votre e-mail",
     "changePassword": "Changer le mot de passe",
     "currentPassword": "Mot de passe actuel",
     "newPassword": "Nouveau mot de passe",
-    "confirmPassword": "Confirmer le mot de passe"
+    "confirmPassword": "Confirmer le mot de passe",
+    "getStarted": "Commencez avec Supersaas",
+    "submit": "Soumettre"
   },
   "navigation": {
     "dashboard": "Tableau de bord",
@@ -70,11 +74,17 @@
     "notifications": "Notifications",
     "help": "Aide",
     "home": "Accueil",
-    "backToDashboard": "Retour au tableau de bord"
+    "backToDashboard": "asdf",
+    "accountSettings": "Paramètres du compte",
+    "posts": "Articles",
+    "superAdmin": "Super Admin",
+    "teamTranslations": "Traductions d'équipe",
+    "workspaceMembers": "Membres de l'espace de travail",
+    "workspaceSettings": "Paramètres de l'espace de travail"
   },
   "messages": {
-    "success": "Opération réussie",
-    "error": "Une erreur s'est produite",
+    "success": "Succès",
+    "error": "Erreur",
     "warning": "Avertissement",
     "info": "Information",
     "confirmDelete": "Êtes-vous sûr de vouloir supprimer ceci?",
@@ -92,7 +102,13 @@
     "networkError": "Erreur réseau. Veuillez réessayer.",
     "unauthorized": "Vous n'êtes pas autorisé à effectuer cette action",
     "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter.",
-    "somethingWentWrong": "Quelque chose s'est mal passé. Veuillez réessayer."
+    "somethingWentWrong": "Quelque chose s'est mal passé. Veuillez réessayer.",
+    "copiedToClipboard": "Copié dans le presse-papiers",
+    "failedToCopy": "Échec de la copie",
+    "failedToDelete": "Échec de la suppression",
+    "failedToSave": "Échec de la sauvegarde",
+    "noTextToCopy": "Pas de texte à copier",
+    "operationSuccessful": "Opération réussie"
   },
   "email": {
     "orderConfirmation": "Confirmation de commande",
@@ -158,7 +174,13 @@
     "last": "Dernier",
     "noResults": "Aucun résultat trouvé",
     "sortAscending": "Tri croissant",
-    "sortDescending": "Tri décroissant"
+    "sortDescending": "Tri décroissant",
+    "display": "Affichage",
+    "noTranslation": "Pas de traduction",
+    "noTranslationAvailable": "Aucune traduction disponible",
+    "overrideable": "Remplaçable",
+    "selectAll": "Tout sélectionner",
+    "selectRow": "Sélectionner la ligne"
   },
   "pos": {
     "pointOfSale": "Point de vente",
@@ -208,5 +230,19 @@
   },
   "testkeypath": "french",
   "a test": "asfd",
-  "asdf": "asdf"
+  "asdf": "asdf",
+  "billing": {
+    "description": "Gérez vos informations de facturation",
+    "freePlan": "Gratuit",
+    "plan": "plan",
+    "title": "Facturation",
+    "upgradeToPaid": "Passez à un plan payant",
+    "youAreOn": "Vous êtes sur",
+    "youAreOnThe": "Vous êtes sur le"
+  },
+  "team": {
+    "createNewTeam": "Créer une nouvelle équipe",
+    "systemTranslations": "Traductions système",
+    "teamTranslations": "Traductions d'équipe"
+  }
 }

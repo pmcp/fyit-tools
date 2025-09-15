@@ -2,11 +2,27 @@ import { and, eq, isNull } from 'drizzle-orm'
 import { isTeamMember } from '@@/server/utils/teams'
 
 export default defineEventHandler(async (event) => {
-  const { id: teamId } = getRouterParams(event)
+  const teamSlug = getRouterParam(event, 'id') // This is actually the slug from the URL
   const { user } = await requireUserSession(event)
   
+  const db = useDB()
+  
+  // First, get the team by slug to get the actual team ID
+  const team = await db
+    .select()
+    .from(tables.teams)
+    .where(eq(tables.teams.slug, teamSlug))
+    .get()
+    
+  if (!team) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Team not found'
+    })
+  }
+  
   // Check if user has access to this team
-  const hasAccess = await isTeamMember(teamId, user.id)
+  const hasAccess = await isTeamMember(team.id, user.id)
   if (!hasAccess) {
     throw createError({
       statusCode: 403,
@@ -26,15 +42,13 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const db = useDB()
-
   // First, try to get team-specific translation
   const teamTranslation = await db
     .select()
     .from(tables.translationsUi)
     .where(
       and(
-        eq(tables.translationsUi.teamId, teamId),
+        eq(tables.translationsUi.teamId, team.id),
         eq(tables.translationsUi.keyPath, keyPath),
         eq(tables.translationsUi.namespace, namespace)
       )

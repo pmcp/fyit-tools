@@ -1,0 +1,65 @@
+{
+  "translations": {
+    "navigation": {
+      "posts": { "en": "Posts", "nl": "Berichten", "fr": "Articles" },
+      "teamTranslations": { "en": "Team Translations", "nl": "Team Vertalingen", "fr": "Traductions d'équipe" },
+      "workspaceSettings": { "en": "Workspace Settings", "nl": "Werkruimte Instellingen", "fr": "Paramètres de l'espace de travail" },
+      "workspaceMembers": { "en": "Workspace Members", "nl": "Werkruimte Leden", "fr": "Membres de l'espace de travail" },
+      "accountSettings": { "en": "Account Settings", "nl": "Account Instellingen", "fr": "Paramètres du compte" },
+      "superAdmin": { "en": "Super Admin", "nl": "Super Admin", "fr": "Super Admin" }
+    },
+    "auth": {
+      "getStarted": { "en": "Get Started with Supersaas", "nl": "Begin met Supersaas", "fr": "Commencez avec Supersaas" },
+      "alreadyHaveAccount": { "en": "Already have an account?", "nl": "Heeft u al een account?", "fr": "Vous avez déjà un compte?" },
+      "dontHaveAccount": { "en": "Don't have an account?", "nl": "Heeft u geen account?", "fr": "Vous n'avez pas de compte?" },
+      "submit": { "en": "Submit", "nl": "Verzenden", "fr": "Soumettre" }
+    },
+    "billing": {
+      "title": { "en": "Billing", "nl": "Facturering", "fr": "Facturation" },
+      "description": { "en": "Manage your billing information and subscription plans", "nl": "Beheer uw facturatiegegevens en abonnementen", "fr": "Gérez vos informations de facturation" },
+      "youAreOn": { "en": "You are on", "nl": "U bent op", "fr": "Vous êtes sur" },
+      "youAreOnThe": { "en": "You are on the", "nl": "U bent op het", "fr": "Vous êtes sur le" },
+      "plan": { "en": "plan", "nl": "abonnement", "fr": "plan" },
+      "freePlan": { "en": "Free", "nl": "Gratis", "fr": "Gratuit" },
+      "upgradeToPaid": { "en": "Upgrade to a paid plan to unlock more features and higher usage limits", "nl": "Upgrade naar een betaald abonnement", "fr": "Passez à un plan payant" }
+    },
+    "table": {
+      "display": { "en": "Display", "nl": "Weergave", "fr": "Affichage" },
+      "selectAll": { "en": "Select all", "nl": "Alles selecteren", "fr": "Tout sélectionner" },
+      "selectRow": { "en": "Select row", "nl": "Rij selecteren", "fr": "Sélectionner la ligne" },
+      "noTranslation": { "en": "No translation", "nl": "Geen vertaling", "fr": "Pas de traduction" },
+      "noTranslationAvailable": { "en": "No translation available", "nl": "Geen vertaling beschikbaar", "fr": "Aucune traduction disponible" },
+      "overrideable": { "en": "Overrideable", "nl": "Overschrijfbaar", "fr": "Remplaçable" },
+      "createdAt": { "en": "Created At", "nl": "Aangemaakt op", "fr": "Créé le" },
+      "updatedAt": { "en": "Updated At", "nl": "Bijgewerkt op", "fr": "Mis à jour le" },
+      "actions": { "en": "Actions", "nl": "Acties", "fr": "Actions" },
+      "rowsPerPage": { "en": "Rows per page", "nl": "Rijen per pagina", "fr": "Lignes par page" }
+    },
+    "messages": {
+      "success": { "en": "Success", "nl": "Succes", "fr": "Succès" },
+      "error": { "en": "Error", "nl": "Fout", "fr": "Erreur" },
+      "warning": { "en": "Warning", "nl": "Waarschuwing", "fr": "Avertissement" },
+      "operationSuccessful": { "en": "Operation successful", "nl": "Operatie succesvol", "fr": "Opération réussie" },
+      "failedToSave": { "en": "Failed to save", "nl": "Opslaan mislukt", "fr": "Échec de la sauvegarde" },
+      "failedToDelete": { "en": "Failed to delete", "nl": "Verwijderen mislukt", "fr": "Échec de la suppression" },
+      "copiedToClipboard": { "en": "Copied to clipboard", "nl": "Gekopieerd naar klembord", "fr": "Copié dans le presse-papiers" },
+      "noTextToCopy": { "en": "No text to copy", "nl": "Geen tekst om te kopiëren", "fr": "Pas de texte à copier" },
+      "failedToCopy": { "en": "Failed to copy text", "nl": "Kopiëren mislukt", "fr": "Échec de la copie" }
+    },
+    "team": {
+      "createNewTeam": { "en": "Create a new team", "nl": "Maak een nieuw team", "fr": "Créer une nouvelle équipe" },
+      "systemTranslations": { "en": "System Translations", "nl": "Systeem Vertalingen", "fr": "Traductions système" },
+      "teamTranslations": { "en": "Team Translations", "nl": "Team Vertalingen", "fr": "Traductions d'équipe" }
+    },
+    "common": {
+      "edit": { "en": "Edit", "nl": "Bewerken", "fr": "Modifier" },
+      "delete": { "en": "Delete", "nl": "Verwijderen", "fr": "Supprimer" },
+      "create": { "en": "Create", "nl": "Aanmaken", "fr": "Créer" },
+      "update": { "en": "Update", "nl": "Bijwerken", "fr": "Mettre à jour" },
+      "yes": { "en": "Yes", "nl": "Ja", "fr": "Oui" },
+      "no": { "en": "No", "nl": "Nee", "fr": "Non" },
+      "showExample": { "en": "Show Example", "nl": "Voorbeeld tonen", "fr": "Afficher l'exemple" },
+      "hideExample": { "en": "Hide Example", "nl": "Voorbeeld verbergen", "fr": "Masquer l'exemple" }
+    }
+  }
+}

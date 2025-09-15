@@ -3,11 +3,27 @@ import { isTeamAdmin } from '@@/server/utils/teams'
 import { createTranslationsUi } from '../../../../database/queries'
 
 export default defineEventHandler(async (event) => {
-  const { id: teamId } = getRouterParams(event)
+  const teamSlug = getRouterParam(event, 'id') // This is actually the slug from the URL
   const { user } = await requireUserSession(event)
   
+  const db = useDB()
+  
+  // First, get the team by slug to get the actual team ID
+  const team = await db
+    .select()
+    .from(tables.teams)
+    .where(eq(tables.teams.slug, teamSlug))
+    .get()
+    
+  if (!team) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Team not found'
+    })
+  }
+  
   // Check if user is admin of this team
-  const hasAccess = await isTeamAdmin(teamId, user.id)
+  const hasAccess = await isTeamAdmin(team.id, user.id)
   if (!hasAccess) {
     throw createError({
       statusCode: 403,
@@ -26,7 +42,6 @@ export default defineEventHandler(async (event) => {
   }
 
   // Check if this is overriding a system translation
-  const db = useDB()
   const systemTranslation = await db
     .select()
     .from(tables.translationsUi)
@@ -50,7 +65,7 @@ export default defineEventHandler(async (event) => {
   // Create team-specific translation
   const newTranslation = {
     userId: user.id,
-    teamId: teamId,
+    teamId: team.id,
     namespace: 'ui',
     keyPath: body.keyPath,
     category: body.category,

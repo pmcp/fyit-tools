@@ -1,1 +1,3 @@
-I think claude added the server/utils/emails folder when we implemented translations, and I don't know if we need this. Or how it fits in the flow. There is already email stuff from the supersaas.
+- I think claude added the server/utils/emails folder when we implemented translations, and I don't know if we need this. Or how it fits in the flow. There is already email stuff from the supersaas.
+- Clean up translation end points: they are using actions that go to database queries.
+- Rewrite translation system with a translation_team override database table

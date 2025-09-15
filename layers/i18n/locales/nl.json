@@ -30,7 +30,9 @@
     "loading": "Laden...",
     "noData": "Geen gegevens beschikbaar",
     "yes": "Ja",
-    "no": "Nee"
+    "no": "Nee",
+    "hideExample": "Voorbeeld verbergen",
+    "showExample": "Voorbeeld tonen"
   },
   "auth": {
     "login": "Inloggen",
@@ -44,13 +46,15 @@
     "resetPassword": "Wachtwoord resetten",
     "register": "Registreren",
     "rememberMe": "Onthoud mij",
-    "dontHaveAccount": "Nog geen account?",
-    "alreadyHaveAccount": "Heb je al een account?",
+    "dontHaveAccount": "Heeft u geen account?",
+    "alreadyHaveAccount": "Heeft u al een account?",
     "verifyEmail": "Verifieer je e-mail",
     "changePassword": "Wachtwoord wijzigen",
     "currentPassword": "Huidig wachtwoord",
     "newPassword": "Nieuw wachtwoord",
-    "confirmPassword": "Bevestig wachtwoord"
+    "confirmPassword": "Bevestig wachtwoord",
+    "getStarted": "Begin met Supersaas",
+    "submit": "Verzenden"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -70,11 +74,17 @@
     "notifications": "Meldingen",
     "help": "Help",
     "home": "Home",
-    "backToDashboard": "Terug naar Dashboard"
+    "backToDashboard": "asdf",
+    "accountSettings": "Account Instellingen",
+    "posts": "Berichten",
+    "superAdmin": "Super Admin",
+    "teamTranslations": "Team Vertalingen",
+    "workspaceMembers": "Werkruimte Leden",
+    "workspaceSettings": "Werkruimte Instellingen"
   },
   "messages": {
-    "success": "Operatie succesvol",
-    "error": "Er is een fout opgetreden",
+    "success": "Succes",
+    "error": "Fout",
     "warning": "Waarschuwing",
     "info": "Informatie",
     "confirmDelete": "Weet je zeker dat je dit wilt verwijderen?",
@@ -92,7 +102,13 @@
     "networkError": "Netwerkfout. Probeer het opnieuw.",
     "unauthorized": "Je bent niet gemachtigd om deze actie uit te voeren",
     "sessionExpired": "Je sessie is verlopen. Log opnieuw in.",
-    "somethingWentWrong": "Er is iets misgegaan. Probeer het opnieuw."
+    "somethingWentWrong": "Er is iets misgegaan. Probeer het opnieuw.",
+    "copiedToClipboard": "Gekopieerd naar klembord",
+    "failedToCopy": "Kopiëren mislukt",
+    "failedToDelete": "Verwijderen mislukt",
+    "failedToSave": "Opslaan mislukt",
+    "noTextToCopy": "Geen tekst om te kopiëren",
+    "operationSuccessful": "Operatie succesvol"
   },
   "email": {
     "orderConfirmation": "Orderbevestiging",
@@ -158,7 +174,13 @@
     "last": "Laatste",
     "noResults": "Geen resultaten gevonden",
     "sortAscending": "Oplopend sorteren",
-    "sortDescending": "Aflopend sorteren"
+    "sortDescending": "Aflopend sorteren",
+    "display": "Weergave",
+    "noTranslation": "Geen vertaling",
+    "noTranslationAvailable": "Geen vertaling beschikbaar",
+    "overrideable": "Overschrijfbaar",
+    "selectAll": "Alles selecteren",
+    "selectRow": "Rij selecteren"
   },
   "pos": {
     "pointOfSale": "Kassa",
@@ -208,5 +230,19 @@
   },
   "testkeypath": "dutch",
   "a test": "asdf",
-  "asdf": "asdf"
+  "asdf": "asdf",
+  "billing": {
+    "description": "Beheer uw facturatiegegevens en abonnementen",
+    "freePlan": "Gratis",
+    "plan": "abonnement",
+    "title": "Facturering",
+    "upgradeToPaid": "Upgrade naar een betaald abonnement",
+    "youAreOn": "U bent op",
+    "youAreOnThe": "U bent op het"
+  },
+  "team": {
+    "createNewTeam": "Maak een nieuw team",
+    "systemTranslations": "Systeem Vertalingen",
+    "teamTranslations": "Team Vertalingen"
+  }
 }

@@ -25,9 +25,9 @@ const links = computed(() => [
     to: `/dashboard/${currentTeam.value.slug}`,
   },
   {
-    label: 'Posts',
-    icon: 'i-lucide-file-text',
-    to: `/dashboard/${currentTeam.value.slug}/posts`,
+    label: 'Team Translations',
+    icon: 'i-lucide-languages',
+    to: `/dashboard/${currentTeam.value.slug}/translations`,
   },
 ])
 

@@ -114,6 +114,24 @@
         <span v-else class="text-gray-400 text-sm">None</span>
       </template>
 
+      <template #actions-cell="{ row }">
+        <div class="flex items-center gap-2">
+          <UButton
+            @click="editTranslation(row)"
+            icon="i-lucide-pencil"
+            size="xs"
+            variant="soft"
+          />
+          <UButton
+            @click="deleteTranslationConfirm(row)"
+            icon="i-lucide-trash"
+            size="xs"
+            variant="soft"
+            color="red"
+          />
+        </div>
+      </template>
+
     </CrudTable>
 
     <!-- Overrides Modal -->
@@ -194,29 +212,36 @@ const selectedTranslation = ref<any>(null)
 const currentOverrides = ref<any[]>([])
 const loadingOverrides = ref(false)
 
+
+
+
 const exampleJson = `{
-  "translations": [
-    {
-      "keyPath": "navigation.backToDashboard",
-      "category": "navigation",
-      "values": {
+  "translations": {
+    "navigation": {
+      "backToDashboard": {
         "en": "Back to Dashboard",
         "nl": "Terug naar Dashboard",
         "fr": "Retour au tableau de bord"
       },
-      "description": "Link text to return to dashboard"
+      "home": {
+        "en": "Home",
+        "nl": "Home",
+        "fr": "Accueil"
+      }
     },
-    {
-      "keyPath": "common.welcome",
-      "category": "common",
-      "values": {
+    "common": {
+      "welcome": {
         "en": "Welcome",
         "nl": "Welkom",
         "fr": "Bienvenue"
       },
-      "description": "Welcome message"
+      "save": {
+        "en": "Save",
+        "nl": "Opslaan",
+        "fr": "Sauvegarder"
+      }
     }
-  ]
+  }
 }`
 
 const { data: systemTranslations, refresh } = await useFetch(
@@ -265,50 +290,31 @@ async function handleBulkImport() {
     // Parse and validate JSON
     const data = JSON.parse(bulkImportJson.value)
 
-    if (!data.translations || !Array.isArray(data.translations)) {
-      throw new Error('Invalid format: expected { "translations": [...] }')
+    if (!data.translations || typeof data.translations !== 'object') {
+      throw new Error('Invalid format: expected { "translations": {...} }')
     }
 
-    let successCount = 0
-    let skipCount = 0
-    const errors = []
-
-    // Process each translation
-    for (const translation of data.translations) {
-      try {
-        await $fetch('/api/super-admin/translations-ui', {
-          method: 'POST',
-          body: translation
-        })
-        successCount++
-      } catch (error) {
-        if (error.statusCode === 409) {
-          // Already exists, skip
-          skipCount++
-        } else {
-          errors.push(`${translation.keyPath}: ${error.data?.statusMessage || error.message}`)
-        }
-      }
-    }
+    // Use the bulk-add endpoint which handles the nested object format
+    const result = await $fetch('/api/super-admin/translations-ui/bulk-add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8'
+      },
+      body: data
+    })
 
     // Show results
-    let message = `Added ${successCount} translations`
-    if (skipCount > 0) {
-      message += `, skipped ${skipCount} (already exist)`
-    }
-    if (errors.length > 0) {
-      message += `. Errors: ${errors.join(', ')}`
-    }
+    const message = result.message || `Added ${result.added} translations, skipped ${result.skipped} (already exist)`
 
     toast.add({
-      title: successCount > 0 ? 'Import Complete' : 'Import Failed',
+      title: result.success ? 'Import Complete' : 'Import Failed',
       description: message,
-      color: successCount > 0 ? 'green' : 'orange',
-      icon: successCount > 0 ? 'i-lucide-circle-check' : 'i-lucide-triangle-alert'
+      color: result.success ? 'green' : 'orange',
+      icon: result.success ? 'i-lucide-circle-check' : 'i-lucide-triangle-alert'
     })
 
     // Refresh the table if any were added
-    if (successCount > 0) {
+    if (result.added > 0) {
       await refresh()
       bulkImportJson.value = ''
     }

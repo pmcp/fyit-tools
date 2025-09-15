@@ -1,6 +1,5 @@
 <!-- Everything in a single page on purpose. So you can just delete it if you don't need it. -->
 <template>
-
   <main class="px-4">
     <header>
       <WebsiteSection class="flex w-full items-center justify-between">
