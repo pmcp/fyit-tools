@@ -15,7 +15,7 @@
       :schema="schema"
       :state="state"
       class="space-y-4 flex flex-col justify-between h-full gap-4"
-      @submit="send(action, collection, state)"
+      @submit="send(action, collection, state.value)"
       size="lg"
     >
       <UFormField label="LogType" name="logType">
@@ -46,45 +46,19 @@
 
 <script setup lang="ts">
 import type { PosSystemLogFormProps, PosSystemLogFormData } from '../../types'
-import { z } from 'zod'
 
 const { send } = useCrud()
 
 const props = defineProps<PosSystemLogFormProps>()
 
-const { defaultValue, schema } = usePosSystemLogs()
+const { defaultValue, schema, collection } = usePosSystemLogs()
 
 // Create a reactive form state with proper typing
-const state = reactive<PosSystemLogFormData & { id?: string | null }>({
-  id: null,
-  logType: '',
-  message: '',
-  metadata: '',
-  eventId: 0
-})
 
-// Compute what the initial values should be based on props
-const getInitialValues = () => {
-  if (props.action === 'update' && 'id' in props.activeItem && props.activeItem.id) {
-    // Update mode: use activeItem data
-    return {
-      ...props.activeItem
-    }
-  } else if (props.action === 'create') {
-    // Create mode: use defaults
-    return {
-      ...defaultValue
-    }
-  } else {
-    // Fallback to empty object
-    return {}
-  }
-}
+// Initialize form state with proper values (no watch needed!)
+const initialValues = props.action === 'update' && props.activeItem?.id
+  ? { ...defaultValue, ...props.activeItem }
+  : { ...defaultValue }
 
-// Initialize and watch for prop changes
-watchEffect(() => {
-  const initialValues = getInitialValues()
-  // Merge the values into the reactive state
-  Object.assign(state, initialValues)
-})
+const state = ref<PosSystemLogFormData & { id?: string | null }>(initialValues)
 </script>

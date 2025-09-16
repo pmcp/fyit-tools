@@ -15,7 +15,7 @@
       :schema="schema"
       :state="state"
       class="space-y-4 flex flex-col justify-between h-full gap-4"
-      @submit="send(action, collection, state)"
+      @submit="send(action, collection, state.value)"
       size="lg"
     >
       <UFormField label="EventId" name="eventId">
@@ -106,60 +106,19 @@
 
 <script setup lang="ts">
 import type { PosOrderFormProps, PosOrderFormData } from '../../types'
-import { z } from 'zod'
 
 const { send } = useCrud()
 
 const props = defineProps<PosOrderFormProps>()
 
-const { defaultValue, schema } = usePosOrders()
+const { defaultValue, schema, collection } = usePosOrders()
 
 // Create a reactive form state with proper typing
-const state = reactive<PosOrderFormData & { id?: string | null }>({
-  id: null,
-  eventId: 0,
-  clientId: 0,
-  locationId: 0,
-  orderNumber: '',
-  status: '',
-  paymentMethod: '',
-  paymentStatus: '',
-  subtotal: 0,
-  taxAmount: 0,
-  discountAmount: 0,
-  totalAmount: 0,
-  notes: '',
-  metadata: '',
-  completedAt: null,
-  eventOrderNumber: 0,
-  clientName: '',
-  waiterId: 0,
-  personnel: false,
-  overallRemarks: ''
-})
 
-// Compute what the initial values should be based on props
-const getInitialValues = () => {
-  if (props.action === 'update' && 'id' in props.activeItem && props.activeItem.id) {
-    // Update mode: use activeItem data
-    return {
-      ...props.activeItem
-    }
-  } else if (props.action === 'create') {
-    // Create mode: use defaults
-    return {
-      ...defaultValue
-    }
-  } else {
-    // Fallback to empty object
-    return {}
-  }
-}
+// Initialize form state with proper values (no watch needed!)
+const initialValues = props.action === 'update' && props.activeItem?.id
+  ? { ...defaultValue, ...props.activeItem }
+  : { ...defaultValue }
 
-// Initialize and watch for prop changes
-watchEffect(() => {
-  const initialValues = getInitialValues()
-  // Merge the values into the reactive state
-  Object.assign(state, initialValues)
-})
+const state = ref<PosOrderFormData & { id?: string | null }>(initialValues)
 </script>

@@ -143,7 +143,7 @@ const props = withDefaults(defineProps<Props>(), {
   mode: 'system'
 })
 
-const { defaultValue, schema } = useTranslationsUi()
+const { defaultValue, schema, collection } = useTranslationsUi()
 
 // Determine which endpoint to use based on mode
 const route = useRoute()
@@ -155,8 +155,8 @@ const endpoint = computed(() =>
     : `/api/super-admin/translations-ui`
 )
 
-// System translations search
-const { data: systemTranslations, refresh } = await useFetch(endpoint.value)
+// System translations search (non-blocking to avoid async setup issues)
+const { data: systemTranslations, refresh } = useFetch(endpoint.value)
 const selectedSystemTranslation = ref<any>(null)
 const loadingSystemTranslations = ref(false)
 
@@ -176,81 +176,42 @@ const fetchSystemTranslation = async (keyPath: string) => {
 }
 
 
-// Create a reactive form state with proper typing and proper values structure
-const state = reactive<TranslationsUiFormData & { id?: string | null }>({
-  id: null,
-  keyPath: '',
-  category: '',
-  values: { en: '' }, // Initialize as object with at least English
-  description: '',
-  isOverrideable: true
-})
-
-// Compute what the initial values should be based on props
-const getInitialValues = () => {
-  if (props.action === 'update' && 'id' in props.activeItem && props.activeItem.id) {
-    // Update mode: use activeItem data
-    return {
-      ...props.activeItem
-    }
-  } else if (props.action === 'create') {
-    // Create mode: use defaults
-    return {
-      ...defaultValue
-    }
-  } else {
-    // Fallback to empty object
-    return {}
-  }
-}
-
-// Watch for system translation selection (for team overrides)
-watch(selectedSystemTranslation, (newTranslation) => {
-  if (newTranslation && props.mode === 'team') {
-    // Pre-populate form with system translation data
-    state.keyPath = newTranslation.keyPath
-    state.category = newTranslation.category || ''
-    state.description = newTranslation.description || ''
-
-    // Pre-populate translation values directly
-    if (newTranslation.values && typeof newTranslation.values === 'object') {
-      state.values = { ...newTranslation.values }
-    }
-  }
-})
-
-// Initialize state once when component mounts
-const initialValues = getInitialValues()
-Object.assign(state, initialValues)
+// Initialize form state with proper values (simplified pattern - no watch needed!)
+const initialValues = props.action === 'update' && props.activeItem?.id
+  ? { ...defaultValue, ...props.activeItem }
+  : { ...defaultValue }
 
 // Ensure values is always an object
-if (!state.values || typeof state.values !== 'object') {
-  state.values = { en: '' }
+if (!initialValues.values || typeof initialValues.values !== 'object') {
+  initialValues.values = { en: '' }
 }
 
-// Ensure description is never null (convert to empty string)
-if (state.description === null || state.description === undefined) {
-  state.description = ''
+// Ensure description is never null
+if (initialValues.description === null || initialValues.description === undefined) {
+  initialValues.description = ''
 }
 
-// Watch for activeItem changes (for pre-filling)
-watch(
-  () => props.activeItem,
-  (newActiveItem) => {
-    if (newActiveItem && Object.keys(newActiveItem).length > 0) {
-      Object.assign(state, newActiveItem)
+const state = ref<TranslationsUiFormData & { id?: string | null }>(initialValues)
 
-      // Ensure values is always an object
-      if (!state.values || typeof state.values !== 'object') {
-        state.values = { en: '' }
-      }
+// Watch for system translation selection (for team overrides - this is the only watcher we need)
+watch(selectedSystemTranslation, (newTranslation) => {
+  if (newTranslation && props.mode === 'team') {
+    // Pre-populate form with system translation data - PRESERVE THE ID!
+    state.value = {
+      ...state.value,
+      id: state.value.id, // Explicitly preserve the id
+      keyPath: newTranslation.keyPath,
+      category: newTranslation.category || '',
+      description: newTranslation.description || '',
+      values: newTranslation.values && typeof newTranslation.values === 'object'
+        ? { ...newTranslation.values }
+        : { en: '' }
     }
-  },
-  { immediate: false, deep: true }
-)
+  }
+})
 
 // Fetch system translation data if needed (only for team mode editing)
-if (props.mode === 'team' && state.id && state.keyPath) {
-  fetchSystemTranslation(state.keyPath)
+if (props.mode === 'team' && state.value.id && state.value.keyPath) {
+  fetchSystemTranslation(state.value.keyPath)
 }
 </script>

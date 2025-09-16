@@ -195,6 +195,36 @@ async function createDatabaseTable(config) {
   }
 }
 
+// Update collection registry with new collection
+async function updateRegistry(layer, collection, collectionKey, componentName) {
+  const registryPath = path.resolve('layers', 'crud', 'registry', 'collections.ts')
+
+  try {
+    let content = await fsp.readFile(registryPath, 'utf8')
+
+    // Check if already exists
+    if (content.includes(`${collectionKey}:`)) {
+      console.log(`⚠️  Collection "${collectionKey}" already in registry`)
+      return
+    }
+
+    // Add new entry before the closing brace using #imports
+    const composableName = `use${componentName}`
+    const newEntry = `  ${collectionKey}: () => import('#imports').then(m => m.${composableName}),`
+
+    content = content.replace(
+      '} as const',
+      `${newEntry}\n} as const`
+    )
+
+    await fsp.writeFile(registryPath, content)
+    console.log(`✓ Added "${collectionKey}" to registry`)
+  } catch (error) {
+    console.error('Failed to update registry:', error)
+    // Don't fail the entire generation if registry update fails
+  }
+}
+
 // Update root nuxt.config.ts to extend the layer
 async function updateRootNuxtConfig(layer) {
   const rootConfigPath = path.resolve('nuxt.config.ts')
@@ -445,7 +475,12 @@ async function writeScaffold({ layer, collection, fields, dialect, autoRelations
   if (!noDb) {
     await createDatabaseTable({ name: collection, layer, fields, force })
   }
-  
+
+  // Update collection registry
+  const collectionKey = `${layer}${cases.pascalCase}`
+  const componentName = `${layerPascalCase}${cases.pascalCasePlural}`
+  await updateRegistry(layer, cases.plural, collectionKey, componentName)
+
   console.log(`\n✅ Successfully generated collection '${cases.plural}' in layer '${layer}'`)
   console.log(`\nNext steps:`)
   console.log(`1. Review the generated files in ${base}`)

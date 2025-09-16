@@ -216,17 +216,17 @@ export default function () {
 
   async function send(action: string, collection: string, data: any): Promise<any> {
     if(useCrudError().foundErrors()) return;
-    
+
     // Find the state that initiated this send
     const currentState = crudStates.value[crudStates.value.length - 1]
     if (!currentState) return;
-    
+
     currentState.loading = `${action}_send`
-    
+
     // Get test reference before async operations
     const collections = useCollections();
     const collectionRef = collections[collection as keyof typeof collections] as any;
-    
+
     // Get the apiPath from config, fallback to collection name
     const config = collections.getConfig(collection)
     const apiPath = config?.apiPath || collection

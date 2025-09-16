@@ -15,7 +15,7 @@
       :schema="schema"
       :state="state"
       class="space-y-4 flex flex-col justify-between h-full gap-4"
-      @submit="send(action, collection, state)"
+      @submit="send(action, collection, state.value)"
       size="lg"
     >
       <UFormField label="EventId" name="eventId">
@@ -85,55 +85,20 @@
 
 <script setup lang="ts">
 import type { PosPrinterFormProps, PosPrinterFormData } from '../../types'
-import { z } from 'zod'
 
 const { send } = useCrud()
 const { t } = useT()
 
 const props = defineProps<PosPrinterFormProps>()
 
-const { defaultValue, schema } = usePosPrinters()
+const { defaultValue, schema, collection } = usePosPrinters()
 
 // Create a reactive form state with proper typing
-const state = reactive<PosPrinterFormData & { id?: string | null }>({
-  id: null,
-  eventId: 0,
-  name: '',
-  ipAddress: '',
-  port: 0,
-  status: 0,
-  showPrices: false,
-  locationId: 0,
-  priority: 0,
-  healthStatus: '',
-  lastSuccessAt: null,
-  lastFailureAt: null,
-  consecutiveFailures: 0,
-  translations: {}
-})
 
-// Compute what the initial values should be based on props
-const getInitialValues = () => {
-  if (props.action === 'update' && 'id' in props.activeItem && props.activeItem.id) {
-    // Update mode: use activeItem data
-    return {
-      ...props.activeItem
-    }
-  } else if (props.action === 'create') {
-    // Create mode: use defaults
-    return {
-      ...defaultValue
-    }
-  } else {
-    // Fallback to empty object
-    return {}
-  }
-}
+// Initialize form state with proper values (no watch needed!)
+const initialValues = props.action === 'update' && props.activeItem?.id
+  ? { ...defaultValue, ...props.activeItem }
+  : { ...defaultValue }
 
-// Initialize and watch for prop changes
-watchEffect(() => {
-  const initialValues = getInitialValues()
-  // Merge the values into the reactive state
-  Object.assign(state, initialValues)
-})
+const state = ref<PosPrinterFormData & { id?: string | null }>(initialValues)
 </script>

@@ -97,43 +97,16 @@ ${formFields}${translationField}
 
 <script setup lang="ts">
 import type { ${prefixedPascalCase}FormProps, ${prefixedPascalCase}FormData } from '../../types'
-import { z } from 'zod'
 
 const { send } = useCrud()
-
 const props = defineProps<${prefixedPascalCase}FormProps>()
+const { defaultValue, schema, collection } = use${prefixedPascalCasePlural}()
 
-const { defaultValue, schema } = use${prefixedPascalCasePlural}()
+// Initialize form state with proper values (no watch needed!)
+const initialValues = props.action === 'update' && props.activeItem?.id
+  ? { ...defaultValue, ...props.activeItem }
+  : { ...defaultValue }
 
-// Create a reactive form state with proper typing
-const state = reactive<${prefixedPascalCase}FormData & { id?: string | null }>({
-  id: null,
-${stateFields}${translationsState}
-})
-
-// Compute what the initial values should be based on props
-const getInitialValues = () => {
-  if (props.action === 'update' && 'id' in props.activeItem && props.activeItem.id) {
-    // Update mode: use activeItem data
-    return {
-      ...props.activeItem
-    }
-  } else if (props.action === 'create') {
-    // Create mode: use defaults
-    return {
-      ...defaultValue
-    }
-  } else {
-    // Fallback to empty object
-    return {}
-  }
-}
-
-// Initialize and watch for prop changes
-watchEffect(() => {
-  const initialValues = getInitialValues()
-  // Merge the values into the reactive state
-  Object.assign(state, initialValues)
-})
+const state = ref<${prefixedPascalCase}FormData & { id?: string | null }>(initialValues)
 </script>`
 }

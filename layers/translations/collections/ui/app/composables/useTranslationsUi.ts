@@ -56,7 +56,8 @@ export const useTranslationsUi = () => ({
   columns: TRANSLATION_UI_COLUMNS,
   defaultValue: TRANSLATION_UI_DEFAULTS,
   defaultPagination: TRANSLATION_UI_PAGINATION,
-  config: translationsUiConfig
+  config: translationsUiConfig,
+  collection: 'translationsUi'
 })
 
 // Default export for auto-import compatibility
