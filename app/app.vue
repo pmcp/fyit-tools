@@ -7,8 +7,9 @@
 
   <!--  TODO: ONLY WHEN ADMIN OR HIGHER? -->
   <CrudContainer />
-  
+
   <TranslationsLanguageSwitcherIsland />
+  <TranslationsDevModeToggle />
 
 </template>
 
