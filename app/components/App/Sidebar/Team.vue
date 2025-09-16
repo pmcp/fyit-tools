@@ -14,18 +14,19 @@
 </template>
 
 <script lang="ts" setup>
+const { t } = useT()
 import { useTeam } from '@/composables/useTeam'
 
 const { isTeamOwner, currentTeam } = useTeam()
 
 const links = computed(() => [
   {
-    label: 'Home',
+    label: t('sidebar.home'),
     icon: 'i-lucide-home',
     to: `/dashboard/${currentTeam.value.slug}`,
   },
   {
-    label: 'Team Translations',
+    label: t('navigation.teamTranslations'),
     icon: 'i-lucide-languages',
     to: `/dashboard/${currentTeam.value.slug}/translations`,
   },
@@ -33,17 +34,17 @@ const links = computed(() => [
 
 const settings = computed(() => [
   {
-    label: 'Workspace Settings',
+    label: t('workspace.settings.title'),
     icon: 'i-lucide-settings',
     to: `/dashboard/${currentTeam.value.slug}/settings`,
   },
   {
-    label: 'Workspace Members',
+    label: t('workspace.settings.members'),
     icon: 'i-lucide-users',
     to: `/dashboard/${currentTeam.value.slug}/settings/members`,
   },
   {
-    label: 'Billing',
+    label: t('workspace.settings.billing'),
     icon: 'i-lucide-credit-card',
     to: `/dashboard/${currentTeam.value.slug}/settings/billing`,
   },

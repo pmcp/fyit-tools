@@ -26,7 +26,7 @@
         <UInput v-model="state.name" class="w-full" size="xl" />
       </UFormField>
 
-      <UFormField label="Email" name="email">
+      <UFormField :label="t('pos.clients.fields.email')" name="email">
         <UInput v-model="state.email" class="w-full" size="xl" />
       </UFormField>
 
@@ -46,7 +46,7 @@
           notes: state.notes,
           description: state.description
         }"
-        label="Translations"
+        :label="t('pos.clients.fields.translations')"
         @update:english="(data) => { state[data.field] = data.value }"
       />
 
@@ -65,6 +65,7 @@ import type { PosClientFormProps, PosClientFormData } from '../../types'
 import { z } from 'zod'
 
 const { send } = useCrud()
+const { t } = useT()
 
 const props = defineProps<PosClientFormProps>()
 

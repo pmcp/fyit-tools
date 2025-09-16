@@ -18,23 +18,23 @@
       @submit="send(action, collection, state)"
       size="lg"
     >
-      <UFormField label="EventId" name="eventId">
+      <UFormField :label="t('pos.categories.fields.event')" name="eventId">
         <UInput v-model.number="state.eventId" type="number" class="w-full" size="xl" />
       </UFormField>
 
-      <UFormField label="Color" name="color">
+      <UFormField :label="t('pos.categories.fields.color')" name="color">
         <UInput v-model="state.color" class="w-full" size="xl" />
       </UFormField>
 
-      <UFormField label="Icon" name="icon">
+      <UFormField :label="t('pos.categories.fields.icon')" name="icon">
         <UInput v-model="state.icon" class="w-full" size="xl" />
       </UFormField>
 
-      <UFormField label="SortOrder" name="sortOrder">
+      <UFormField :label="t('pos.categories.fields.sortOrder')" name="sortOrder">
         <UInput v-model.number="state.sortOrder" type="number" class="w-full" size="xl" />
       </UFormField>
 
-      <UFormField label="IsActive" name="isActive">
+      <UFormField :label="t('pos.categories.fields.isActive')" name="isActive">
         <UCheckbox v-model="state.isActive" />
       </UFormField>
 
@@ -45,7 +45,7 @@
         :default-values="{
           name: state.name
         }"
-        label="Translations"
+        :label="t('pos.categories.fields.translations')"
         @update:english="(data) => { state[data.field] = data.value }"
       />
 
@@ -64,6 +64,7 @@ import type { PosCategorieFormProps, PosCategorieFormData } from '../../types'
 import { z } from 'zod'
 
 const { send } = useCrud()
+const { t } = useT()
 
 const props = defineProps<PosCategorieFormProps>()
 

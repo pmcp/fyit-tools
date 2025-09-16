@@ -206,7 +206,86 @@
     "addCustomer": "Klant toevoegen",
     "selectEvent": "Selecteer evenement",
     "selectLocation": "Selecteer locatie",
-    "selectCategory": "Selecteer categorie"
+    "selectCategory": "Selecteer categorie",
+    "categories": {
+      "fields": {
+        "color": "Kleur",
+        "event": "Evenement",
+        "icon": "Icoon",
+        "isActive": "Is Actief",
+        "sortOrder": "Sorteervolgorde",
+        "translations": "Vertalingen"
+      },
+      "title": "Categorieën"
+    },
+    "clients": {
+      "fields": {
+        "address": "Adres",
+        "clientType": "Klanttype",
+        "email": "E-mail",
+        "notes": "Notities",
+        "phone": "Telefoon",
+        "translations": "Vertalingen"
+      },
+      "title": "Klanten"
+    },
+    "events": {
+      "fields": {
+        "endDate": "Einddatum",
+        "isActive": "Is Actief",
+        "settings": "Instellingen",
+        "startDate": "Startdatum",
+        "translations": "Vertalingen"
+      },
+      "title": "Evenementen"
+    },
+    "locations": {
+      "fields": {
+        "address": "Adres",
+        "capacity": "Capaciteit",
+        "isActive": "Is Actief",
+        "translations": "Vertalingen"
+      },
+      "title": "Locaties"
+    },
+    "orders": {
+      "fields": {
+        "completedAt": "Voltooid Op",
+        "discountAmount": "Kortingsbedrag",
+        "orderNumber": "Bestelnummer",
+        "paymentMethod": "Betaalmethode",
+        "paymentStatus": "Betaalstatus",
+        "subtotal": "Subtotaal",
+        "taxAmount": "BTW Bedrag",
+        "totalAmount": "Totaalbedrag"
+      },
+      "title": "Bestellingen"
+    },
+    "printers": {
+      "fields": {
+        "ipAddress": "IP-adres",
+        "isActive": "Is Actief",
+        "isDefault": "Is Standaard",
+        "location": "Locatie",
+        "port": "Poort",
+        "translations": "Vertalingen"
+      },
+      "title": "Printers"
+    },
+    "products": {
+      "fields": {
+        "category": "Categorie",
+        "event": "Evenement",
+        "isActive": "Is Actief",
+        "isTemplate": "Is Sjabloon",
+        "location": "Locatie",
+        "price": "Prijs",
+        "requiresRemark": "Opmerking Vereist",
+        "sortOrder": "Sorteervolgorde",
+        "translations": "Vertalingen"
+      },
+      "title": "Producten"
+    }
   },
   "settings": {
     "general": "Algemeen",
@@ -244,5 +323,54 @@
     "createNewTeam": "Maak een nieuw team",
     "systemTranslations": "Systeem Vertalingen",
     "teamTranslations": "Team Vertalingen"
+  },
+  "sidebar": {
+    "home": "Home"
+  },
+  "translations": {
+    "form": {
+      "selectSystemTranslationModal": "Selecteer een Systeemvertaling"
+    },
+    "ui": {
+      "baseFromSystemTranslation": "Basis van Systeemvertaling",
+      "bulkImportTranslations": "Bulk Import Vertalingen",
+      "canBeOverriddenByTeams": "Kan worden overschreven door teams",
+      "clear": "Wissen",
+      "exampleJsonFormat": "Voorbeeld JSON formaat:",
+      "failedToLoadOverrides": "Kan team overschrijvingen niet laden",
+      "failedToSyncTranslations": "Kan vertalingen niet synchroniseren",
+      "import": "Importeren",
+      "importComplete": "Import Voltooid",
+      "importError": "Import Fout",
+      "importFailed": "Import Mislukt",
+      "importTranslations": "Vertalingen Importeren",
+      "invalidJsonFormat": "Ongeldig JSON formaat",
+      "keyPath": "Sleutelpad",
+      "loadingTeamOverrides": "Team overschrijvingen laden...",
+      "noTeamOverridesFound": "Geen team overschrijvingen gevonden voor deze vertaling.",
+      "none": "Geen",
+      "pasteJsonHere": "Plak je JSON hier...",
+      "searchSystemTranslations": "Zoek systeemvertalingen om te overschrijven...",
+      "searchSystemTranslationsBase": "Zoek systeemvertalingen...",
+      "selectSystemTranslation": "Selecteer Systeemvertaling om te Overschrijven",
+      "syncToLocaleFiles": "Exporteren naar Lokale Bestanden",
+      "importFromLocaleFiles": "Importeren van Lokale Bestanden",
+      "syncedTranslations": "Synchroniseerde {count} vertalingen naar lokale bestanden",
+      "systemTranslation": "Systeemvertaling",
+      "systemTranslations": "Systeemvertalingen",
+      "teamCustomizations": "Team Aanpassingen:",
+      "teamOverrides": "Team Overschrijvingen",
+      "teamTranslations": "Teamvertalingen",
+      "teamsCount": "geen teams | {count} team | {count} teams",
+      "unknownTeam": "Onbekend Team",
+      "updated": "Bijgewerkt"
+    }
+  },
+  "workspace": {
+    "settings": {
+      "billing": "Facturering",
+      "members": "Werkruimte Leden",
+      "title": "Werkruimte Instellingen"
+    }
   }
 }

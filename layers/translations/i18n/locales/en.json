@@ -206,7 +206,86 @@
     "addCustomer": "Add Customer",
     "selectEvent": "Select Event",
     "selectLocation": "Select Location",
-    "selectCategory": "Select Category"
+    "selectCategory": "Select Category",
+    "categories": {
+      "fields": {
+        "color": "Color",
+        "event": "Event",
+        "icon": "Icon",
+        "isActive": "Is Active",
+        "sortOrder": "Sort Order",
+        "translations": "Translations"
+      },
+      "title": "Categories"
+    },
+    "clients": {
+      "fields": {
+        "address": "Address",
+        "clientType": "Client Type",
+        "email": "Email",
+        "notes": "Notes",
+        "phone": "Phone",
+        "translations": "Translations"
+      },
+      "title": "Clients"
+    },
+    "events": {
+      "fields": {
+        "endDate": "End Date",
+        "isActive": "Is Active",
+        "settings": "Settings",
+        "startDate": "Start Date",
+        "translations": "Translations"
+      },
+      "title": "Events"
+    },
+    "locations": {
+      "fields": {
+        "address": "Address",
+        "capacity": "Capacity",
+        "isActive": "Is Active",
+        "translations": "Translations"
+      },
+      "title": "Locations"
+    },
+    "orders": {
+      "fields": {
+        "completedAt": "Completed At",
+        "discountAmount": "Discount Amount",
+        "orderNumber": "Order Number",
+        "paymentMethod": "Payment Method",
+        "paymentStatus": "Payment Status",
+        "subtotal": "Subtotal",
+        "taxAmount": "Tax Amount",
+        "totalAmount": "Total Amount"
+      },
+      "title": "Orders"
+    },
+    "printers": {
+      "fields": {
+        "ipAddress": "IP Address",
+        "isActive": "Is Active",
+        "isDefault": "Is Default",
+        "location": "Location",
+        "port": "Port",
+        "translations": "Translations"
+      },
+      "title": "Printers"
+    },
+    "products": {
+      "fields": {
+        "category": "Category",
+        "event": "Event",
+        "isActive": "Is Active",
+        "isTemplate": "Is Template",
+        "location": "Location",
+        "price": "Price",
+        "requiresRemark": "Requires Remark",
+        "sortOrder": "Sort Order",
+        "translations": "Translations"
+      },
+      "title": "Products"
+    }
   },
   "settings": {
     "general": "General",
@@ -244,5 +323,54 @@
     "createNewTeam": "Create a new team",
     "systemTranslations": "System Translations",
     "teamTranslations": "Team Translations"
+  },
+  "sidebar": {
+    "home": "Home"
+  },
+  "translations": {
+    "form": {
+      "selectSystemTranslationModal": "Select a System Translation"
+    },
+    "ui": {
+      "baseFromSystemTranslation": "Base from System Translation",
+      "bulkImportTranslations": "Bulk Import Translations",
+      "canBeOverriddenByTeams": "Can be overridden by teams",
+      "clear": "Clear",
+      "exampleJsonFormat": "Example JSON format:",
+      "failedToLoadOverrides": "Failed to load team overrides",
+      "failedToSyncTranslations": "Failed to sync translations",
+      "import": "Import",
+      "importComplete": "Import Complete",
+      "importError": "Import Error",
+      "importFailed": "Import Failed",
+      "importTranslations": "Import Translations",
+      "invalidJsonFormat": "Invalid JSON format",
+      "keyPath": "Key Path",
+      "loadingTeamOverrides": "Loading team overrides...",
+      "noTeamOverridesFound": "No team overrides found for this translation.",
+      "none": "None",
+      "pasteJsonHere": "Paste your JSON here...",
+      "searchSystemTranslations": "Search system translations to override...",
+      "searchSystemTranslationsBase": "Search system translations...",
+      "selectSystemTranslation": "Select System Translation to Override",
+      "syncToLocaleFiles": "Export to Locale Files",
+      "importFromLocaleFiles": "Import from Locale Files",
+      "syncedTranslations": "Synced {count} translations to locale files",
+      "systemTranslation": "System Translation",
+      "systemTranslations": "System Translations",
+      "teamCustomizations": "Team Customizations:",
+      "teamOverrides": "Team Overrides",
+      "teamTranslations": "Team Translations",
+      "teamsCount": "no teams | {count} team | {count} teams",
+      "unknownTeam": "Unknown Team",
+      "updated": "Updated"
+    }
+  },
+  "workspace": {
+    "settings": {
+      "billing": "Billing",
+      "members": "Workspace Members",
+      "title": "Workspace Settings"
+    }
   }
 }

@@ -10,27 +10,35 @@
     >
       <template #header>
           <CrudTableHeader
-            title="System Translations"
+            :title="t('translations.ui.systemTranslations')"
             :collection="'translationsUi'"
             createButton
           >
             <template #extraButtons>
+              <UButton
+                @click="importFromLocales"
+                :loading="importingFromLocales"
+                variant="soft"
+                color="blue"
+              >
+                {{ t('translations.ui.importFromLocaleFiles') }}
+              </UButton>
+              <UButton
+                @click="syncTranslations"
+                :loading="syncing"
+                variant="soft"
+              >
+                {{ t('translations.ui.syncToLocaleFiles') }}
+              </UButton>
               <UModal>
                 <UButton
                   variant="soft"
                 >
-                  Import
-                </UButton>
-                <UButton
-                  @click="syncTranslations"
-                  :loading="syncing"
-                  variant="soft"
-                >
-                  Sync to Locale Files
+                  {{ t('translations.ui.import') }}
                 </UButton>
                 <template #header>
                   <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-semibold">Bulk Import Translations</h3>
+                    <h3 class="text-lg font-semibold">{{ t('translations.ui.bulkImportTranslations') }}</h3>
 
                   </div>
                 </template>
@@ -44,20 +52,20 @@
                       :icon="showExample ? 'i-lucide-eye-off' : 'i-lucide-eye'"
 
                     >
-                      {{ showExample ? 'Hide' : 'Show' }} Example
+                      {{ showExample ? t('common.hideExample') : t('common.showExample') }}
                     </UButton>
 
 
                     <!-- Example JSON -->
                     <div v-if="showExample" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                      <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Example JSON format:</p>
+                      <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ t('translations.ui.exampleJsonFormat') }}</p>
                       <pre class="text-xs overflow-x-auto"><code>{{ exampleJson }}</code></pre>
                     </div>
 
                     <!-- Import Textarea -->
                     <UTextarea
                       v-model="bulkImportJson"
-                      placeholder="Paste your JSON here..."
+                      :placeholder="t('translations.ui.pasteJsonHere')"
                       :rows="10"
                       class="font-mono text-sm w-full"
                     />
@@ -69,7 +77,7 @@
                         variant="ghost"
                         :disabled="!bulkImportJson || importing"
                       >
-                        Clear
+                        {{ t('translations.ui.clear') }}
                       </UButton>
                       <UButton
                         @click="handleBulkImport"
@@ -77,7 +85,7 @@
                         :disabled="!bulkImportJson"
                         color="green"
                       >
-                        Import Translations
+                        {{ t('translations.ui.importTranslations') }}
                       </UButton>
                     </div>
                   </div>
@@ -112,9 +120,9 @@
           color="blue"
           size="xs"
         >
-          {{ row.overrideCount }} {{ row.overrideCount === 1 ? 'team' : 'teams' }}
+          {{ row.overrideCount }} {{ row.overrideCount === 1 ? t('team.team', 'team') : t('team.teams', 'teams') }}
         </UButton>
-        <span v-else class="text-gray-400 text-sm">None</span>
+        <span v-else class="text-gray-400 text-sm">{{ t('translations.ui.none') }}</span>
       </template>
     </CrudTable>
 
@@ -124,7 +132,7 @@
         <UCard>
           <template #header>
             <div class="flex items-center justify-between">
-              <h3 class="text-base font-semibold">Team Overrides</h3>
+              <h3 class="text-base font-semibold">{{ t('translations.ui.teamOverrides') }}</h3>
               <UButton
                 color="gray"
                 variant="ghost"
@@ -137,26 +145,26 @@
 
           <div v-if="selectedTranslation" class="space-y-4">
             <div class="p-3 bg-gray-50 dark:bg-gray-800 rounded">
-              <p class="text-sm font-medium mb-2">System Translation: {{ selectedTranslation.keyPath }}</p>
+              <p class="text-sm font-medium mb-2">{{ t('translations.ui.systemTranslation') }}: {{ selectedTranslation.keyPath }}</p>
               <TranslationsDisplay :translations="selectedTranslation.values" />
             </div>
 
             <div v-if="loadingOverrides" class="flex items-center justify-center py-8">
               <UIcon name="i-lucide-loader-2" class="animate-spin w-5 h-5 mr-2" />
-              <span>Loading team overrides...</span>
+              <span>{{ t('translations.ui.loadingTeamOverrides') }}</span>
             </div>
 
             <div v-else-if="currentOverrides?.length" class="space-y-3">
-              <h4 class="font-semibold text-sm">Team Customizations:</h4>
+              <h4 class="font-semibold text-sm">{{ t('translations.ui.teamCustomizations') }}</h4>
               <div
                 v-for="override in currentOverrides"
                 :key="override.id"
                 class="border dark:border-gray-700 rounded p-3 space-y-2"
               >
                 <div class="flex items-center justify-between">
-                  <span class="font-medium text-sm">{{ override.teamName || 'Unknown Team' }}</span>
+                  <span class="font-medium text-sm">{{ override.teamName || t('translations.ui.unknownTeam') }}</span>
                   <span class="text-xs text-gray-500">
-                    Updated: {{ new Date(override.updatedAt).toLocaleDateString() }}
+                    {{ t('translations.ui.updated') }}: {{ new Date(override.updatedAt).toLocaleDateString() }}
                   </span>
                 </div>
                 <TranslationsDisplay :translations="override.values" />
@@ -164,7 +172,7 @@
             </div>
 
             <div v-else class="text-center py-8 text-gray-500">
-              No team overrides found for this translation.
+              {{ t('translations.ui.noTeamOverridesFound') }}
             </div>
           </div>
         </UCard>
@@ -177,6 +185,7 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useT()
 const { columns, defaultPagination } = useTranslationsUi()
 const { currentTeam } = useTeam()
 const toast = useToast()
@@ -189,6 +198,7 @@ const { items: translationsItems, pagination, refresh, pending } = useCollection
 // State for sync and import
 const syncing = ref(false)
 const importing = ref(false)
+const importingFromLocales = ref(false)
 const showExample = ref(false)
 const bulkImportJson = ref('')
 
@@ -229,6 +239,35 @@ const exampleJson = `{
     }
   }
 }`
+
+// Import translations from locale files to database
+async function importFromLocales() {
+  importingFromLocales.value = true
+  try {
+    const result = await $fetch('/api/super-admin/translations-ui/import', {
+      method: 'POST'
+    })
+
+    toast.add({
+      title: 'Success',
+      description: `Imported ${result.imported} translations from locale files`,
+      color: 'green',
+      icon: 'i-lucide-circle-check'
+    })
+
+    // Refresh the list
+    await refresh()
+  } catch (error) {
+    toast.add({
+      title: 'Error',
+      description: error.data?.statusMessage || 'Failed to import translations',
+      color: 'red',
+      icon: 'i-lucide-circle-x'
+    })
+  } finally {
+    importingFromLocales.value = false
+  }
+}
 
 // Sync translations to locale files
 async function syncTranslations() {

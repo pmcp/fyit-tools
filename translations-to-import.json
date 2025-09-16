@@ -1,189 +1,481 @@
 {
-  "navigation": {
-    "posts": "Posts",
-    "teamTranslations": "Team Translations",
-    "workspaceSettings": "Workspace Settings",
-    "workspaceMembers": "Workspace Members",
-    "accountSettings": "Account Settings",
-    "superAdmin": "Super Admin",
-    "teamSettings": "Team Settings",
-    "members": "Members"
-  },
-  "auth": {
-    "getStarted": "Get Started with Supersaas",
-    "alreadyHaveAccount": "Already have an account?",
-    "dontHaveAccount": "Don't have an account?",
-    "submit": "Submit",
-    "loginWithGoogle": "Google",
-    "loginWithGithub": "Github",
-    "loginWithDiscord": "Discord",
-    "phoneNumberLogin": "Phone Number Login",
-    "loginWithPasskey": "Login with Passkey",
-    "loginWithMagicLink": "Login with Magic Link",
-    "socialLogin": "Social Login",
-    "generatePassword": "Generate Password",
-    "inviteUser": "Invite User",
-    "autoVerifyUser": "Auto verify user",
-    "userCreatedSuccessfully": "User Created Successfully",
-    "passwordCopied": "Password copied",
-    "nameIsRequired": "Name is required",
-    "invalidEmail": "Invalid email"
-  },
-  "billing": {
-    "title": "Billing",
-    "description": "Manage your billing information and subscription plans",
-    "youAreOn": "You are on",
-    "youAreOnThe": "You are on the",
-    "plan": "plan",
-    "freePlan": "Free",
-    "upgradeToPaid": "Upgrade to a paid plan to unlock more features and higher usage limits",
-    "every": "every",
-    "business": "Business",
-    "hobby": "Hobby",
-    "upgrade": "Upgrade"
-  },
-  "forms": {
-    "rowsPerPage": "Rows per page",
-    "optional": "Optional",
-    "required": "Required",
-    "keyPath": "Key Path",
-    "keyPathRequired": "Key path is required",
-    "category": "Category",
-    "categoryRequired": "Category is required",
-    "values": "Values",
-    "description": "Description",
-    "optionalDescription": "Optional description",
-    "teamLogo": "Team logo (Recommended size: 1 MB, 1:1 aspect ratio)",
-    "canBeOverriddenByTeams": "Can be overridden by teams",
-    "isTemplate": "Is Template",
-    "requiresRemark": "Requires Remark",
-    "remarkPrompt": "Remark Prompt",
-    "id": "Id",
-    "avatarUrl": "Avatar",
-    "phoneNumber": "Phone Number"
-  },
-  "table": {
-    "display": "Display",
-    "selectAll": "Select all",
-    "selectRow": "Select row",
-    "noTranslation": "No translation",
-    "noTranslationAvailable": "No translation available",
-    "overrideable": "Overrideable",
-    "createdAt": "Created At",
-    "updatedAt": "Updated At",
-    "actions": "Actions",
-    "items": "Items",
-    "data": "Data",
-    "unknownTeam": "Unknown Team"
-  },
-  "messages": {
-    "success": "Success",
-    "error": "Error",
-    "warning": "Warning",
-    "info": "Information",
-    "operationSuccessful": "Operation successful",
-    "failedToSave": "Failed to save",
-    "failedToDelete": "Failed to delete",
-    "failedToUpdate": "Failed to update",
-    "failedToCreate": "Failed to create",
-    "failedToLoad": "Failed to load",
-    "failedToFetch": "Failed to fetch",
-    "translationsSynced": "Translations synced to JSON files successfully",
-    "syncedTranslations": "Synced {count} translations to locale files",
-    "importComplete": "Import Complete",
-    "importFailed": "Import Failed",
-    "importError": "Import Error",
-    "invalidJsonFormat": "Invalid JSON format",
-    "noTextToCopy": "No text to copy",
-    "copiedToClipboard": "Copied to clipboard",
-    "failedToCopy": "Failed to copy text",
-    "failedToSyncTranslations": "Failed to sync translations",
-    "failedToLoadTeamOverrides": "Failed to load team overrides",
-    "failedToLoadTranslations": "Failed to load translations",
-    "translationsRefreshed": "Translations refreshed",
-    "translationDeletedSuccessfully": "Translation deleted successfully",
-    "translationCreatedSuccessfully": "Translation created successfully",
-    "translationUpdatedSuccessfully": "Translation updated successfully",
-    "unknownError": "Unknown error",
-    "failedToUploadAvatar": "Failed to upload avatar"
-  },
-  "team": {
-    "createNew": "Create a new team",
-    "createNewTeam": "Create a new team",
-    "settings": "Team Settings",
-    "members": "Team Members",
-    "copyEmail": "Copy Email",
-    "copyUserId": "Copy User ID",
-    "removeFromTeam": "Remove from team",
-    "member": "Member",
-    "admin": "Admin",
-    "owner": "Owner",
-    "systemTranslations": "System Translations",
-    "teamTranslations": "Team Translations",
-    "detailsAndReply": "Details & Reply",
-    "markAsClosed": "Mark as Closed"
-  },
-  "common": {
-    "edit": "Edit",
-    "delete": "Delete",
-    "create": "Create",
-    "update": "Update",
-    "copy": "Copy",
-    "show": "Show",
-    "hide": "Hide",
-    "showExample": "Show Example",
-    "hideExample": "Hide Example",
-    "yes": "Yes",
-    "no": "No",
-    "upgrade": "Upgrade",
-    "change": "Change",
-    "upload": "Upload",
-    "example": "Example",
-    "data": "Data",
-    "linkTextToReturnToDashboard": "Link text to return to dashboard",
-    "welcomeMessage": "Welcome message",
-    "sendPasswordResetEmail": "Send Password Reset Email",
-    "impersonateUser": "Impersonate User",
-    "banUser": "Ban User",
-    "deleteUser": "Delete User",
-    "maskEmails": "Mask Emails",
-    "unmaskEmails": "Unmask emails"
-  },
-  "superadmin": {
-    "title": "Super Admin",
-    "users": "Users",
-    "teams": "Teams",
-    "stripePlans": "Stripe Plans",
-    "newsletterSubscribers": "Newsletter Subscribers",
-    "feedbackSubmissions": "Feedback Submissions"
-  },
-  "settings": {
-    "accountSecurity": "Account Security",
-    "needHelp": "Need help?",
-    "haveQuestionNeedAssistance": "Have a question or need assistance? We're here to help!",
-    "docs": "Docs"
-  },
-  "pos": {
-    "products": "Products",
-    "orders": "Orders",
-    "events": "Events",
-    "locations": "Locations",
-    "categories": "Categories",
-    "clients": "Clients",
-    "printers": "Printers",
-    "printQueues": "Print Queues",
-    "printerLocations": "Printer Locations",
-    "systemLogs": "System Logs"
-  },
-  "crud": {
-    "displaying": "Displaying",
-    "noData": "No data",
-    "backToList": "Back to list",
-    "exportToCsv": "Export to CSV",
-    "importFromCsv": "Import from CSV",
-    "search": "Search",
-    "filter": "Filter",
-    "sort": "Sort",
-    "columns": "Columns"
+  "translations": {
+    "pos": {
+      "products": {
+        "title": {
+          "en": "Products",
+          "nl": "Producten",
+          "fr": "Produits"
+        },
+        "fields": {
+          "event": {
+            "en": "Event",
+            "nl": "Evenement",
+            "fr": "Événement"
+          },
+          "category": {
+            "en": "Category",
+            "nl": "Categorie",
+            "fr": "Catégorie"
+          },
+          "location": {
+            "en": "Location",
+            "nl": "Locatie",
+            "fr": "Emplacement"
+          },
+          "price": {
+            "en": "Price",
+            "nl": "Prijs",
+            "fr": "Prix"
+          },
+          "isActive": {
+            "en": "Is Active",
+            "nl": "Is Actief",
+            "fr": "Est Actif"
+          },
+          "isTemplate": {
+            "en": "Is Template",
+            "nl": "Is Sjabloon",
+            "fr": "Est Modèle"
+          },
+          "requiresRemark": {
+            "en": "Requires Remark",
+            "nl": "Opmerking Vereist",
+            "fr": "Remarque Requise"
+          },
+          "sortOrder": {
+            "en": "Sort Order",
+            "nl": "Sorteervolgorde",
+            "fr": "Ordre de Tri"
+          },
+          "translations": {
+            "en": "Translations",
+            "nl": "Vertalingen",
+            "fr": "Traductions"
+          }
+        }
+      },
+      "categories": {
+        "title": {
+          "en": "Categories",
+          "nl": "Categorieën",
+          "fr": "Catégories"
+        },
+        "fields": {
+          "event": {
+            "en": "Event",
+            "nl": "Evenement",
+            "fr": "Événement"
+          },
+          "color": {
+            "en": "Color",
+            "nl": "Kleur",
+            "fr": "Couleur"
+          },
+          "icon": {
+            "en": "Icon",
+            "nl": "Icoon",
+            "fr": "Icône"
+          },
+          "sortOrder": {
+            "en": "Sort Order",
+            "nl": "Sorteervolgorde",
+            "fr": "Ordre de Tri"
+          },
+          "isActive": {
+            "en": "Is Active",
+            "nl": "Is Actief",
+            "fr": "Est Actif"
+          },
+          "translations": {
+            "en": "Translations",
+            "nl": "Vertalingen",
+            "fr": "Traductions"
+          }
+        }
+      },
+      "events": {
+        "title": {
+          "en": "Events",
+          "nl": "Evenementen",
+          "fr": "Événements"
+        },
+        "fields": {
+          "startDate": {
+            "en": "Start Date",
+            "nl": "Startdatum",
+            "fr": "Date de Début"
+          },
+          "endDate": {
+            "en": "End Date",
+            "nl": "Einddatum",
+            "fr": "Date de Fin"
+          },
+          "isActive": {
+            "en": "Is Active",
+            "nl": "Is Actief",
+            "fr": "Est Actif"
+          },
+          "settings": {
+            "en": "Settings",
+            "nl": "Instellingen",
+            "fr": "Paramètres"
+          },
+          "translations": {
+            "en": "Translations",
+            "nl": "Vertalingen",
+            "fr": "Traductions"
+          }
+        }
+      },
+      "locations": {
+        "title": {
+          "en": "Locations",
+          "nl": "Locaties",
+          "fr": "Emplacements"
+        },
+        "fields": {
+          "address": {
+            "en": "Address",
+            "nl": "Adres",
+            "fr": "Adresse"
+          },
+          "capacity": {
+            "en": "Capacity",
+            "nl": "Capaciteit",
+            "fr": "Capacité"
+          },
+          "isActive": {
+            "en": "Is Active",
+            "nl": "Is Actief",
+            "fr": "Est Actif"
+          },
+          "translations": {
+            "en": "Translations",
+            "nl": "Vertalingen",
+            "fr": "Traductions"
+          }
+        }
+      },
+      "printers": {
+        "title": {
+          "en": "Printers",
+          "nl": "Printers",
+          "fr": "Imprimantes"
+        },
+        "fields": {
+          "location": {
+            "en": "Location",
+            "nl": "Locatie",
+            "fr": "Emplacement"
+          },
+          "ipAddress": {
+            "en": "IP Address",
+            "nl": "IP-adres",
+            "fr": "Adresse IP"
+          },
+          "port": {
+            "en": "Port",
+            "nl": "Poort",
+            "fr": "Port"
+          },
+          "isDefault": {
+            "en": "Is Default",
+            "nl": "Is Standaard",
+            "fr": "Est Par Défaut"
+          },
+          "isActive": {
+            "en": "Is Active",
+            "nl": "Is Actief",
+            "fr": "Est Actif"
+          },
+          "translations": {
+            "en": "Translations",
+            "nl": "Vertalingen",
+            "fr": "Traductions"
+          }
+        }
+      },
+      "clients": {
+        "title": {
+          "en": "Clients",
+          "nl": "Klanten",
+          "fr": "Clients"
+        },
+        "fields": {
+          "clientType": {
+            "en": "Client Type",
+            "nl": "Klanttype",
+            "fr": "Type de Client"
+          },
+          "phone": {
+            "en": "Phone",
+            "nl": "Telefoon",
+            "fr": "Téléphone"
+          },
+          "email": {
+            "en": "Email",
+            "nl": "E-mail",
+            "fr": "E-mail"
+          },
+          "address": {
+            "en": "Address",
+            "nl": "Adres",
+            "fr": "Adresse"
+          },
+          "notes": {
+            "en": "Notes",
+            "nl": "Notities",
+            "fr": "Notes"
+          },
+          "translations": {
+            "en": "Translations",
+            "nl": "Vertalingen",
+            "fr": "Traductions"
+          }
+        }
+      },
+      "orders": {
+        "title": {
+          "en": "Orders",
+          "nl": "Bestellingen",
+          "fr": "Commandes"
+        },
+        "fields": {
+          "orderNumber": {
+            "en": "Order Number",
+            "nl": "Bestelnummer",
+            "fr": "Numéro de Commande"
+          },
+          "paymentMethod": {
+            "en": "Payment Method",
+            "nl": "Betaalmethode",
+            "fr": "Méthode de Paiement"
+          },
+          "paymentStatus": {
+            "en": "Payment Status",
+            "nl": "Betaalstatus",
+            "fr": "Statut du Paiement"
+          },
+          "subtotal": {
+            "en": "Subtotal",
+            "nl": "Subtotaal",
+            "fr": "Sous-total"
+          },
+          "taxAmount": {
+            "en": "Tax Amount",
+            "nl": "BTW Bedrag",
+            "fr": "Montant de la Taxe"
+          },
+          "discountAmount": {
+            "en": "Discount Amount",
+            "nl": "Kortingsbedrag",
+            "fr": "Montant de la Réduction"
+          },
+          "totalAmount": {
+            "en": "Total Amount",
+            "nl": "Totaalbedrag",
+            "fr": "Montant Total"
+          },
+          "completedAt": {
+            "en": "Completed At",
+            "nl": "Voltooid Op",
+            "fr": "Complété Le"
+          }
+        }
+      }
+    },
+    "translations": {
+      "ui": {
+        "systemTranslations": {
+          "en": "System Translations",
+          "nl": "Systeemvertalingen",
+          "fr": "Traductions Système"
+        },
+        "teamTranslations": {
+          "en": "Team Translations",
+          "nl": "Teamvertalingen",
+          "fr": "Traductions d'Équipe"
+        },
+        "bulkImportTranslations": {
+          "en": "Bulk Import Translations",
+          "nl": "Bulk Import Vertalingen",
+          "fr": "Importation en Masse des Traductions"
+        },
+        "syncToLocaleFiles": {
+          "en": "Sync to Locale Files",
+          "nl": "Synchroniseren naar Lokale Bestanden",
+          "fr": "Synchroniser vers les Fichiers Locaux"
+        },
+        "import": {
+          "en": "Import",
+          "nl": "Importeren",
+          "fr": "Importer"
+        },
+        "importTranslations": {
+          "en": "Import Translations",
+          "nl": "Vertalingen Importeren",
+          "fr": "Importer les Traductions"
+        },
+        "pasteJsonHere": {
+          "en": "Paste your JSON here...",
+          "nl": "Plak je JSON hier...",
+          "fr": "Collez votre JSON ici..."
+        },
+        "exampleJsonFormat": {
+          "en": "Example JSON format:",
+          "nl": "Voorbeeld JSON formaat:",
+          "fr": "Format JSON d'exemple :"
+        },
+        "clear": {
+          "en": "Clear",
+          "nl": "Wissen",
+          "fr": "Effacer"
+        },
+        "teamOverrides": {
+          "en": "Team Overrides",
+          "nl": "Team Overschrijvingen",
+          "fr": "Remplacements d'Équipe"
+        },
+        "systemTranslation": {
+          "en": "System Translation",
+          "nl": "Systeemvertaling",
+          "fr": "Traduction Système"
+        },
+        "loadingTeamOverrides": {
+          "en": "Loading team overrides...",
+          "nl": "Team overschrijvingen laden...",
+          "fr": "Chargement des remplacements d'équipe..."
+        },
+        "teamCustomizations": {
+          "en": "Team Customizations:",
+          "nl": "Team Aanpassingen:",
+          "fr": "Personnalisations d'Équipe :"
+        },
+        "noTeamOverridesFound": {
+          "en": "No team overrides found for this translation.",
+          "nl": "Geen team overschrijvingen gevonden voor deze vertaling.",
+          "fr": "Aucun remplacement d'équipe trouvé pour cette traduction."
+        },
+        "unknownTeam": {
+          "en": "Unknown Team",
+          "nl": "Onbekend Team",
+          "fr": "Équipe Inconnue"
+        },
+        "updated": {
+          "en": "Updated",
+          "nl": "Bijgewerkt",
+          "fr": "Mis à jour"
+        },
+        "selectSystemTranslation": {
+          "en": "Select System Translation to Override",
+          "nl": "Selecteer Systeemvertaling om te Overschrijven",
+          "fr": "Sélectionner la Traduction Système à Remplacer"
+        },
+        "searchSystemTranslations": {
+          "en": "Search system translations to override...",
+          "nl": "Zoek systeemvertalingen om te overschrijven...",
+          "fr": "Rechercher les traductions système à remplacer..."
+        },
+        "keyPath": {
+          "en": "Key Path",
+          "nl": "Sleutelpad",
+          "fr": "Chemin de Clé"
+        },
+        "canBeOverriddenByTeams": {
+          "en": "Can be overridden by teams",
+          "nl": "Kan worden overschreven door teams",
+          "fr": "Peut être remplacé par les équipes"
+        },
+        "baseFromSystemTranslation": {
+          "en": "Base from System Translation",
+          "nl": "Basis van Systeemvertaling",
+          "fr": "Base de la Traduction Système"
+        },
+        "searchSystemTranslationsBase": {
+          "en": "Search system translations...",
+          "nl": "Zoek systeemvertalingen...",
+          "fr": "Rechercher les traductions système..."
+        },
+        "importComplete": {
+          "en": "Import Complete",
+          "nl": "Import Voltooid",
+          "fr": "Importation Terminée"
+        },
+        "importFailed": {
+          "en": "Import Failed",
+          "nl": "Import Mislukt",
+          "fr": "Échec de l'Importation"
+        },
+        "importError": {
+          "en": "Import Error",
+          "nl": "Import Fout",
+          "fr": "Erreur d'Importation"
+        },
+        "invalidJsonFormat": {
+          "en": "Invalid JSON format",
+          "nl": "Ongeldig JSON formaat",
+          "fr": "Format JSON invalide"
+        },
+        "failedToLoadOverrides": {
+          "en": "Failed to load team overrides",
+          "nl": "Kan team overschrijvingen niet laden",
+          "fr": "Échec du chargement des remplacements d'équipe"
+        },
+        "failedToSyncTranslations": {
+          "en": "Failed to sync translations",
+          "nl": "Kan vertalingen niet synchroniseren",
+          "fr": "Échec de la synchronisation des traductions"
+        },
+        "syncedTranslations": {
+          "en": "Synced {count} translations to locale files",
+          "nl": "Synchroniseerde {count} vertalingen naar lokale bestanden",
+          "fr": "Synchronisation de {count} traductions vers les fichiers locaux"
+        },
+        "teamsCount": {
+          "en": "{count} {count, plural, one {team} other {teams}}",
+          "nl": "{count} {count, plural, one {team} other {teams}}",
+          "fr": "{count} {count, plural, one {équipe} other {équipes}}"
+        },
+        "none": {
+          "en": "None",
+          "nl": "Geen",
+          "fr": "Aucun"
+        }
+      },
+      "form": {
+        "selectSystemTranslationModal": {
+          "en": "Select a System Translation",
+          "nl": "Selecteer een Systeemvertaling",
+          "fr": "Sélectionner une Traduction Système"
+        }
+      }
+    },
+    "workspace": {
+      "settings": {
+        "title": {
+          "en": "Workspace Settings",
+          "nl": "Werkruimte Instellingen",
+          "fr": "Paramètres de l'Espace de Travail"
+        },
+        "members": {
+          "en": "Workspace Members",
+          "nl": "Werkruimte Leden",
+          "fr": "Membres de l'Espace de Travail"
+        },
+        "billing": {
+          "en": "Billing",
+          "nl": "Facturering",
+          "fr": "Facturation"
+        }
+      }
+    },
+    "sidebar": {
+      "home": {
+        "en": "Home",
+        "nl": "Home",
+        "fr": "Accueil"
+      }
+    }
   }
 }

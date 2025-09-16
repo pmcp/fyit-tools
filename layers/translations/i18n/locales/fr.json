@@ -206,7 +206,86 @@
     "addCustomer": "Ajouter un client",
     "selectEvent": "Sélectionner un événement",
     "selectLocation": "Sélectionner un emplacement",
-    "selectCategory": "Sélectionner une catégorie"
+    "selectCategory": "Sélectionner une catégorie",
+    "categories": {
+      "fields": {
+        "color": "Couleur",
+        "event": "Événement",
+        "icon": "Icône",
+        "isActive": "Est Actif",
+        "sortOrder": "Ordre de Tri",
+        "translations": "Traductions"
+      },
+      "title": "Catégories"
+    },
+    "clients": {
+      "fields": {
+        "address": "Adresse",
+        "clientType": "Type de Client",
+        "email": "E-mail",
+        "notes": "Notes",
+        "phone": "Téléphone",
+        "translations": "Traductions"
+      },
+      "title": "Clients"
+    },
+    "events": {
+      "fields": {
+        "endDate": "Date de Fin",
+        "isActive": "Est Actif",
+        "settings": "Paramètres",
+        "startDate": "Date de Début",
+        "translations": "Traductions"
+      },
+      "title": "Événements"
+    },
+    "locations": {
+      "fields": {
+        "address": "Adresse",
+        "capacity": "Capacité",
+        "isActive": "Est Actif",
+        "translations": "Traductions"
+      },
+      "title": "Emplacements"
+    },
+    "orders": {
+      "fields": {
+        "completedAt": "Complété Le",
+        "discountAmount": "Montant de la Réduction",
+        "orderNumber": "Numéro de Commande",
+        "paymentMethod": "Méthode de Paiement",
+        "paymentStatus": "Statut du Paiement",
+        "subtotal": "Sous-total",
+        "taxAmount": "Montant de la Taxe",
+        "totalAmount": "Montant Total"
+      },
+      "title": "Commandes"
+    },
+    "printers": {
+      "fields": {
+        "ipAddress": "Adresse IP",
+        "isActive": "Est Actif",
+        "isDefault": "Est Par Défaut",
+        "location": "Emplacement",
+        "port": "Port",
+        "translations": "Traductions"
+      },
+      "title": "Imprimantes"
+    },
+    "products": {
+      "fields": {
+        "category": "Catégorie",
+        "event": "Événement",
+        "isActive": "Est Actif",
+        "isTemplate": "Est Modèle",
+        "location": "Emplacement",
+        "price": "Prix",
+        "requiresRemark": "Remarque Requise",
+        "sortOrder": "Ordre de Tri",
+        "translations": "Traductions"
+      },
+      "title": "Produits"
+    }
   },
   "settings": {
     "general": "Général",
@@ -244,5 +323,54 @@
     "createNewTeam": "Créer une nouvelle équipe",
     "systemTranslations": "Traductions système",
     "teamTranslations": "Traductions d'équipe"
+  },
+  "sidebar": {
+    "home": "Accueil"
+  },
+  "translations": {
+    "form": {
+      "selectSystemTranslationModal": "Sélectionner une Traduction Système"
+    },
+    "ui": {
+      "baseFromSystemTranslation": "Base de la Traduction Système",
+      "bulkImportTranslations": "Importation en Masse des Traductions",
+      "canBeOverriddenByTeams": "Peut être remplacé par les équipes",
+      "clear": "Effacer",
+      "exampleJsonFormat": "Format JSON d'exemple :",
+      "failedToLoadOverrides": "Échec du chargement des remplacements d'équipe",
+      "failedToSyncTranslations": "Échec de la synchronisation des traductions",
+      "import": "Importer",
+      "importComplete": "Importation Terminée",
+      "importError": "Erreur d'Importation",
+      "importFailed": "Échec de l'Importation",
+      "importTranslations": "Importer les Traductions",
+      "invalidJsonFormat": "Format JSON invalide",
+      "keyPath": "Chemin de Clé",
+      "loadingTeamOverrides": "Chargement des remplacements d'équipe...",
+      "noTeamOverridesFound": "Aucun remplacement d'équipe trouvé pour cette traduction.",
+      "none": "Aucun",
+      "pasteJsonHere": "Collez votre JSON ici...",
+      "searchSystemTranslations": "Rechercher les traductions système à remplacer...",
+      "searchSystemTranslationsBase": "Rechercher les traductions système...",
+      "selectSystemTranslation": "Sélectionner la Traduction Système à Remplacer",
+      "syncToLocaleFiles": "Exporter vers les Fichiers Locaux",
+      "importFromLocaleFiles": "Importer depuis les Fichiers Locaux",
+      "syncedTranslations": "Synchronisation de {count} traductions vers les fichiers locaux",
+      "systemTranslation": "Traduction Système",
+      "systemTranslations": "Traductions Système",
+      "teamCustomizations": "Personnalisations d'Équipe :",
+      "teamOverrides": "Remplacements d'Équipe",
+      "teamTranslations": "Traductions d'Équipe",
+      "teamsCount": "aucune équipe | {count} équipe | {count} équipes",
+      "unknownTeam": "Équipe Inconnue",
+      "updated": "Mis à jour"
+    }
+  },
+  "workspace": {
+    "settings": {
+      "billing": "Facturation",
+      "members": "Membres de l'Espace de Travail",
+      "title": "Paramètres de l'Espace de Travail"
+    }
   }
 }

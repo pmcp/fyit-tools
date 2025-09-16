@@ -29,56 +29,56 @@
           remarkPrompt: state.remarkPrompt
         }"
           @update:english="(data) => { state[data.field] = data.value }"
-          label="Translations"
+          :label="t('pos.products.fields.translations')"
       />
 
-      <UFormField label="Event" name="eventId">
+      <UFormField :label="t('pos.products.fields.event')" name="eventId">
         <CrudEntitySelect
           v-model="state.eventId"
-          label="Event"
+          :label="t('pos.products.fields.event')"
           entity-type="event"
           collection="posEvents"
           api-path="pos-events"
         />
       </UFormField>
 
-      <UFormField label="Category" name="categoryId">
+      <UFormField :label="t('pos.products.fields.category')" name="categoryId">
         <CrudEntitySelect
           v-model="state.categoryId"
-          label="Category"
+          :label="t('pos.products.fields.category')"
           entity-type="category"
           collection="posCategories"
           api-path="pos-categories"
         />
       </UFormField>
 
-      <UFormField label="Location" name="locationId">
+      <UFormField :label="t('pos.products.fields.location')" name="locationId">
         <CrudEntitySelect
           v-model="state.locationId"
-          label="Location"
+          :label="t('pos.products.fields.location')"
           entity-type="location"
           collection="posLocations"
           api-path="pos-locations"
         />
       </UFormField>
 
-      <UFormField label="Price" name="price">
+      <UFormField :label="t('pos.products.fields.price')" name="price">
         <UInput v-model.number="state.price" type="number" class="w-full" size="xl" />
       </UFormField>
 
-      <UFormField label="IsActive" name="isActive">
+      <UFormField :label="t('pos.products.fields.isActive')" name="isActive">
         <UCheckbox v-model="state.isActive" />
       </UFormField>
 
-      <UFormField label="IsTemplate" name="isTemplate">
+      <UFormField :label="t('pos.products.fields.isTemplate')" name="isTemplate">
         <UCheckbox v-model="state.isTemplate" />
       </UFormField>
 
-      <UFormField label="RequiresRemark" name="requiresRemark">
+      <UFormField :label="t('pos.products.fields.requiresRemark')" name="requiresRemark">
         <UCheckbox v-model="state.requiresRemark" />
       </UFormField>
 
-      <UFormField label="SortOrder" name="sortOrder">
+      <UFormField :label="t('pos.products.fields.sortOrder')" name="sortOrder">
         <UInput v-model.number="state.sortOrder" type="number" class="w-full" size="xl" />
       </UFormField>
 
@@ -100,6 +100,7 @@ import type { PosProductFormProps, PosProductFormData } from '../../types'
 import { z } from 'zod'
 
 const { send } = useCrud()
+const { t } = useT()
 
 const props = defineProps<PosProductFormProps>()
 

@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const localesDir = join(process.cwd(), 'layers', 'i18n', 'locales')
+  const localesDir = join(process.cwd(), 'layers', 'translations', 'i18n', 'locales')
 
   try {
     // Read all locale files

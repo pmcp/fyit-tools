@@ -30,15 +30,15 @@
         <UInput v-model="state.status" class="w-full" size="xl" />
       </UFormField>
 
-      <UFormField label="StartDate" name="startDate">
+      <UFormField :label="t('pos.events.fields.startDate')" name="startDate">
         <UInput v-model="state.startDate" type="datetime-local" class="w-full" size="xl" />
       </UFormField>
 
-      <UFormField label="EndDate" name="endDate">
+      <UFormField :label="t('pos.events.fields.endDate')" name="endDate">
         <UInput v-model="state.endDate" type="datetime-local" class="w-full" size="xl" />
       </UFormField>
 
-      <UFormField label="IsActive" name="isActive">
+      <UFormField :label="t('pos.events.fields.isActive')" name="isActive">
         <UCheckbox v-model="state.isActive" />
       </UFormField>
 
@@ -66,7 +66,7 @@
           name: state.name,
           description: state.description
         }"
-        label="Translations"
+        :label="t('pos.events.fields.translations')"
         @update:english="(data) => { state[data.field] = data.value }"
       />
 
@@ -85,6 +85,7 @@ import type { PosEventFormProps, PosEventFormData } from '../../types'
 import { z } from 'zod'
 
 const { send } = useCrud()
+const { t } = useT()
 
 const props = defineProps<PosEventFormProps>()
 

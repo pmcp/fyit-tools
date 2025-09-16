@@ -22,14 +22,14 @@
       <!-- Team Mode: Select from overrideable system translations -->
       <UFormField
         v-if="mode === 'team' && !state?.id"
-        label="Select System Translation to Override"
+        :label="t('translations.ui.selectSystemTranslation')"
         name="systemTranslation"
       >
         <USelectMenu
           v-model="selectedSystemTranslation"
           :items="systemTranslations || []"
           :loading="loadingSystemTranslations"
-          placeholder="Search system translations to override..."
+          :placeholder="t('translations.ui.searchSystemTranslations')"
           :search-input="{
             placeholder: 'Search by key, category or description...',
             icon: 'i-lucide-search'
@@ -54,7 +54,7 @@
       <!-- System Mode: Direct KeyPath input -->
       <UFormField
         v-if="mode === 'system' || state?.id"
-        label="KeyPath"
+        :label="t('translations.ui.keyPath')"
         name="keyPath"
       >
         <UInput
@@ -68,7 +68,7 @@
       <!-- Category: Hidden for team editing -->
       <UFormField
         v-if="mode === 'system' || !state?.id"
-        label="Category"
+        :label="t('forms.category')"
         name="category"
       >
         <UInput v-model="state.category" class="w-full" size="xl" />
@@ -76,7 +76,7 @@
 
       <!-- Show system translation info for team mode -->
       <div v-if="mode === 'team' && state?.id && systemTranslationData" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-        <h4 class="text-sm font-semibold mb-2">System Translation</h4>
+        <h4 class="text-sm font-semibold mb-2">{{ t('translations.ui.systemTranslation') }}</h4>
         <div class="space-y-1 text-sm">
           <div><span class="font-medium">Category:</span> {{ systemTranslationData.category }}</div>
           <div v-if="systemTranslationData.description"><span class="font-medium">System Description:</span> {{ systemTranslationData.description }}</div>
@@ -85,7 +85,7 @@
 
       <!-- Translation values for different locales -->
       <UFormField
-        label="Translations"
+        :label="t('forms.translations', 'Translations')"
         name="values"
         :required="true"
         #default="{ error }"
@@ -93,7 +93,7 @@
         <TranslationsInput
           v-model="state.values"
           :fields="['value']"
-          label="Translations"
+          :label="t('forms.translations', 'Translations')"
           :error="error"
         />
       </UFormField>
@@ -113,7 +113,7 @@
       <!-- Hide override switch for team mode -->
       <USwitch
         v-if="mode === 'system'"
-        label="Can be overridden by teams"
+        :label="t('translations.ui.canBeOverriddenByTeams')"
         v-model="state.isOverrideable"
         size="lg"
       />
@@ -130,6 +130,7 @@
 
 <script setup lang="ts">
 import type { TranslationsUiFormProps, TranslationsUiFormData } from '../../types'
+const { t } = useT()
 
 interface Props extends TranslationsUiFormProps {
   mode?: 'system' | 'team'

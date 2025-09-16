@@ -22,11 +22,11 @@
         <UInput v-model.number="state.eventId" type="number" class="w-full" size="xl" />
       </UFormField>
 
-      <UFormField label="IpAddress" name="ipAddress">
+      <UFormField :label="t('pos.printers.fields.ipAddress')" name="ipAddress">
         <UInput v-model="state.ipAddress" class="w-full" size="xl" />
       </UFormField>
 
-      <UFormField label="Port" name="port">
+      <UFormField :label="t('pos.printers.fields.port')" name="port">
         <UInput v-model.number="state.port" type="number" class="w-full" size="xl" />
       </UFormField>
 
@@ -38,7 +38,7 @@
         <UCheckbox v-model="state.showPrices" />
       </UFormField>
 
-      <UFormField label="LocationId" name="locationId">
+      <UFormField :label="t('pos.printers.fields.location')" name="locationId">
         <UInput v-model.number="state.locationId" type="number" class="w-full" size="xl" />
       </UFormField>
 
@@ -69,7 +69,7 @@
         :default-values="{
           name: state.name
         }"
-        label="Translations"
+        :label="t('pos.printers.fields.translations')"
         @update:english="(data) => { state[data.field] = data.value }"
       />
 
@@ -88,6 +88,7 @@ import type { PosPrinterFormProps, PosPrinterFormData } from '../../types'
 import { z } from 'zod'
 
 const { send } = useCrud()
+const { t } = useT()
 
 const props = defineProps<PosPrinterFormProps>()
 

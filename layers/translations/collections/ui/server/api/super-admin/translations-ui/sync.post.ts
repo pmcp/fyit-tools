@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     .where(isNull(translationsUi.teamId))
     .all()
 
-  const localesDir = join(process.cwd(), 'layers', 'i18n', 'locales')
+  const localesDir = join(process.cwd(), 'layers', 'translations', 'i18n', 'locales')
   
   // Load existing locale files
   const existingLocales = {

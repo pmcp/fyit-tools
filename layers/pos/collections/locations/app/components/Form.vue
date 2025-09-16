@@ -22,7 +22,7 @@
         <UInput v-model.number="state.eventId" type="number" class="w-full" size="xl" />
       </UFormField>
 
-      <UFormField label="IsActive" name="isActive">
+      <UFormField :label="t('pos.locations.fields.isActive')" name="isActive">
         <UCheckbox v-model="state.isActive" />
       </UFormField>
 
@@ -42,7 +42,7 @@
           name: state.name,
           description: state.description
         }"
-        label="Translations"
+        :label="t('pos.locations.fields.translations')"
         @update:english="(data) => { state[data.field] = data.value }"
       />
 
@@ -61,6 +61,7 @@ import type { PosLocationFormProps, PosLocationFormData } from '../../types'
 import { z } from 'zod'
 
 const { send } = useCrud()
+const { t } = useT()
 
 const props = defineProps<PosLocationFormProps>()
 
