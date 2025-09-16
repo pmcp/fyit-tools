@@ -364,7 +364,7 @@ export default function () {
     }
   }
 
-  const open = async (actionIn: string, collection: string, ids: string[]): Promise<void> => {
+  const open = async (actionIn: string, collection: string, ids: string[], container: 'slideover' | 'modal' | 'dialog' = 'slideover'): Promise<void> => {
     if(useCrudError().foundErrors()) return;
 
     // Check if we've reached maximum depth
@@ -387,7 +387,8 @@ export default function () {
       activeItem: {},
       items: [],
       loading: `${actionIn}_open` as any,
-      isOpen: true
+      isOpen: true,
+      containerType: container
     }
 
     // Add new state to array
