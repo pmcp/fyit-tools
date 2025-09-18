@@ -31,19 +31,20 @@ export default defineEventHandler(async (event) => {
   // Create new translation (system level - no teamId)
   const newTranslation = {
     userId: user.id,
-    teamId: null, // System-level translation
+    teamId: undefined, // System-level translation (null in database)
     namespace: 'ui',
     keyPath: body.keyPath,
     category: body.category,
     values: body.values,
-    description: body.description || null,
+    description: body.description || undefined,
     isOverrideable: body.isOverrideable !== undefined ? body.isOverrideable : true,
   }
 
   try {
     return await createTranslationsUi(newTranslation)
   } catch (error) {
-    if (error.message?.includes('UNIQUE constraint failed')) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+    if (errorMessage.includes('UNIQUE constraint failed')) {
       throw createError({
         statusCode: 409,
         statusMessage: 'A translation with this keyPath and namespace already exists',

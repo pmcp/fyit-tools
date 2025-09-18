@@ -3,6 +3,12 @@ import { createTranslationsUi, getTeamBySlug, getSystemTranslationByKeyPath } fr
 
 export default defineEventHandler(async (event) => {
   const teamSlug = getRouterParam(event, 'id') // This is actually the slug from the URL
+  if (!teamSlug) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Team slug is required',
+    })
+  }
   const { user } = await requireUserSession(event)
 
   // Get the team by slug

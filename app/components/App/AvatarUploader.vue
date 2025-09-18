@@ -11,7 +11,7 @@
       type="button"
       color="neutral"
       variant="soft"
-      :label="model ? 'Change' : 'Upload'"
+      :label="model ? tString('common.change') : tString('common.upload')"
       size="xs"
       @click="() => open()"
     />
@@ -20,7 +20,7 @@
       type="button"
       color="error"
       variant="soft"
-      label="Remove"
+      :label="tString('common.remove')"
       size="xs"
       @click="removeImage"
     />
@@ -28,6 +28,7 @@
 </template>
 
 <script setup lang="ts">
+const { t, tString } = useT()
 import { useFileDialog, useObjectUrl } from '@vueuse/core'
 
 withDefaults(

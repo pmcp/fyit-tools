@@ -31,10 +31,10 @@ export const useTeamTranslations = () => {
     error.value = null
     
     try {
-      const { data } = await $fetch(`/api/teams/${tid}/translations-ui`, {
+      const data = await $fetch<TranslationsUi[]>(`/api/teams/${tid}/translations-ui`, {
         query: { locale: locale.value }
       })
-      
+
       translationsCache.value[cacheKey] = data
       return data
     } catch (err) {
@@ -56,15 +56,15 @@ export const useTeamTranslations = () => {
     if (!tid) return defaultValue || keyPath
     
     try {
-      const { data } = await $fetch(`/api/teams/${tid}/translations-ui/resolve`, {
+      const response = await $fetch<{ value: string }>(`/api/teams/${tid}/translations-ui/resolve`, {
         query: {
           keyPath,
           namespace,
           locale: locale.value
         }
       })
-      
-      return data.value || defaultValue || keyPath
+
+      return response?.value || defaultValue || keyPath
     } catch (err) {
       console.error('Failed to resolve translation:', err)
       return defaultValue || keyPath
@@ -88,8 +88,12 @@ export const useTeamTranslations = () => {
       t => t.keyPath === keyPath && t.namespace === namespace
     )
     
-    if (translation?.values?.[locale.value]) {
-      return translation.values[locale.value]
+    if (translation?.values && typeof translation.values === 'object' && translation.values !== null) {
+      const valuesObj = translation.values as Record<string, string>
+      const value = valuesObj[locale.value]
+      if (value) {
+        return value
+      }
     }
     
     return defaultValue || keyPath

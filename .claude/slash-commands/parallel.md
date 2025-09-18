@@ -1,3 +1,9 @@
+---
+name: parallel
+description: Execute multiple tasks simultaneously using sub-agents
+namespace: project
+---
+
 # /parallel - Parallel Task Orchestrator
 
 Execute multiple independent tasks simultaneously using sub-agents for maximum efficiency.

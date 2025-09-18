@@ -248,6 +248,7 @@ const startImpersonationSession = async (user: User) => {
 
 const maskEmail = (email: string) => {
   const [localPart, domain] = email.split('@')
+  if (!localPart || !domain) return email
   return `${localPart
     .split('')
     .map(() => '•')

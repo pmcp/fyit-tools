@@ -1,5 +1,5 @@
 <template>
-  <AppContainer title="Feedback">
+  <AppContainer :title="tString('superAdmin.feedback')">
     <div class="overflow-x-auto">
       <table class="w-full table-auto text-left text-sm">
         <thead>
@@ -75,8 +75,8 @@
     <!-- Reply Modal -->
     <UModal
       v-model:open="replyModal"
-      title="Reply to Feedback"
-      description="Send a response to the user's feedback"
+      :title="tString('superAdmin.feedback.replyToFeedback')"
+      :description="tString('superAdmin.feedback.sendResponse')"
     >
       <template #body>
         <div
@@ -87,7 +87,7 @@
             size="2xs"
             :alt="selectedFeedback?.user.name"
           />
-          {{ selectedFeedback?.user.name }} says
+          {{ selectedFeedback?.user.name }} {{ tString('superAdmin.feedback.userSays') }}
         </div>
         <div class="mb-4 rounded-lg bg-neutral-50 p-4 dark:bg-neutral-800">
           <p
@@ -99,43 +99,43 @@
         <div class="mb-4 rounded-lg bg-neutral-50 p-4 dark:bg-neutral-800">
           <div class="grid grid-cols-2 gap-3 text-xs">
             <div v-if="selectedFeedback?.meta?.url" class="col-span-2">
-              <span class="font-medium text-neutral-600 dark:text-neutral-300">Page URL:</span>
+              <span class="font-medium text-neutral-600 dark:text-neutral-300">{{ tString('superAdmin.meta.pageUrl') }}</span>
               <span class="ml-2 text-neutral-500 dark:text-neutral-400">{{
                 selectedFeedback.meta.url
               }}</span>
             </div>
             <div v-if="selectedFeedback?.meta?.browser">
-              <span class="font-medium text-neutral-600 dark:text-neutral-300">Browser:</span>
+              <span class="font-medium text-neutral-600 dark:text-neutral-300">{{ tString('superAdmin.meta.browser') }}</span>
               <span class="ml-2 text-neutral-500 dark:text-neutral-400">{{
                 selectedFeedback.meta.browser.split(' ')[0]
               }}</span>
             </div>
             <div v-if="selectedFeedback?.meta?.platform">
-              <span class="font-medium text-neutral-600 dark:text-neutral-300">Platform:</span>
+              <span class="font-medium text-neutral-600 dark:text-neutral-300">{{ tString('superAdmin.meta.platform') }}</span>
               <span class="ml-2 text-neutral-500 dark:text-neutral-400">{{
                 selectedFeedback.meta.platform
               }}</span>
             </div>
             <div v-if="selectedFeedback?.meta?.screenResolution">
-              <span class="font-medium text-neutral-600 dark:text-neutral-300">Screen:</span>
+              <span class="font-medium text-neutral-600 dark:text-neutral-300">{{ tString('superAdmin.meta.screen') }}</span>
               <span class="ml-2 text-neutral-500 dark:text-neutral-400">{{
                 selectedFeedback.meta.screenResolution
               }}</span>
             </div>
             <div v-if="selectedFeedback?.meta?.language">
-              <span class="font-medium text-neutral-600 dark:text-neutral-300">Language:</span>
+              <span class="font-medium text-neutral-600 dark:text-neutral-300">{{ tString('superAdmin.meta.language') }}</span>
               <span class="ml-2 text-neutral-500 dark:text-neutral-400">{{
                 selectedFeedback.meta.language
               }}</span>
             </div>
             <div v-if="selectedFeedback?.meta?.timezone">
-              <span class="font-medium text-neutral-600 dark:text-neutral-300">Timezone:</span>
+              <span class="font-medium text-neutral-600 dark:text-neutral-300">{{ tString('superAdmin.meta.timezone') }}</span>
               <span class="ml-2 text-neutral-500 dark:text-neutral-400">{{
                 selectedFeedback.meta.timezone
               }}</span>
             </div>
             <div v-if="selectedFeedback?.meta?.colorScheme">
-              <span class="font-medium text-neutral-600 dark:text-neutral-300">Color Scheme:</span>
+              <span class="font-medium text-neutral-600 dark:text-neutral-300">{{ tString('superAdmin.meta.colorScheme') }}</span>
               <span
                 class="ml-2 text-neutral-500 capitalize dark:text-neutral-400"
               >{{ selectedFeedback.meta.colorScheme }}</span>
@@ -143,10 +143,10 @@
           </div>
         </div>
         <UForm :state="replyFormState" @submit="handleReply">
-          <UFormField label="Message" name="message">
+          <UFormField :label="tString('fields.message')" name="message">
             <UTextarea
               v-model="replyFormState.message"
-              placeholder="Enter your response..."
+              :placeholder="tString('placeholders.enterYourResponse')"
               :rows="4"
               class="w-full"
             />
@@ -157,10 +157,10 @@
               color="neutral"
               @click="replyModal = false"
             >
-              Cancel
+              {{ tString('common.cancel') }}
             </UButton>
             <UButton type="submit" :loading="isSubmitting">
-              Send Reply
+              {{ tString('superAdmin.feedback.sendReply') }}
             </UButton>
           </div>
         </UForm>
@@ -170,21 +170,21 @@
     <!-- Delete Confirmation Modal -->
     <UModal
       v-model:open="showDeleteConfirmation"
-      title="Delete Feedback"
-      description="This action is irreversible"
+      :title="tString('superAdmin.feedback.deleteFeedback')"
+      :description="tString('superAdmin.feedback.irreversibleAction')"
     >
       <template #body>
         <div class="flex justify-end gap-2">
           <UButton
             variant="ghost"
             color="neutral"
-            label="Cancel"
+            :label="tString('common.cancel')"
             @click="showDeleteConfirmation = false"
           />
           <UButton
             color="error"
             :loading="isDeleting"
-            label="Delete"
+            :label="tString('common.delete')"
             @click="handleDelete"
           />
         </div>
@@ -222,8 +222,16 @@ const { data: feedback, refresh } = await useFetch<Feedback[]>(
   '/api/super-admin/feedback',
 )
 const toast = useToast()
+const { tString } = useT()
 
-const columns = ['User', 'Email', 'Status', 'Message', 'Date', '']
+const columns = [
+  tString('superAdmin.columns.user'),
+  tString('superAdmin.columns.email'),
+  tString('superAdmin.columns.status'),
+  tString('superAdmin.columns.message'),
+  tString('superAdmin.columns.date'),
+  ''
+]
 const loadingFeedbackId = ref<string | null>(null)
 const selectedFeedback = ref<Feedback | null>(null)
 const replyModal = ref(false)
@@ -237,7 +245,7 @@ const replyFormState = ref({
 
 const actions = computed(() => [
   {
-    label: 'Details & Reply',
+    label: tString('superAdmin.feedback.detailsAndReply'),
     onSelect: () => {
       if (selectedFeedback.value) {
         replyModal.value = true
@@ -245,7 +253,7 @@ const actions = computed(() => [
     },
   },
   {
-    label: 'Mark as Closed',
+    label: tString('superAdmin.feedback.markAsClosed'),
     onSelect: () => {
       if (selectedFeedback.value) {
         void handleMarkAsClosed(selectedFeedback.value)
@@ -253,7 +261,7 @@ const actions = computed(() => [
     },
   },
   {
-    label: 'Delete',
+    label: tString('common.delete'),
     color: 'error' as const,
     onSelect: () => {
       if (selectedFeedback.value) {
@@ -293,8 +301,8 @@ const handleReply = async () => {
       },
     })
     toast.add({
-      title: 'Reply sent',
-      description: 'Your response has been sent to the user',
+      title: tString('superAdmin.feedback.replySent'),
+      description: tString('superAdmin.feedback.replySentDescription'),
       color: 'success',
     })
     replyModal.value = false
@@ -302,8 +310,8 @@ const handleReply = async () => {
     await refresh()
   } catch {
     toast.add({
-      title: 'Error',
-      description: 'Failed to send reply',
+      title: tString('messages.error'),
+      description: tString('superAdmin.feedback.failedToSendReply'),
       color: 'error',
     })
   } finally {
@@ -321,15 +329,15 @@ const handleMarkAsClosed = async (feedbackItem: Feedback) => {
       },
     })
     toast.add({
-      title: 'Feedback marked as closed',
-      description: 'The feedback has been marked as closed',
+      title: tString('superAdmin.feedback.feedbackMarkedClosed'),
+      description: tString('superAdmin.feedback.feedbackMarkedClosed'),
       color: 'success',
     })
     await refresh()
   } catch {
     toast.add({
-      title: 'Error',
-      description: 'Failed to mark feedback as closed',
+      title: tString('messages.error'),
+      description: tString('superAdmin.feedback.failedToMarkClosed'),
       color: 'error',
     })
   } finally {
@@ -346,16 +354,16 @@ const handleDelete = async () => {
       method: 'DELETE',
     })
     toast.add({
-      title: 'Feedback deleted',
-      description: 'The feedback has been deleted',
+      title: tString('superAdmin.feedback.feedbackDeleted'),
+      description: tString('superAdmin.feedback.feedbackDeletedDescription'),
       color: 'success',
     })
     showDeleteConfirmation.value = false
     await refresh()
   } catch {
     toast.add({
-      title: 'Error',
-      description: 'Failed to delete feedback',
+      title: tString('messages.error'),
+      description: tString('superAdmin.feedback.failedToDeleteFeedback'),
       color: 'error',
     })
   } finally {

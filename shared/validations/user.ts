@@ -1,6 +1,6 @@
-import { insertUserSchema } from '@@/types/database'
+import { z } from 'zod'
 
-export const updateUserSchema = insertUserSchema.pick({
-  name: true,
-  avatarUrl: true,
+export const updateUserSchema = z.object({
+  name: z.string(),
+  avatarUrl: z.string().nullable().optional(),
 })

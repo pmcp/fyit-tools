@@ -1,3 +1,9 @@
+---
+name: test
+description: Generate comprehensive tests for Nuxt applications
+namespace: project
+---
+
 # /test - Testing Assistant
 
 Generate comprehensive tests for Nuxt applications with focus on Playwright E2E and authentication scenarios.

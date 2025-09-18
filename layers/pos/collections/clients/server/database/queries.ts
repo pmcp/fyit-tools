@@ -1,4 +1,4 @@
-import type { PosClient, NewPosClient } from '../types'
+import type { PosClient, NewPosClient } from '../../types'
 
 export async function getAllPosClients(teamId: string) {
   const db = useDB()

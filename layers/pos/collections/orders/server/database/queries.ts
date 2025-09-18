@@ -1,4 +1,4 @@
-import type { PosOrder, NewPosOrder } from '../types'
+import type { PosOrder, NewPosOrder } from '../../types'
 
 export async function getAllPosOrders(teamId: string) {
   const db = useDB()

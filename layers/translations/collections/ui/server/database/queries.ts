@@ -212,11 +212,14 @@ export async function resolveTranslation(
     )
     .get()
 
-  if (teamTranslation?.values?.[locale]) {
-    return {
-      source: 'team',
-      value: teamTranslation.values[locale],
-      translation: teamTranslation
+  if (teamTranslation?.values && typeof teamTranslation.values === 'object' && teamTranslation.values !== null) {
+    const valuesObj = teamTranslation.values as Record<string, string>
+    if (valuesObj[locale]) {
+      return {
+        source: 'team',
+        value: valuesObj[locale],
+        translation: teamTranslation
+      }
     }
   }
 
@@ -233,11 +236,14 @@ export async function resolveTranslation(
     )
     .get()
 
-  if (systemTranslation?.values?.[locale]) {
-    return {
-      source: 'system',
-      value: systemTranslation.values[locale],
-      translation: systemTranslation
+  if (systemTranslation?.values && typeof systemTranslation.values === 'object' && systemTranslation.values !== null) {
+    const valuesObj = systemTranslation.values as Record<string, string>
+    if (valuesObj[locale]) {
+      return {
+        source: 'system',
+        value: valuesObj[locale],
+        translation: systemTranslation
+      }
     }
   }
 
@@ -382,7 +388,7 @@ export function processTranslationObject(
 ): NewTranslationsUi[] {
   const translations: NewTranslationsUi[] = []
 
-  function extractTranslations(obj: any, prefix: string = '') {
+  function extractTranslations(obj: Record<string, any>, prefix: string = '') {
     for (const [key, value] of Object.entries(obj)) {
       const keyPath = prefix ? `${prefix}.${key}` : key
 
@@ -394,13 +400,13 @@ export function processTranslationObject(
         if (hasLocaleKeys) {
           // This is a translation values object
           translations.push({
-            teamId,
+            teamId: teamId || undefined,
             userId,
             namespace,
             keyPath,
-            category: prefix.split('.')[0] || key.split('.')[0],
-            values: value,
-            description: null,
+            category: prefix.split('.')[0] || key.split('.')[0] || 'default',
+            values: value as Record<string, string>,
+            description: undefined,
             isOverrideable: true
           })
         } else {
@@ -410,17 +416,17 @@ export function processTranslationObject(
       } else if (typeof value === 'string') {
         // Simple string value - use for all locales
         translations.push({
-          teamId,
+          teamId: teamId || undefined,
           userId,
           namespace,
           keyPath,
-          category: prefix.split('.')[0] || key.split('.')[0],
+          category: prefix.split('.')[0] || key.split('.')[0] || 'default',
           values: {
             en: value,
             nl: value,
             fr: value
           },
-          description: null,
+          description: undefined,
           isOverrideable: true
         })
       }
@@ -447,11 +453,11 @@ export async function upsertTranslation(
   const db = useDB()
 
   const {
-    teamId = null,
+    teamId = undefined,
     userId,
     namespace = 'ui',
-    category = keyPath.split('.')[0],
-    description = null,
+    category = keyPath.split('.')[0] || 'default',
+    description = undefined,
     isOverrideable = true
   } = options
 
@@ -487,7 +493,7 @@ export async function upsertTranslation(
     const [created] = await db
       .insert(tables.translationsUi)
       .values({
-        teamId,
+        teamId: teamId || undefined,
         userId,
         namespace,
         keyPath,
@@ -630,7 +636,7 @@ export async function getSystemTranslationsWithTeamOverrides(teamId: string, loc
   // Filter by locale if provided
   if (locale) {
     return enhancedTranslations.filter(t =>
-      t.systemValues && locale in t.systemValues
+      t.systemValues && typeof t.systemValues === 'object' && t.systemValues !== null && locale in t.systemValues
     )
   }
 

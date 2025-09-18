@@ -12,6 +12,7 @@ export interface PosClient {
   active?: boolean
   description?: string
   isGlobal?: boolean
+  translations?: Record<string, any>
   createdAt: Date
   updatedAt: Date
   optimisticId?: string
@@ -20,6 +21,10 @@ export interface PosClient {
 
 export type PosClientFormData = z.infer<typeof posClientSchema>
 export type NewPosClient = Omit<PosClient, 'id' | 'createdAt' | 'updatedAt'>
+export type CreatePosClientInput = Partial<NewPosClient> & {
+  id?: string  // Can be provided but will be excluded
+  locale?: string
+}
 
 // Props type for the Form component
 export interface PosClientFormProps {

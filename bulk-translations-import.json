@@ -1,0 +1,720 @@
+{
+  "translations": {
+    "pages": {
+      "dashboard": {
+        "accountSettings": {
+          "en": "Account Settings",
+          "nl": "Account Instellingen",
+          "fr": "Paramètres du compte"
+        },
+        "posts": {
+          "en": "Posts",
+          "nl": "Berichten",
+          "fr": "Articles"
+        },
+        "imageGallery": {
+          "en": "Image Gallery",
+          "nl": "Afbeeldingengalerij",
+          "fr": "Galerie d'images"
+        },
+        "aiImageGen": {
+          "en": "AI Image Generation",
+          "nl": "AI Afbeelding Generatie",
+          "fr": "Génération d'images IA"
+        },
+        "accountSecurity": {
+          "en": "Account Security",
+          "nl": "Account Beveiliging",
+          "fr": "Sécurité du compte"
+        },
+        "teamSettings": {
+          "en": "Team Settings",
+          "nl": "Team Instellingen",
+          "fr": "Paramètres de l'équipe"
+        },
+        "workspaceMembers": {
+          "en": "Workspace Members",
+          "nl": "Werkruimte Leden",
+          "fr": "Membres de l'espace de travail"
+        },
+        "linkShortner": {
+          "en": "Link Shortner",
+          "nl": "Link Verkorten",
+          "fr": "Raccourcisseur de liens"
+        },
+        "tasksDemo": {
+          "en": "Tasks Demo",
+          "nl": "Taken Demo",
+          "fr": "Démo des tâches"
+        }
+      },
+      "superAdmin": {
+        "allTeams": {
+          "en": "All Teams",
+          "nl": "Alle Teams",
+          "fr": "Toutes les équipes"
+        },
+        "users": {
+          "en": "Users",
+          "nl": "Gebruikers",
+          "fr": "Utilisateurs"
+        },
+        "feedback": {
+          "en": "Feedback",
+          "nl": "Feedback",
+          "fr": "Commentaires"
+        },
+        "stripePlans": {
+          "en": "Stripe Plans",
+          "nl": "Stripe Plannen",
+          "fr": "Plans Stripe"
+        }
+      }
+    },
+    "buttons": {
+      "signOut": {
+        "en": "Sign out",
+        "nl": "Uitloggen",
+        "fr": "Se déconnecter"
+      },
+      "newPost": {
+        "en": "New Post",
+        "nl": "Nieuw Bericht",
+        "fr": "Nouveau poste"
+      },
+      "getStarted": {
+        "en": "Get Started",
+        "nl": "Begin",
+        "fr": "Commencer"
+      },
+      "backToLogin": {
+        "en": "Back to Login",
+        "nl": "Terug naar Inloggen",
+        "fr": "Retour à la connexion"
+      },
+      "inviteUser": {
+        "en": "Invite User",
+        "nl": "Gebruiker Uitnodigen",
+        "fr": "Inviter un utilisateur"
+      },
+      "banUser": {
+        "en": "Ban User",
+        "nl": "Gebruiker Verbannen",
+        "fr": "Bannir l'utilisateur"
+      },
+      "deleteUser": {
+        "en": "Delete User",
+        "nl": "Gebruiker Verwijderen",
+        "fr": "Supprimer l'utilisateur"
+      },
+      "createPasskey": {
+        "en": "Create Passkey",
+        "nl": "Toegangssleutel Maken",
+        "fr": "Créer une clé d'accès"
+      },
+      "manageSubscription": {
+        "en": "Manage Subscription",
+        "nl": "Abonnement Beheren",
+        "fr": "Gérer l'abonnement"
+      },
+      "inviteMember": {
+        "en": "Invite Member",
+        "nl": "Lid Uitnodigen",
+        "fr": "Inviter un membre"
+      },
+      "sendInvitation": {
+        "en": "Send invitation",
+        "nl": "Uitnodiging versturen",
+        "fr": "Envoyer une invitation"
+      },
+      "linkAccount": {
+        "en": "Link Account",
+        "nl": "Account Koppelen",
+        "fr": "Lier le compte"
+      },
+      "verifyPhoneNumber": {
+        "en": "Verify Phone Number",
+        "nl": "Telefoonnummer Verifiëren",
+        "fr": "Vérifier le numéro de téléphone"
+      },
+      "changePhoneNumber": {
+        "en": "Change Phone Number",
+        "nl": "Telefoonnummer Wijzigen",
+        "fr": "Changer le numéro de téléphone"
+      },
+      "updatePassword": {
+        "en": "Update Password",
+        "nl": "Wachtwoord Bijwerken",
+        "fr": "Mettre à jour le mot de passe"
+      },
+      "proceed": {
+        "en": "Proceed",
+        "nl": "Doorgaan",
+        "fr": "Continuer"
+      },
+      "stopSession": {
+        "en": "Stop session",
+        "nl": "Sessie stoppen",
+        "fr": "Arrêter la session"
+      },
+      "liftBan": {
+        "en": "Lift Ban",
+        "nl": "Verbanning Opheffen",
+        "fr": "Lever l'interdiction"
+      },
+      "remove": {
+        "en": "Remove",
+        "nl": "Verwijderen",
+        "fr": "Supprimer"
+      },
+      "verify": {
+        "en": "Verify",
+        "nl": "Verifiëren",
+        "fr": "Vérifier"
+      },
+      "google": {
+        "en": "Google",
+        "nl": "Google",
+        "fr": "Google"
+      },
+      "github": {
+        "en": "Github",
+        "nl": "Github",
+        "fr": "Github"
+      },
+      "discord": {
+        "en": "Discord",
+        "nl": "Discord",
+        "fr": "Discord"
+      },
+      "features": {
+        "en": "Features",
+        "nl": "Functies",
+        "fr": "Fonctionnalités"
+      },
+      "pricing": {
+        "en": "Pricing",
+        "nl": "Prijzen",
+        "fr": "Tarification"
+      },
+      "blog": {
+        "en": "Blog",
+        "nl": "Blog",
+        "fr": "Blog"
+      },
+      "docs": {
+        "en": "Docs",
+        "nl": "Documentatie",
+        "fr": "Documents"
+      },
+      "goToApp": {
+        "en": "Go to App",
+        "nl": "Ga naar App",
+        "fr": "Aller à l'application"
+      }
+    },
+    "fields": {
+      "newPassword": {
+        "en": "New Password",
+        "nl": "Nieuw Wachtwoord",
+        "fr": "Nouveau mot de passe"
+      },
+      "phoneNumber": {
+        "en": "Phone Number",
+        "nl": "Telefoonnummer",
+        "fr": "Numéro de téléphone"
+      },
+      "avatar": {
+        "en": "Avatar",
+        "nl": "Avatar",
+        "fr": "Avatar"
+      },
+      "teamName": {
+        "en": "Team name",
+        "nl": "Teamnaam",
+        "fr": "Nom de l'équipe"
+      },
+      "teamUrl": {
+        "en": "Team URL",
+        "nl": "Team URL",
+        "fr": "URL de l'équipe"
+      },
+      "teamId": {
+        "en": "Team ID",
+        "nl": "Team ID",
+        "fr": "ID de l'équipe"
+      },
+      "accountId": {
+        "en": "Account ID",
+        "nl": "Account ID",
+        "fr": "ID du compte"
+      },
+      "title": {
+        "en": "Title",
+        "nl": "Titel",
+        "fr": "Titre"
+      },
+      "content": {
+        "en": "Content",
+        "nl": "Inhoud",
+        "fr": "Contenu"
+      },
+      "image": {
+        "en": "Image",
+        "nl": "Afbeelding",
+        "fr": "Image"
+      },
+      "message": {
+        "en": "Message",
+        "nl": "Bericht",
+        "fr": "Message"
+      },
+      "verificationCode": {
+        "en": "Verification Code",
+        "nl": "Verificatiecode",
+        "fr": "Code de vérification"
+      },
+      "memberEmail": {
+        "en": "Member email",
+        "nl": "Lid e-mail",
+        "fr": "E-mail du membre"
+      },
+      "role": {
+        "en": "Role",
+        "nl": "Rol",
+        "fr": "Rôle"
+      },
+      "reason": {
+        "en": "Reason",
+        "nl": "Reden",
+        "fr": "Raison"
+      },
+      "bannedUntil": {
+        "en": "Banned Until",
+        "nl": "Verbannen Tot",
+        "fr": "Banni jusqu'à"
+      }
+    },
+    "placeholders": {
+      "enterNewPassword": {
+        "en": "Enter new password",
+        "nl": "Voer nieuw wachtwoord in",
+        "fr": "Entrez le nouveau mot de passe"
+      },
+      "personalOrCompanyName": {
+        "en": "Personal or Company Name",
+        "nl": "Persoonlijke of Bedrijfsnaam",
+        "fr": "Nom personnel ou d'entreprise"
+      },
+      "enterTeamName": {
+        "en": "Enter team name",
+        "nl": "Voer teamnaam in",
+        "fr": "Entrez le nom de l'équipe"
+      },
+      "optionalDescription": {
+        "en": "Optional description for this translation",
+        "nl": "Optionele beschrijving voor deze vertaling",
+        "fr": "Description optionnelle pour cette traduction"
+      }
+    },
+    "modals": {
+      "deletePost": {
+        "title": {
+          "en": "Delete Post",
+          "nl": "Bericht Verwijderen",
+          "fr": "Supprimer le poste"
+        }
+      },
+      "newPost": {
+        "title": {
+          "en": "New Post",
+          "nl": "Nieuw Bericht",
+          "fr": "Nouveau poste"
+        }
+      },
+      "editPost": {
+        "title": {
+          "en": "Edit Post",
+          "nl": "Bericht Bewerken",
+          "fr": "Modifier le poste"
+        }
+      },
+      "createTeam": {
+        "title": {
+          "en": "Create a new team",
+          "nl": "Een nieuw team maken",
+          "fr": "Créer une nouvelle équipe"
+        }
+      },
+      "banUser": {
+        "title": {
+          "en": "Ban User",
+          "nl": "Gebruiker Verbannen",
+          "fr": "Bannir l'utilisateur"
+        },
+        "description": {
+          "en": "Ban a user from the platform",
+          "nl": "Een gebruiker van het platform verbannen",
+          "fr": "Bannir un utilisateur de la plateforme"
+        }
+      },
+      "deleteUser": {
+        "title": {
+          "en": "Delete User",
+          "nl": "Gebruiker Verwijderen",
+          "fr": "Supprimer l'utilisateur"
+        },
+        "description": {
+          "en": "This action is irreversible",
+          "nl": "Deze actie is onomkeerbaar",
+          "fr": "Cette action est irréversible"
+        }
+      },
+      "createUser": {
+        "title": {
+          "en": "Create a new user",
+          "nl": "Een nieuwe gebruiker maken",
+          "fr": "Créer un nouvel utilisateur"
+        },
+        "description": {
+          "en": "Invite a new user to the platform",
+          "nl": "Een nieuwe gebruiker uitnodigen voor het platform",
+          "fr": "Inviter un nouvel utilisateur sur la plateforme"
+        }
+      },
+      "replyFeedback": {
+        "title": {
+          "en": "Reply to Feedback",
+          "nl": "Reageren op Feedback",
+          "fr": "Répondre aux commentaires"
+        }
+      },
+      "deleteFeedback": {
+        "title": {
+          "en": "Delete Feedback",
+          "nl": "Feedback Verwijderen",
+          "fr": "Supprimer les commentaires"
+        }
+      },
+      "deleteAccount": {
+        "title": {
+          "en": "Delete Account",
+          "nl": "Account Verwijderen",
+          "fr": "Supprimer le compte"
+        }
+      },
+      "registerPasskey": {
+        "title": {
+          "en": "Register a new passkey",
+          "nl": "Een nieuwe toegangssleutel registreren",
+          "fr": "Enregistrer une nouvelle clé d'accès"
+        }
+      },
+      "linkAccount": {
+        "title": {
+          "en": "Link Account",
+          "nl": "Account Koppelen",
+          "fr": "Lier le compte"
+        }
+      }
+    },
+    "messages": {
+      "updatePost": {
+        "en": "Update your post",
+        "nl": "Werk je bericht bij",
+        "fr": "Mettez à jour votre poste"
+      },
+      "createNewPost": {
+        "en": "Create a new post to share with your team",
+        "nl": "Maak een nieuw bericht om te delen met je team",
+        "fr": "Créez un nouveau poste à partager avec votre équipe"
+      },
+      "deleteAccountConfirm": {
+        "en": "Please type 'delete' to confirm",
+        "nl": "Typ 'delete' om te bevestigen",
+        "fr": "Veuillez taper 'delete' pour confirmer"
+      },
+      "autoVerifyUser": {
+        "en": "Auto verify user",
+        "nl": "Gebruiker automatisch verifiëren",
+        "fr": "Vérifier automatiquement l'utilisateur"
+      }
+    },
+    "toast": {
+      "translationSaved": {
+        "title": {
+          "en": "Translation Saved",
+          "nl": "Vertaling Opgeslagen",
+          "fr": "Traduction sauvegardée"
+        }
+      },
+      "translationSaveFailed": {
+        "title": {
+          "en": "Translation Save Failed",
+          "nl": "Vertaling Opslaan Mislukt",
+          "fr": "Échec de la sauvegarde de la traduction"
+        },
+        "description": {
+          "en": "Could not save the translation. Please try again.",
+          "nl": "Kon de vertaling niet opslaan. Probeer het opnieuw.",
+          "fr": "Impossible de sauvegarder la traduction. Veuillez réessayer."
+        }
+      },
+      "userCreated": {
+        "title": {
+          "en": "User Created Successfully",
+          "nl": "Gebruiker Succesvol Aangemaakt",
+          "fr": "Utilisateur créé avec succès"
+        }
+      },
+      "passwordCopied": {
+        "title": {
+          "en": "Password copied",
+          "nl": "Wachtwoord gekopieerd",
+          "fr": "Mot de passe copié"
+        }
+      },
+      "postCreated": {
+        "title": {
+          "en": "Post created",
+          "nl": "Bericht aangemaakt",
+          "fr": "Poste créé"
+        },
+        "description": {
+          "en": "Your post has been created successfully",
+          "nl": "Je bericht is succesvol aangemaakt",
+          "fr": "Votre poste a été créé avec succès"
+        }
+      },
+      "postUpdated": {
+        "title": {
+          "en": "Post updated",
+          "nl": "Bericht bijgewerkt",
+          "fr": "Poste mis à jour"
+        },
+        "description": {
+          "en": "Your post has been updated successfully",
+          "nl": "Je bericht is succesvol bijgewerkt",
+          "fr": "Votre poste a été mis à jour avec succès"
+        }
+      },
+      "postDeleted": {
+        "title": {
+          "en": "Post deleted",
+          "nl": "Bericht verwijderd",
+          "fr": "Poste supprimé"
+        },
+        "description": {
+          "en": "Your post has been deleted successfully",
+          "nl": "Je bericht is succesvol verwijderd",
+          "fr": "Votre poste a été supprimé avec succès"
+        }
+      },
+      "loggedInSuccessfully": {
+        "title": {
+          "en": "Logged in successfully",
+          "nl": "Succesvol ingelogd",
+          "fr": "Connecté avec succès"
+        }
+      }
+    },
+    "validation": {
+      "titleRequired": {
+        "en": "Title is required",
+        "nl": "Titel is vereist",
+        "fr": "Le titre est requis"
+      },
+      "contentRequired": {
+        "en": "Content is required",
+        "nl": "Inhoud is vereist",
+        "fr": "Le contenu est requis"
+      },
+      "nameRequired": {
+        "en": "Name is required",
+        "nl": "Naam is vereist",
+        "fr": "Le nom est requis"
+      },
+      "invalidEmail": {
+        "en": "Invalid email",
+        "nl": "Ongeldig e-mailadres",
+        "fr": "E-mail invalide"
+      },
+      "keyPathRequired": {
+        "en": "Key path is required",
+        "nl": "Sleutelpad is vereist",
+        "fr": "Le chemin de clé est requis"
+      },
+      "categoryRequired": {
+        "en": "Category is required",
+        "nl": "Categorie is vereist",
+        "fr": "La catégorie est requise"
+      },
+      "translationRequired": {
+        "en": "At least one translation is required",
+        "nl": "Minimaal één vertaling is vereist",
+        "fr": "Au moins une traduction est requise"
+      }
+    },
+    "errors": {
+      "failedToUploadImage": {
+        "en": "An error occurred while uploading the image",
+        "nl": "Er is een fout opgetreden bij het uploaden van de afbeelding",
+        "fr": "Une erreur s'est produite lors du téléchargement de l'image"
+      },
+      "failedToCreatePost": {
+        "en": "An error occurred while creating the post",
+        "nl": "Er is een fout opgetreden bij het aanmaken van het bericht",
+        "fr": "Une erreur s'est produite lors de la création du poste"
+      },
+      "failedToUpdatePost": {
+        "en": "An error occurred while updating the post",
+        "nl": "Er is een fout opgetreden bij het bijwerken van het bericht",
+        "fr": "Une erreur s'est produite lors de la mise à jour du poste"
+      },
+      "failedToDeletePost": {
+        "en": "An error occurred while deleting the post",
+        "nl": "Er is een fout opgetreden bij het verwijderen van het bericht",
+        "fr": "Une erreur s'est produite lors de la suppression du poste"
+      },
+      "failedToSendVerificationCode": {
+        "en": "Failed to send verification code",
+        "nl": "Verificatiecode verzenden mislukt",
+        "fr": "Échec de l'envoi du code de vérification"
+      },
+      "failedToVerifyCode": {
+        "en": "Failed to verify code",
+        "nl": "Code verifiëren mislukt",
+        "fr": "Échec de la vérification du code"
+      },
+      "failedToCreateUser": {
+        "en": "Failed to create user",
+        "nl": "Gebruiker aanmaken mislukt",
+        "fr": "Échec de la création de l'utilisateur"
+      },
+      "failedToUploadAvatar": {
+        "en": "Failed to upload avatar",
+        "nl": "Avatar uploaden mislukt",
+        "fr": "Échec du téléchargement de l'avatar"
+      },
+      "unexpectedError": {
+        "en": "An unexpected error occurred",
+        "nl": "Er is een onverwachte fout opgetreden",
+        "fr": "Une erreur inattendue s'est produite"
+      }
+    },
+    "translationUi": {
+      "baseFromSystemTranslation": {
+        "en": "Base from System Translation",
+        "nl": "Gebaseerd op Systeemvertaling",
+        "fr": "Basé sur la traduction système"
+      },
+      "keyPath": {
+        "en": "Key Path",
+        "nl": "Sleutelpad",
+        "fr": "Chemin de clé"
+      },
+      "category": {
+        "en": "Category",
+        "nl": "Categorie",
+        "fr": "Catégorie"
+      },
+      "description": {
+        "en": "Description",
+        "nl": "Beschrijving",
+        "fr": "Description"
+      },
+      "translations": {
+        "en": "Translations",
+        "nl": "Vertalingen",
+        "fr": "Traductions"
+      },
+      "teamOverrideDescription": {
+        "en": "Team Override Description",
+        "nl": "Team Override Beschrijving",
+        "fr": "Description de substitution d'équipe"
+      },
+      "createTranslation": {
+        "en": "Create Translation",
+        "nl": "Vertaling Maken",
+        "fr": "Créer une traduction"
+      },
+      "updateTranslation": {
+        "en": "Update Translation",
+        "nl": "Vertaling Bijwerken",
+        "fr": "Mettre à jour la traduction"
+      },
+      "teamTranslationOverrides": {
+        "en": "Team Translation Overrides",
+        "nl": "Team Vertaling Overschrijvingen",
+        "fr": "Substitutions de traduction d'équipe"
+      },
+      "systemValues": {
+        "en": "System Values",
+        "nl": "Systeemwaarden",
+        "fr": "Valeurs système"
+      },
+      "yourOverride": {
+        "en": "Your Override",
+        "nl": "Jouw Overschrijving",
+        "fr": "Votre substitution"
+      },
+      "edit": {
+        "en": "Edit",
+        "nl": "Bewerken",
+        "fr": "Modifier"
+      },
+      "override": {
+        "en": "Override",
+        "nl": "Overschrijven",
+        "fr": "Substituer"
+      },
+      "noTranslation": {
+        "en": "No translation",
+        "nl": "Geen vertaling",
+        "fr": "Aucune traduction"
+      },
+      "noTranslationAvailable": {
+        "en": "No translation available",
+        "nl": "Geen vertaling beschikbaar",
+        "fr": "Aucune traduction disponible"
+      },
+      "yes": {
+        "en": "Yes",
+        "nl": "Ja",
+        "fr": "Oui"
+      },
+      "no": {
+        "en": "No",
+        "nl": "Nee",
+        "fr": "Non"
+      }
+    },
+    "dashboard": {
+      "followers": {
+        "en": "Followers",
+        "nl": "Volgers",
+        "fr": "Abonnés"
+      },
+      "impressions": {
+        "en": "Impressions",
+        "nl": "Impressies",
+        "fr": "Impressions"
+      },
+      "profileVisits": {
+        "en": "Profile Visits",
+        "nl": "Profielbezoeken",
+        "fr": "Visites de profil"
+      },
+      "likes": {
+        "en": "Likes",
+        "nl": "Likes",
+        "fr": "J'aime"
+      },
+      "impressionsOverview": {
+        "en": "Impressions Overview",
+        "nl": "Impressies Overzicht",
+        "fr": "Aperçu des impressions"
+      }
+    }
+  }
+}

@@ -1,16 +1,23 @@
 import { updatePosOrderProduct } from '../../../../database/queries'
 import { isTeamMember } from '@@/server/database/queries/teams'
-import type { PosOrderProduct } from '../../../../../../types'
+import type { PosOrderProduct } from '../../../../../types'
 
+type PatchBody = Partial<PosOrderProduct>
 export default defineEventHandler(async (event) => {
   const { id: teamId, orderproductId } = getRouterParams(event)
+  if (!teamId || typeof teamId !== 'string') {
+    throw createError({ statusCode: 400, statusMessage: 'Team ID is required' })
+  }
+  if (!orderproductId || typeof orderproductId !== 'string') {
+    throw createError({ statusCode: 400, statusMessage: 'Orderproduct ID is required' })
+  }
   const { user } = await requireUserSession(event)
   const hasAccess = await isTeamMember(teamId, user.id)
   if (!hasAccess) {
     throw createError({ statusCode: 403, statusMessage: 'Unauthorized' })
   }
 
-  const body = await readBody<Partial<PosOrderProduct>>(event)
+  const body = await readBody<PatchBody>(event)
   
   return await updatePosOrderProduct(orderproductId, teamId, user.id, {
     orderId: body.orderId,

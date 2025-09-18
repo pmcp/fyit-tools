@@ -4,6 +4,20 @@ import { deleteTranslationsUi, getTeamBySlug, verifyTeamTranslation } from '../.
 export default defineEventHandler(async (event) => {
   const teamSlug = getRouterParam(event, 'id') // This is actually the slug from the URL
   const translationId = getRouterParam(event, 'translationId')
+
+  if (!teamSlug) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Team slug is required',
+    })
+  }
+  if (!translationId) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Translation ID is required',
+    })
+  }
+
   const { user } = await requireUserSession(event)
 
   // Get the team by slug

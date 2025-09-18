@@ -1,0 +1,14 @@
+{
+  "name": "fyit-editor-layer",
+  "version": "1.0.0",
+  "dependencies": {
+    "nuxt-tiptap-editor": "^2.3.1"
+  },
+  "devDependencies": {
+    "@tiptap/extension-bubble-menu": "^2.10.0",
+    "@tiptap/extension-color": "^2.10.0",
+    "@tiptap/extension-placeholder": "^2.10.0",
+    "@tiptap/extension-text-style": "^2.10.0",
+    "@tiptap/suggestion": "^2.10.0"
+  }
+}

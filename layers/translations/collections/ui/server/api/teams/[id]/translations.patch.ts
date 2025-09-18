@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
       // If no system translation exists and createIfNotExists is true, create it first
       if (!systemTranslation && createIfNotExists) {
         await createTranslationsUi({
-          teamId: null, // System translation
+          teamId: undefined, // System translation (null in database)
           keyPath,
           category,
           namespace: category,

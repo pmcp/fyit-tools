@@ -1,3 +1,9 @@
+---
+name: layer
+description: Create a new Nuxt layer following domain-driven design
+namespace: project
+---
+
 # /layer - Create Nuxt Layer
 
 Generate a new Nuxt layer following domain-driven design principles.

@@ -17,6 +17,7 @@ export interface PosPrinter {
   lastSuccessAt?: Date
   lastFailureAt?: Date
   consecutiveFailures?: number
+  translations?: Record<string, any>
   createdAt: Date
   updatedAt: Date
   optimisticId?: string
@@ -25,6 +26,10 @@ export interface PosPrinter {
 
 export type PosPrinterFormData = z.infer<typeof posPrinterSchema>
 export type NewPosPrinter = Omit<PosPrinter, 'id' | 'createdAt' | 'updatedAt'>
+export type CreatePosPrinterInput = Partial<NewPosPrinter> & {
+  id?: string  // Can be provided but will be excluded
+  locale?: string
+}
 
 // Props type for the Form component
 export interface PosPrinterFormProps {

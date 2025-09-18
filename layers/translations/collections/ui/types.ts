@@ -3,12 +3,14 @@ import type { translationsUiSchema } from './app/composables/useTranslationsUi'
 
 export interface TranslationsUi {
   id: string
-  teamId: string
+  teamId: string | null
   userId: string
+  namespace: string
   keyPath: string
   category: string
-  values: Record<string, any>
-  description?: string
+  values: Record<string, string>
+  description: string | null
+  isOverrideable: boolean
   createdAt: Date
   updatedAt: Date
   optimisticId?: string
@@ -16,7 +18,16 @@ export interface TranslationsUi {
 }
 
 export type TranslationsUiFormData = z.infer<typeof translationsUiSchema>
-export type NewTranslationsUi = Omit<TranslationsUi, 'id' | 'createdAt' | 'updatedAt'>
+export interface NewTranslationsUi {
+  teamId?: string | null
+  userId: string
+  namespace: string
+  keyPath: string
+  category: string
+  values: Record<string, string>
+  description?: string | null
+  isOverrideable?: boolean
+}
 
 // Props type for the Form component
 export interface TranslationsUiFormProps {

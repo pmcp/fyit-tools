@@ -1,4 +1,4 @@
-import type { PosPrinterLocation, NewPosPrinterLocation } from '../types'
+import type { PosPrinterLocation, NewPosPrinterLocation } from '../../types'
 
 export async function getAllPosPrinterLocations(teamId: string) {
   const db = useDB()

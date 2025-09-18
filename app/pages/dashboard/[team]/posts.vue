@@ -1,7 +1,7 @@
 <template>
-  <AppContainer title="Posts">
+  <AppContainer :title="tString('pages.dashboard.posts')">
     <template #actions>
-      <UButton label="New Post" @click="openCreateModal()" />
+      <UButton :label="tString('buttons.newPost')" @click="openCreateModal()" />
     </template>
     <div>
       <div
@@ -79,11 +79,11 @@
     <!-- Post Modal (Create/Edit) -->
     <UModal
       v-model:open="postModal.isOpen"
-      :title="postModal.isEdit ? 'Edit Post' : 'New Post'"
+      :title="postModal.isEdit ? tString('modals.editPost.title') : tString('modals.newPost.title')"
       :description="
         postModal.isEdit
-          ? 'Update your post'
-          : 'Create a new post to share with your team'
+          ? tString('messages.updatePost')
+          : tString('messages.createNewPost')
       "
     >
       <template #body>
@@ -93,22 +93,22 @@
           class="space-y-4"
           @submit="handleSubmit"
         >
-          <UFormField label="Image" name="imagePath">
+          <UFormField :label="tString('fields.image')" name="imagePath">
             <AppPostImageUploader
               v-model="state.image"
               @file-selected="handleFileSelected"
             />
           </UFormField>
-          <UFormField label="Title" name="title">
+          <UFormField :label="tString('fields.title')" name="title">
             <UInput v-model="state.title" class="w-full" size="xl" />
           </UFormField>
 
-          <UFormField label="Content" name="content">
+          <UFormField :label="tString('fields.content')" name="content">
             <UTextarea v-model="state.content" class="w-full" size="xl" />
           </UFormField>
 
           <UButton
-            :label="postModal.isEdit ? 'Update' : 'Submit'"
+            :label="postModal.isEdit ? tString('common.update') : tString('common.submit')"
             type="submit"
             :loading="loading"
           />
@@ -117,21 +117,20 @@
     </UModal>
 
     <!-- Delete Confirmation Modal -->
-    <UModal v-model:open="deleteModal.isOpen" title="Delete Post">
+    <UModal v-model:open="deleteModal.isOpen" :title="tString('modals.deletePost.title')">
       <template #body>
         <p class="mb-4">
-          Are you sure you want to delete this post? This action cannot be
-          undone.
+          {{ tString('messages.confirmDeletePost') }}
         </p>
         <div class="flex justify-end gap-2">
           <UButton
-            label="Cancel"
+:label="tString('common.cancel')"
             color="neutral"
             variant="outline"
             @click="deleteModal.isOpen = false"
           />
           <UButton
-            label="Delete"
+:label="tString('common.delete')"
             color="error"
             :loading="loading"
             @click="handleDeletePost"
@@ -144,10 +143,16 @@
 
 <script setup lang="ts">
 import { z } from 'zod'
-import type { Post, InsertPost } from '@@/types/database'
+import type { Post, InsertPost, User } from '@@/types/database'
 import type { FormSubmitEvent } from '@nuxt/ui'
 
+// Extended Post type with populated user data
+type PostWithUser = Omit<Post, 'userId'> & {
+  userId: User
+}
+
 const { currentTeam } = useTeam()
+const { tString } = useT()
 const toast = useToast()
 const loading = ref(false)
 const deletingPostId = ref<string | null>(null)
@@ -173,21 +178,22 @@ const state = reactive<Partial<Schema>>({
 const schema = z.object({
   title: z
     .string()
-    .min(1, 'Title is required')
-    .max(100, 'Title must be less than 100 characters'),
+    .min(1, tString('validation.titleRequired'))
+    .max(100, tString('validation.titleMaxLength')),
   content: z
     .string()
-    .min(1, 'Content is required')
-    .max(1000, 'Content must be less than 1000 characters'),
+    .min(1, tString('validation.contentRequired'))
+    .max(1000, tString('validation.contentMaxLength')),
   image: z.string().optional(),
 })
 
 type Schema = z.output<typeof schema>
 
-const { data: posts, refresh } = await useFetch(
+const { data: posts, refresh } = await useFetch<PostWithUser[]>(
   `/api/teams/${currentTeam.value.id}/posts`,
   {
     watch: [currentTeam],
+    default: () => [],
   },
 )
 
@@ -204,9 +210,9 @@ const uploadImage = async () => {
   } catch (error: any) {
     console.log(error)
     toast.add({
-      title: 'Failed to upload image',
+      title: tString('errors.failedToUploadImage'),
       description:
-        error.data?.message || 'An error occurred while uploading the image',
+        error.data?.message || tString('errors.failedToUploadImage'),
       color: 'error',
     })
     throw createError('Failed to upload image')
@@ -230,9 +236,9 @@ const createPost = async (post: Partial<InsertPost>) => {
     return data.value
   } catch (error: any) {
     toast.add({
-      title: 'Failed to create post',
+      title: tString('errors.failedToCreatePost'),
       description:
-        error.data?.message || 'An error occurred while creating the post',
+        error.data?.message || tString('errors.failedToCreatePost'),
       color: 'error',
     })
     throw error
@@ -251,9 +257,9 @@ const updatePost = async (id: string, post: Partial<Post>) => {
     return updatedPost
   } catch (error: any) {
     toast.add({
-      title: 'Failed to update post',
+      title: tString('errors.failedToUpdatePost'),
       description:
-        error.data?.message || 'An error occurred while updating the post',
+        error.data?.message || tString('errors.failedToUpdatePost'),
       color: 'error',
     })
     throw error
@@ -271,9 +277,9 @@ const deletePost = async (id: string) => {
     )
   } catch (error: any) {
     toast.add({
-      title: 'Failed to delete post',
+      title: tString('errors.failedToDeletePost'),
       description:
-        error.data?.message || 'An error occurred while deleting the post',
+        error.data?.message || tString('errors.failedToDeletePost'),
       color: 'error',
     })
     throw error
@@ -296,7 +302,7 @@ const openCreateModal = () => {
   postModal.isOpen = true
 }
 
-const openEditModal = (post: Omit<Post, 'createdAt' | 'updatedAt'>) => {
+const openEditModal = (post: Omit<PostWithUser, 'createdAt' | 'updatedAt'>) => {
   resetForm()
   state.title = post.title
   state.content = post.content
@@ -335,15 +341,15 @@ const handleSubmit = async (event: FormSubmitEvent<Schema>) => {
     if (postModal.isEdit && postModal.editId) {
       await updatePost(postModal.editId, payload)
       toast.add({
-        title: 'Post updated',
-        description: 'Your post has been updated successfully',
+        title: tString('toast.postUpdated.title'),
+        description: tString('toast.postUpdated.description'),
         color: 'success',
       })
     } else {
       await createPost(payload)
       toast.add({
-        title: 'Post created',
-        description: 'Your post has been created successfully',
+        title: tString('toast.postCreated.title'),
+        description: tString('toast.postCreated.description'),
         color: 'success',
       })
     }
@@ -368,8 +374,8 @@ const handleDeletePost = async () => {
     }
 
     toast.add({
-      title: 'Post deleted',
-      description: 'Your post has been deleted successfully',
+      title: tString('toast.postDeleted.title'),
+      description: tString('toast.postDeleted.description'),
       color: 'success',
     })
     deleteModal.isOpen = false

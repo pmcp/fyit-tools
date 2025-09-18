@@ -40,13 +40,13 @@
       <UButton
         variant="soft"
         color="neutral"
-        label="Cancel"
+        :label="tString('common.cancel')"
         @click="$emit('cancel')"
       />
       <UButton
         variant="soft"
         color="error"
-        label="Delete User"
+        :label="tString('buttons.deleteUser')"
         :loading="loading"
         @click="deleteUser"
       />
@@ -57,6 +57,8 @@
 <script lang="ts" setup>
 import type { OAuthAccounts, User } from '@@/types/database'
 import type { SanitizedUser } from '@@/server/utils/auth'
+
+const { t, tString } = useT()
 
 interface TeamMember {
   id: string

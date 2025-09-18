@@ -27,7 +27,7 @@ rather than sequentially.
 ### 3. Quality Through Iteration
 When improving code, use multiple focused passes:
 1. Functionality pass - Make it work
-2. Performance pass - Make it fast  
+2. Performance pass - Make it fast
 3. Quality pass - Make it clean
 4. Testing pass - Make it reliable
 5. Documentation pass - Make it clear
@@ -36,11 +36,20 @@ When improving code, use multiple focused passes:
 
 - **Framework**: Nuxt (latest version) - [Documentation](https://nuxt.com/docs)
 - **UI Library**: Nuxt UI 4 (CRITICAL: Only v4, never v2/v3)
+  - Common v4 changes: USeparator (not UDivider), USwitch (not UToggle), UDropdownMenu (not UDropdown), UToast (not UNotification)
 - **Utilities**: VueUse (ALWAYS check VueUse first before implementing complex logic)
 - **Hosting**: NuxtHub (Cloudflare edge)
 - **Package Manager**: pnpm (ALWAYS use pnpm)
 - **Architecture**: Domain-Driven Design with Nuxt Layers
 - **Testing**: Vitest + Playwright
+
+## MANDATORY: TypeScript Checking
+**EVERY agent and Claude Code MUST run `npx nuxt typecheck` after making changes**
+- Run after creating/modifying Vue components
+- Run after changing TypeScript files
+- Run before considering any task complete
+- If typecheck fails, FIX the errors immediately
+- Never use `pnpm typecheck` - ALWAYS use `npx nuxt typecheck`
 
 ## Core Principles
 
@@ -121,22 +130,104 @@ Each layer is isolated with its own:
 - server/api/
 - types/
 
-## Nuxt UI 4 Patterns
+## CRITICAL: Nuxt UI 4 Component Patterns
 
-### Correct Component Usage
+### ⚠️ Component Name Changes (v3 → v4)
+**YOU MUST USE THE V4 NAMES:**
+- ❌ `UDropdown` → ✅ `UDropdownMenu`
+- ❌ `UDivider` → ✅ `USeparator`
+- ❌ `UToggle` → ✅ `USwitch`
+- ❌ `UNotification` → ✅ `UToast`
+
+### ❌ NEVER DO THIS (Old v2/v3 Patterns)
+```vue
+<!-- WRONG: v3 Modal with UCard inside -->
+<UModal v-model="showModal">
+  <UCard>
+    <template #header>
+      <h3>Title</h3>
+    </template>
+    Content here
+    <template #footer>
+      <UButton>Save</UButton>
+    </template>
+  </UCard>
+</UModal>
+
+<!-- WRONG: Old component names -->
+<UDropdown /> <!-- Should be UDropdownMenu -->
+<UDivider />  <!-- Should be USeparator -->
+<UToggle />   <!-- Should be USwitch -->
+```
+
+### ✅ ALWAYS DO THIS (Correct v4 Patterns)
+
+#### Modal (Most Common Mistake!)
+```vue
+<!-- CORRECT: v4 Modal without UCard -->
+<UModal v-model="isOpen">
+  <template #content="{ close }">
+    <div class="p-6">
+      <h3 class="text-lg font-semibold mb-4">Modal Title</h3>
+      <div class="space-y-4">
+        <!-- Your content here -->
+      </div>
+      <div class="flex justify-end gap-2 mt-6">
+        <UButton color="gray" variant="ghost" @click="close">
+          Cancel
+        </UButton>
+        <UButton color="primary" @click="handleSave">
+          Save
+        </UButton>
+      </div>
+    </div>
+  </template>
+</UModal>
+```
+
+#### Slideover
+```vue
+<!-- CORRECT: v4 Slideover -->
+<USlideover v-model="isOpen">
+  <template #content="{ close }">
+    <div class="p-6">
+      <h3 class="text-lg font-semibold mb-4">Slideover Title</h3>
+      <!-- Content -->
+      <UButton @click="close">Close</UButton>
+    </div>
+  </template>
+</USlideover>
+```
+
+#### Drawer
+```vue
+<!-- CORRECT: v4 Drawer -->
+<UDrawer v-model="isOpen">
+  <template #content="{ close }">
+    <div class="p-6">
+      <!-- Content -->
+    </div>
+  </template>
+</UDrawer>
+```
+
+#### Forms
 ```vue
 <!-- CORRECT: Nuxt UI 4 -->
-<UButton color="primary" variant="solid" size="md">
-  Action
-</UButton>
-
 <UForm :state="state" :schema="schema" @submit="onSubmit">
   <UFormField label="Email" name="email">
     <UInput v-model="state.email" />
   </UFormField>
 </UForm>
+```
 
-<!-- NEVER: Old v2/v3 syntax -->
+#### Correct Component Names
+```vue
+<!-- CORRECT v4 names -->
+<UDropdownMenu :items="items" />
+<USeparator />
+<USwitch v-model="enabled" />
+<UToast :ui="{ position: 'top-right' }" />
 ```
 
 ## Testing Strategy
@@ -268,13 +359,13 @@ export default defineEventHandler(async (event) => {
   try {
     // Validate input
     const body = await readValidatedBody(event, schema.parse)
-    
+
     // Check auth
     const user = await requireAuth(event)
-    
+
     // Business logic
     const result = await processRequest(body)
-    
+
     return { success: true, data: result }
   } catch (error) {
     throw createError({
@@ -318,15 +409,48 @@ jobs:
       - run: nuxthub deploy
 ```
 
+## Documentation Organization
+
+### Agent Output Structure
+When agents create documentation, briefings, or reports, they MUST follow this structure:
+
+```
+docs/
+├── briefings/           # Task briefings and initial analyses
+│   └── [feature-name]-brief.md
+├── reports/            # Analysis reports and findings
+│   └── [analysis-type]-report.md
+├── guides/             # How-to guides and best practices
+│   └── [topic]-guide.md
+├── setup/              # Setup and configuration docs
+│   └── [component]-setup.md
+└── architecture/       # Architecture decisions and designs
+    └── [domain]-architecture.md
+```
+
+### Agent Documentation Rules
+1. **Briefings** → `docs/briefings/[feature-name]-brief.md`
+2. **Audit Reports** → `docs/reports/[audit-type]-report.md`
+3. **Technical Guides** → `docs/guides/[topic]-guide.md`
+4. **Architecture Docs** → `docs/architecture/[domain]-architecture.md`
+5. **Setup Instructions** → `docs/setup/[component]-setup.md`
+
+### File Naming Convention
+- Use kebab-case for all documentation files
+- Include timestamp suffix for reports: `[name]-report-YYYYMMDD.md`
+- Be descriptive but concise: `translation-audit-report.md` not `report.md`
+
 ## Key Reminders
 
 1. **Check Nuxt MCP first** - Always, no exceptions
-2. **Parallel when possible** - Don't sequence independent tasks
-3. **One domain = one layer** - Keep isolation
-4. **Test as you code** - Not after
-5. **Keep it simple** - You're working solo
-6. **Make it impressive** - UI should feel alive
-7. **General solutions** - Not test-specific hacks
+2. **Run `npx nuxt typecheck`** - After EVERY change, no exceptions
+3. **Parallel when possible** - Don't sequence independent tasks
+4. **One domain = one layer** - Keep isolation
+5. **Test as you code** - Not after
+6. **Keep it simple** - You're working solo
+7. **Make it impressive** - UI should feel alive
+8. **General solutions** - Not test-specific hacks
+9. **Document in correct folder** - Follow docs/ structure above
 
 ---
 

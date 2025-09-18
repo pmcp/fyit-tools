@@ -29,9 +29,13 @@
 </template>
 
 <script lang="ts" setup>
-import type { TeamMember } from '@@/types/database'
+import type { TeamMember, User } from '@@/types/database'
+
+interface TeamMemberWithUser extends TeamMember {
+  user: User
+}
 
 defineProps<{
-  members: TeamMember[]
+  members: TeamMemberWithUser[]
 }>()
 </script>

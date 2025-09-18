@@ -17,7 +17,7 @@
       color="neutral"
       block
       :variant="active ? 'solid' : 'outline'"
-      :label="active ? 'Manage plan' : hasActiveSubscription ? 'Switch plan' : 'Subscribe'"
+      :label="active ? tString('buttons.managePlan') : hasActiveSubscription ? tString('buttons.switchPlan') : tString('buttons.subscribe')"
       :loading="loading"
       :disabled="loading"
       size="lg"
@@ -37,6 +37,8 @@
 </template>
 
 <script lang="ts" setup>
+const { t, tString } = useT()
+
 interface Feature {
   name: string
 }

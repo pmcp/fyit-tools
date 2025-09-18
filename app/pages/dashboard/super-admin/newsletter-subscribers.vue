@@ -66,7 +66,7 @@ const formatDate = (date: string | Date | undefined) => {
   return useDateFormat(date, 'MMM D, YYYY HH:mm a').value
 }
 
-const referrerLogo = (referrer: string | undefined) => {
+const referrerLogo = (referrer: string | null | undefined) => {
   if (!referrer) return undefined
   return `https://logo.clearbit.com/${referrer}`
 }

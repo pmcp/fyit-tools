@@ -1,5 +1,5 @@
 <template>
-  <AppContainer title="All Teams">
+  <AppContainer :title="tString('superAdmin.allTeams')">
     <div class="overflow-x-auto">
       <table class="w-full table-auto text-left text-sm">
         <thead>
@@ -46,5 +46,12 @@
 import { useDateFormat } from '@vueuse/core'
 
 const { data: teams } = useFetch('/api/super-admin/teams')
-const columns = ['Name', 'Owner', 'Members', 'Subscription', 'Created At']
+const { tString } = useT()
+const columns = [
+  tString('superAdmin.columns.name'),
+  tString('superAdmin.columns.owner'),
+  tString('superAdmin.columns.members'),
+  tString('superAdmin.columns.subscription'),
+  tString('superAdmin.columns.createdAt')
+]
 </script>

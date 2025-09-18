@@ -1,3 +1,9 @@
+---
+name: brief
+description: Transform vague requirements into clear, actionable development tasks
+namespace: project
+---
+
 # /brief - Task Briefing Assistant
 
 Help me understand and structure development tasks properly.

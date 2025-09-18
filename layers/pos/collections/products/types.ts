@@ -16,6 +16,7 @@ export interface PosProduct {
   requiresRemark?: boolean
   remarkPrompt?: string
   sortOrder?: number
+  translations?: Record<string, any>
   createdAt: Date
   updatedAt: Date
   optimisticId?: string
@@ -24,6 +25,10 @@ export interface PosProduct {
 
 export type PosProductFormData = z.infer<typeof posProductSchema>
 export type NewPosProduct = Omit<PosProduct, 'id' | 'createdAt' | 'updatedAt'>
+export type CreatePosProductInput = Partial<NewPosProduct> & {
+  id?: string  // Can be provided but will be excluded
+  locale?: string
+}
 
 // Props type for the Form component
 export interface PosProductFormProps {

@@ -1,3 +1,9 @@
+---
+name: refine
+description: Improve code quality through iterative refinement
+namespace: project
+---
+
 # /refine - Iterative Refinement Assistant
 
 Improve code quality through multiple passes of targeted refinement.

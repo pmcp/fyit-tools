@@ -1,4 +1,4 @@
-import type { PosLocation, NewPosLocation } from '../types'
+import type { PosLocation, NewPosLocation } from '../../types'
 
 export async function getAllPosLocations(teamId: string) {
   const db = useDB()

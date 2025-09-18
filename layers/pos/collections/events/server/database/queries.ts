@@ -1,4 +1,4 @@
-import type { PosEvent, NewPosEvent } from '../types'
+import type { PosEvent, NewPosEvent } from '../../types'
 
 export async function getAllPosEvents(teamId: string) {
   const db = useDB()

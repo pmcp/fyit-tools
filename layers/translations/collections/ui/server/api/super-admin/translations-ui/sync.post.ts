@@ -25,12 +25,12 @@ export default defineEventHandler(async (event) => {
   const localesDir = join(process.cwd(), 'layers', 'translations', 'i18n', 'locales')
   
   // Load existing locale files
-  const existingLocales = {
+  const existingLocales: Record<string, Record<string, any>> = {
     en: {},
     nl: {},
     fr: {},
   }
-  
+
   for (const locale of ['en', 'nl', 'fr']) {
     const filePath = join(localesDir, `${locale}.json`)
     if (existsSync(filePath)) {
@@ -47,25 +47,41 @@ export default defineEventHandler(async (event) => {
   // Merge database translations with existing ones
   for (const translation of translations) {
     const { category, keyPath, values } = translation
-    
+
+    // Type guard for values
+    if (!values || typeof values !== 'object') continue
+
+    const valuesObj = values as Record<string, string>
+
     // Create nested structure from keyPath (e.g., "auth.login" -> { auth: { login: value } })
     const keys = keyPath.split('.')
-    
+
     for (const locale of ['en', 'nl', 'fr']) {
-      if (!values[locale]) continue
-      
+      if (!valuesObj[locale]) continue
+
       let current = existingLocales[locale]
-      
+
       // Navigate/create the nested structure
       for (let i = 0; i < keys.length - 1; i++) {
-        if (!current[keys[i]]) {
-          current[keys[i]] = {}
+        const key = keys[i]
+        if (!current || !key) break
+
+        if (!current[key]) {
+          current[key] = {}
         }
-        current = current[keys[i]]
+
+        if (current[key] && typeof current[key] === 'object') {
+          current = current[key] as Record<string, any>
+        } else {
+          break
+        }
       }
-      
+
       // Set the final value (this will override existing value if present)
-      current[keys[keys.length - 1]] = values[locale]
+      const finalKey = keys[keys.length - 1]
+      if (finalKey && current) {
+        current[finalKey] = valuesObj[locale]
+      }
     }
   }
 
@@ -82,9 +98,10 @@ export default defineEventHandler(async (event) => {
       synced: translations.length,
     }
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
     throw createError({
       statusCode: 500,
-      statusMessage: `Failed to write translation files: ${error.message}`,
+      statusMessage: `Failed to write translation files: ${errorMessage}`,
     })
   }
 })

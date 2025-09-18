@@ -11,6 +11,12 @@ export default defineEventHandler(async (event) => {
   }
 
   const id = getRouterParam(event, 'id')
+  if (!id) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Translation ID is required',
+    })
+  }
   const body = await readBody(event)
 
   // Validate values if provided - ensure at least English is present

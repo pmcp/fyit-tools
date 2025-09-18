@@ -3,6 +3,7 @@ import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
 import { OneTimePasswordTypes } from '../../../constants'
 import { users } from './users'
 import { relations } from 'drizzle-orm'
+import type { WebAuthnCredential } from '#auth-utils'
 
 export const oauthAccounts = sqliteTable('oauth_accounts', {
   id: text('id')

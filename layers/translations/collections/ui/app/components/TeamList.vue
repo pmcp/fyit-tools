@@ -1,6 +1,5 @@
 <template>
   <div class="space-y-6">
-    {{ t('navigation.teamTranslations') }}
     <CrudTable
       collection="translationsUi"
       :columns="enhancedColumns"
@@ -56,6 +55,19 @@
             :color="row.original.hasOverride ? 'orange' : 'primary'"
           >
             {{ row.original.hasOverride ? 'Edit' : 'Override' }}
+          </UButton>
+
+          <!-- Delete override button (only for existing overrides) -->
+          <UButton
+            v-if="row.original.hasOverride"
+            @click="deleteOverride(row.original)"
+            icon="i-lucide-trash-2"
+            size="xs"
+            variant="soft"
+            color="red"
+            :title="'Delete override and revert to system translation'"
+          >
+            Delete
           </UButton>
         </div>
       </template>
@@ -116,26 +128,27 @@ const refresh = async () => {
 onMounted(() => refresh())
 
 // Smart edit function that handles both creating overrides and editing existing ones
-const editTranslation = async (translation: any) => {
+const editTranslation = (translation: any) => {
   if (translation.hasOverride) {
     // Edit existing team override
     open('update', 'translationsUi', [translation.overrideId])
   } else {
-    // Create new team override - pre-fill with system data
-    open('create', 'translationsUi', [])
-
-    // Pre-fill the form data after opening
-    await nextTick()
-    const currentState = crudStates.value[crudStates.value.length - 1]
-    if (currentState) {
-      currentState.activeItem = {
-        keyPath: translation.keyPath,
-        category: translation.category,
-        values: { ...translation.systemValues }, // Start with system values
-        description: '', // Team can add custom description
-        isOverrideable: translation.isOverrideable
-      }
+    // Create new team override - pass initial data directly
+    const initialData = {
+      keyPath: translation.keyPath,
+      category: translation.category,
+      values: { ...translation.systemValues }, // Start with system values
+      description: '', // Team can add custom description
+      isOverrideable: translation.isOverrideable
     }
+    open('create', 'translationsUi', [], 'slideover', initialData)
+  }
+}
+
+// Delete override function to revert to system translation
+const deleteOverride = (translation: any) => {
+  if (translation.hasOverride && translation.overrideId) {
+    open('delete', 'translationsUi', [translation.overrideId], 'dialog')
   }
 }
 

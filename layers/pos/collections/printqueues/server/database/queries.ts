@@ -1,4 +1,4 @@
-import type { PosPrintQueue, NewPosPrintQueue } from '../types'
+import type { PosPrintQueue, NewPosPrintQueue } from '../../types'
 
 export async function getAllPosPrintQueues(teamId: string) {
   const db = useDB()

@@ -157,18 +157,26 @@ const handleSubscriptionEvent = async (data: Stripe.Subscription) => {
     })
   }
 
+  const firstItem = data.items.data[0]
+  if (!firstItem) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Subscription has no items',
+    })
+  }
+
   const subscription = await upsertSubscription({
     id: data.id,
     customerId: data.customer as string,
-    priceId: data.items.data[0].price.id,
+    priceId: firstItem.price.id,
     teamId: teamId,
     userId: userId,
     status: data.status,
     metadata: data.metadata,
-    quantity: data.items.data[0].quantity ?? 1,
+    quantity: firstItem.quantity ?? 1,
     cancelAtPeriodEnd: data.cancel_at_period_end,
-    currentPeriodEnd: new Date(data.items.data[0].current_period_end * 1000),
-    currentPeriodStart: new Date(data.items.data[0].current_period_start * 1000),
+    currentPeriodEnd: new Date(firstItem.current_period_end * 1000),
+    currentPeriodStart: new Date(firstItem.current_period_start * 1000),
     endedAt: data.ended_at ? new Date(data.ended_at * 1000) : null,
     cancelAt: data.cancel_at ? new Date(data.cancel_at * 1000) : null,
     trialStart: data.trial_start ? new Date(data.trial_start * 1000) : null,
@@ -215,20 +223,28 @@ const handleCheckoutSessionEvent = async (data: Stripe.Checkout.Session) => {
     const subscriptionId = session.subscription as string
     const subscription = await stripeService.getSubscription(subscriptionId)
 
+    const firstItem = subscription.items.data[0]
+    if (!firstItem) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Subscription has no items',
+      })
+    }
+
     const subscriptionData: InsertSubscription = {
       id: subscription.id,
       customerId,
       teamId,
       userId,
-      priceId: subscription.items.data[0].price.id,
+      priceId: firstItem.price.id,
       status: subscription.status,
-      quantity: subscription.items.data[0].quantity ?? 1,
+      quantity: firstItem.quantity ?? 1,
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
       currentPeriodEnd: new Date(
-        subscription.items.data[0].current_period_end * 1000,
+        firstItem.current_period_end * 1000,
       ),
       currentPeriodStart: new Date(
-        subscription.items.data[0].current_period_start * 1000,
+        firstItem.current_period_start * 1000,
       ),
       cancelAt: subscription.cancel_at
         ? new Date(subscription.cancel_at * 1000)

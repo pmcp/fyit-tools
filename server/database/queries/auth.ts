@@ -10,7 +10,7 @@ export const countEmailVerificationCodes = async (userId: string) => {
       .select({ count: count() })
       .from(tables.emailVerificationCodes)
       .where(eq(tables.emailVerificationCodes.userId, userId))
-    return result[0].count
+    return result[0]?.count || 0
   } catch (error) {
     console.error(error)
     throw new Error('Failed to count verification codes')

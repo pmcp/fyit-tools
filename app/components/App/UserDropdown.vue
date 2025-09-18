@@ -49,7 +49,7 @@
   </UDropdownMenu>
   <UModal
     v-model:open="feedbackModal"
-    title="Need help?"
+    :title="tString('messages.needHelp')"
     description="Have a question or need assistance? We're here to help!"
   >
     <template #body>
@@ -63,7 +63,7 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 
 const { user } = useUserSession()
 const { logout } = useAuth()
-const { t } = useT()
+const { t, tString } = useT()
 const mobileMenu = useState('mobileMenu')
 const isSuperAdmin = computed(() => user.value?.superAdmin)
 const feedbackModal = ref(false)
@@ -101,7 +101,7 @@ const items = computed(() => [
       label: t('forms.language'),
       icon: 'i-lucide-globe',
       slot: 'language',
-      onSelect: (e) => e.preventDefault(),
+      onSelect: (e: Event) => e.preventDefault(),
     },
     {
       label: t('settings.theme'),

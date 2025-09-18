@@ -11,6 +11,7 @@ export interface PosCategorie {
   icon?: string
   sortOrder?: number
   isActive?: boolean
+  translations?: Record<string, any>
   createdAt: Date
   updatedAt: Date
   optimisticId?: string
@@ -19,6 +20,10 @@ export interface PosCategorie {
 
 export type PosCategorieFormData = z.infer<typeof posCategorieSchema>
 export type NewPosCategorie = Omit<PosCategorie, 'id' | 'createdAt' | 'updatedAt'>
+export type CreatePosCategorieInput = Partial<NewPosCategorie> & {
+  id?: string  // Can be provided but will be excluded
+  locale?: string
+}
 
 // Props type for the Form component
 export interface PosCategorieFormProps {

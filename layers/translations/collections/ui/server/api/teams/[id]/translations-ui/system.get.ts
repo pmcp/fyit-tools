@@ -3,6 +3,12 @@ import { getOverrideableSystemTranslations, getTeamBySlug } from '../../../../da
 
 export default defineEventHandler(async (event) => {
   const teamSlug = getRouterParam(event, 'id')
+  if (!teamSlug) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Team slug is required',
+    })
+  }
   const { user } = await requireUserSession(event)
 
   // Verify team and access

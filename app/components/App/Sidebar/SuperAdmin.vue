@@ -12,41 +12,43 @@
 </template>
 
 <script lang="ts" setup>
-const links = [
+const { tString } = useT()
+
+const links = computed(() => [
   {
-    label: 'Back to Dashboard',
+    label: tString('navigation.backToDashboard'),
     icon: 'i-lucide-chevron-left',
     to: '/dashboard',
   },
   {
-    label: 'Users',
+    label: tString('navigation.users'),
     icon: 'i-lucide-users',
     to: '/dashboard/super-admin',
   },
   {
-    label: 'Teams',
+    label: tString('navigation.teams'),
     icon: 'i-lucide-users',
     to: '/dashboard/super-admin/teams',
   },
   {
-    label: 'Translations',
+    label: tString('navigation.translations'),
     icon: 'i-lucide-globe',
     to: '/dashboard/super-admin/translations',
   },
   {
-    label: 'Stripe Plans',
+    label: tString('navigation.stripePlans'),
     icon: 'i-lucide-credit-card',
     to: '/dashboard/super-admin/stripe-plans',
   },
   {
-    label: 'Feedback Submissions',
+    label: tString('navigation.feedbackSubmissions'),
     icon: 'i-lucide-message-circle',
     to: '/dashboard/super-admin/feedback-submissions',
   },
   {
-    label: 'Newsletter Subscribers',
+    label: tString('navigation.newsletterSubscribers'),
     icon: 'i-lucide-mail',
     to: '/dashboard/super-admin/newsletter-subscribers',
   },
-]
+])
 </script>

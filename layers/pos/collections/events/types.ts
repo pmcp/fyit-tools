@@ -17,6 +17,7 @@ export interface PosEvent {
   archivedAt?: Date
   parentEventId?: number
   metadata?: Record<string, any>
+  translations?: Record<string, any>
   createdAt: Date
   updatedAt: Date
   optimisticId?: string
@@ -25,6 +26,10 @@ export interface PosEvent {
 
 export type PosEventFormData = z.infer<typeof posEventSchema>
 export type NewPosEvent = Omit<PosEvent, 'id' | 'createdAt' | 'updatedAt'>
+export type CreatePosEventInput = Partial<NewPosEvent> & {
+  id?: string  // Can be provided but will be excluded
+  locale?: string
+}
 
 // Props type for the Form component
 export interface PosEventFormProps {

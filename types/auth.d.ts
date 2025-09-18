@@ -9,19 +9,17 @@ declare module '#auth-utils' {
     superAdmin: boolean
   }
 
-  interface User extends Omit<
-    DrizzleUser,
-    | 'hashedPassword'
-    | 'banned'
-    | 'bannedReason'
-    | 'bannedUntil'
-    | 'createdAt'
-    | 'updatedAt'
-    | 'phoneNumber'
-    | 'lastActive'
-  > {
-    _impersonated?: boolean
+  interface User {
+    id: string
+    email: string
+    name: string
+    avatarUrl: string | null
+    emailVerified: boolean
     superAdmin: boolean
+    onboarded: boolean
+    proAccount: boolean
+    phoneNumber: string | null
+    _impersonated?: boolean
   }
 
   interface UserSession {

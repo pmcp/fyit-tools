@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
     } else if (createIfNotExists) {
       // Create new system translation
       const newTranslation = await createTranslationsUi({
-        teamId: null, // System translation
+        teamId: undefined, // System translation (null in database)
         keyPath,
         category,
         namespace: category,

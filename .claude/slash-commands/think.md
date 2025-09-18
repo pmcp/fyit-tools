@@ -1,3 +1,9 @@
+---
+name: think
+description: Trigger extended thinking mode for complex problems
+namespace: project
+---
+
 # /think - Deep Analysis Mode
 
 Trigger Claude's extended thinking mode for complex problems.

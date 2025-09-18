@@ -15,8 +15,9 @@ export default defineNuxtConfig({
   extends: [
     './layers/crud',
     './layers/typo',
-    './layers/pos',
-    './layers/translations'
+    './layers/translations',
+    './layers/editor'
+    // './layers/pos',
   ],
 
   devtools: { enabled: true },
@@ -40,7 +41,6 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-07-30',
   nitro: {
     rollupConfig: {
-      // @ts-expect-error - Rollup plugin type collections are incomplete for vue plugin
       plugins: [vue()],
     },
     experimental: {

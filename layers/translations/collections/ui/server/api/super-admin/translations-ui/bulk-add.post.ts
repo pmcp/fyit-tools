@@ -55,9 +55,10 @@ export default defineEventHandler(async (event) => {
     }
   } catch (error) {
     console.error('Bulk add error:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
     throw createError({
       statusCode: 500,
-      statusMessage: `Failed to add translations: ${error.message}`,
+      statusMessage: `Failed to add translations: ${errorMessage}`,
     })
   }
 })

@@ -4,6 +4,12 @@ import { nanoid } from 'nanoid'
 
 export default defineEventHandler(async (event) => {
   const { id: teamId } = getRouterParams(event)
+  if (!teamId) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Team ID is required',
+    })
+  }
   const { user } = await requireUserSession(event)
   const body = await readBody(event)
 

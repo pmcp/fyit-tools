@@ -8,10 +8,10 @@
           <p class="font-bold">Supersaas V3</p>
         </NuxtLink>
         <div class="hidden flex-1 items-center justify-center gap-3 md:flex">
-          <UButton label="Features" color="neutral" variant="ghost" />
-          <UButton label="Pricing" color="neutral" variant="ghost" />
-          <UButton label="Blog" color="neutral" variant="ghost" />
-          <UButton label="Docs" color="neutral" variant="ghost" />
+          <UButton :label="tString('buttons.features')" color="neutral" variant="ghost" />
+          <UButton :label="tString('buttons.pricing')" color="neutral" variant="ghost" />
+          <UButton :label="tString('buttons.blog')" color="neutral" variant="ghost" />
+          <UButton :label="tString('buttons.docs')" color="neutral" variant="ghost" />
         </div>
         <div class="flex items-center gap-3">
           <AuthState v-slot="{ loggedIn: isAuthLoggedIn }">
@@ -19,7 +19,7 @@
               v-if="isAuthLoggedIn"
               color="neutral"
               variant="soft"
-              label="Go to App"
+              :label="tString('buttons.goToApp')"
               to="/dashboard"
             />
             <UFieldGroup v-else>
@@ -27,7 +27,7 @@
                 color="neutral"
                 variant="soft"
                 to="/auth/login"
-                label="Login"
+                :label="tString('auth.login')"
               />
               <UDropdownMenu
                 :items="authOptions"
@@ -67,41 +67,43 @@ import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
 
 const { loggedIn } = useUserSession()
-const authOptions = ref([
+const { tString } = useT()
+
+const authOptions = computed(() => [
   {
-    label: 'Login (Email/Password)',
+    label: tString('auth.login') + ' (Email/Password)',
     to: '/auth/login',
     icon: 'i-lucide-key-square',
   },
   {
-    label: 'Login with Magic Link',
+    label: tString('auth.loginWithMagicLink'),
     to: '/auth/magic-link',
     icon: 'i-lucide-mail',
   },
   {
-    label: 'Login with Passkey',
+    label: tString('auth.loginWithPasskey'),
     to: '/auth/login-passkey',
     icon: 'i-lucide-fingerprint',
   },
   {
-    label: 'Social Login',
+    label: tString('auth.socialLogin'),
     to: '/auth/social-login',
     icon: 'i-lucide-twitter',
   },
   {
-    label: 'Phone Number Login',
+    label: tString('auth.phoneNumberLogin'),
     to: '/auth/login-phone',
     icon: 'i-lucide-phone',
   },
   {
-    label: 'Register',
+    label: tString('auth.register'),
     to: '/auth/register',
     icon: 'i-lucide-user-plus',
   },
 ])
 
 const schema = z.object({
-  email: z.string().email('Invalid email'),
+  email: z.string().email(tString('validation.invalidEmail')),
 })
 
 type Schema = z.output<typeof schema>
@@ -121,7 +123,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       },
     })
     toast.add({
-      title: 'Success',
+      title: tString('messages.success'),
       description: 'The form has been submitted.',
       color: 'success',
     })
@@ -130,9 +132,9 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       'D1_ERROR: UNIQUE constraint failed: subscribers.email: SQLITE_CONSTRAINT',
     )
       ? 'You are already subscribed to our newsletter.'
-      : 'An unexpected error occurred'
+      : tString('errors.unexpectedError')
     toast.add({
-      title: 'Error',
+      title: tString('messages.error'),
       description: msg,
       color: 'error',
     })

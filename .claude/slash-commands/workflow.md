@@ -1,3 +1,9 @@
+---
+name: workflow
+description: Execute complete development workflow from spec to deployment-ready code
+namespace: project
+---
+
 # /workflow - Full Development Workflow
 
 Execute a complete development workflow from specification to deployment-ready code.

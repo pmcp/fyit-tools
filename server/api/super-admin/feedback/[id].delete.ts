@@ -9,6 +9,12 @@ export default defineEventHandler(async (event) => {
     })
   }
   const { id } = getRouterParams(event)
+  if (!id) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Feedback ID is required',
+    })
+  }
   await deleteFeedback(id)
   sendNoContent(event)
 })

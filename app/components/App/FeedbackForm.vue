@@ -1,6 +1,6 @@
 <template>
   <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
-    <UFormField label="Message" name="message">
+    <UFormField :label="t('fields.message')" name="message">
       <UTextarea
         v-model="state.message"
         size="lg"
@@ -9,7 +9,7 @@
       />
     </UFormField>
 
-    <UButton type="submit" size="lg" block :loading="loading" label="Submit" />
+    <UButton type="submit" size="lg" block :loading="loading" :label="t('common.submit')" />
   </UForm>
 </template>
 
@@ -32,6 +32,7 @@ const schema = z.object({
 })
 
 const { user } = useUserSession()
+const { t } = useT()
 type Schema = z.output<typeof schema>
 
 const state = reactive<Partial<Schema>>({
@@ -61,16 +62,16 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       body: event.data,
     })
     toast.add({
-      title: 'Your feedback has been submitted.',
-      description: 'We will get back to you as soon as possible.',
+      title: t('messages.feedbackSubmitted'),
+      description: t('messages.feedbackSubmittedDesc'),
       color: 'success',
     })
     emit('close')
   } catch (error) {
     console.error(error)
     toast.add({
-      title: 'Error',
-      description: 'Something went wrong. Please try again.',
+      title: t('messages.error'),
+      description: t('messages.somethingWentWrong'),
       color: 'error',
     })
   } finally {

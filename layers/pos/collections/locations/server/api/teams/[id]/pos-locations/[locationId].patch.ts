@@ -1,16 +1,26 @@
 import { updatePosLocation, getPosLocationsByIds } from '../../../../database/queries'
 import { isTeamMember } from '@@/server/database/queries/teams'
-import type { PosLocation } from '../../../../../../types'
+import type { PosLocation } from '../../../../../types'
 
+type PatchBody = Partial<PosLocation> & {
+  translations?: Record<string, any>
+  locale?: string
+}
 export default defineEventHandler(async (event) => {
   const { id: teamId, locationId } = getRouterParams(event)
+  if (!teamId || typeof teamId !== 'string') {
+    throw createError({ statusCode: 400, statusMessage: 'Team ID is required' })
+  }
+  if (!locationId || typeof locationId !== 'string') {
+    throw createError({ statusCode: 400, statusMessage: 'Location ID is required' })
+  }
   const { user } = await requireUserSession(event)
   const hasAccess = await isTeamMember(teamId, user.id)
   if (!hasAccess) {
     throw createError({ statusCode: 403, statusMessage: 'Unauthorized' })
   }
 
-  const body = await readBody<Partial<PosLocation>>(event)
+  const body = await readBody<PatchBody>(event)
   
   // Handle translation updates properly
   if (body.translations && body.locale) {

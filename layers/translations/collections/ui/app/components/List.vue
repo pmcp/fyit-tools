@@ -15,83 +15,111 @@
             createButton
           >
             <template #extraButtons>
-              <UButton
-                @click="importFromLocales"
-                :loading="importingFromLocales"
-                variant="soft"
-                color="blue"
-              >
-                {{ t('translations.ui.importFromLocaleFiles') }}
-              </UButton>
-              <UButton
-                @click="syncTranslations"
-                :loading="syncing"
-                variant="soft"
-              >
-                {{ t('translations.ui.syncToLocaleFiles') }}
-              </UButton>
               <UModal>
                 <UButton
+                  :loading="importingFromLocales"
                   variant="soft"
+                  color="blue"
                 >
-                  {{ t('translations.ui.import') }}
+                  {{ t('translations.ui.importFromLocaleFiles') }}
+
                 </UButton>
-                <template #header>
-                  <div class="flex items-center justify-between">
-                    <h3 class="text-lg font-semibold">{{ t('translations.ui.bulkImportTranslations') }}</h3>
-
-                  </div>
-                </template>
                 <template #content>
-                  <UCard>
-                    <div class="space-y-4">
+                  <div class="flex flex-col gap-4">
                     <UButton
-                      @click="showExample = !showExample"
-                      variant="ghost"
-                      size="sm"
-                      :icon="showExample ? 'i-lucide-eye-off' : 'i-lucide-eye'"
-
+                      @click="importFromLocales('replace')"
+                      :disabled="importingFromLocales"
                     >
-                      {{ showExample ? t('common.hideExample') : t('common.showExample') }}
+
+                      Replace All (Clear & Import)
+                    </UButton>
+                    <UButton
+                      @click="importFromLocales('merge')"
+                      :disabled="importingFromLocales"
+                    >
+                      <UIcon name="i-lucide-git-merge" class="mr-2" />
+                      Merge (Update & Add)
+                    </UButton>
+
+                    <UButton
+                      @click="syncTranslations"
+                      :loading="syncing"
+                      variant="soft"
+                    >
+                      {{ t('translations.ui.syncToLocaleFiles') }}
                     </UButton>
 
 
-                    <!-- Example JSON -->
-                    <div v-if="showExample" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                      <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ t('translations.ui.exampleJsonFormat') }}</p>
-                      <pre class="text-xs overflow-x-auto"><code>{{ exampleJson }}</code></pre>
-                    </div>
 
-                    <!-- Import Textarea -->
-                    <UTextarea
-                      v-model="bulkImportJson"
-                      :placeholder="t('translations.ui.pasteJsonHere')"
-                      :rows="10"
-                      class="font-mono text-sm w-full"
-                    />
+                    <UModal>
+                      <UButton
+                        variant="soft"
+                      >
+                        {{ t('translations.ui.import') }}
+                      </UButton>
+                      <template #header>
+                        <div class="flex items-center justify-between">
+                          <h3 class="text-lg font-semibold">{{ t('translations.ui.bulkImportTranslations') }}</h3>
 
-                    <!-- Import Button -->
-                    <div class="flex justify-end gap-2">
-                      <UButton
-                        @click="bulkImportJson = ''"
-                        variant="ghost"
-                        :disabled="!bulkImportJson || importing"
-                      >
-                        {{ t('translations.ui.clear') }}
-                      </UButton>
-                      <UButton
-                        @click="handleBulkImport"
-                        :loading="importing"
-                        :disabled="!bulkImportJson"
-                        color="green"
-                      >
-                        {{ t('translations.ui.importTranslations') }}
-                      </UButton>
-                    </div>
+                        </div>
+                      </template>
+                      <template #content>
+                        <UCard>
+                          <div class="space-y-4">
+                            <UButton
+                              @click="showExample = !showExample"
+                              variant="ghost"
+                              size="sm"
+                              :icon="showExample ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+
+                            >
+                              {{ showExample ? t('common.hideExample') : t('common.showExample') }}
+                            </UButton>
+
+
+                            <!-- Example JSON -->
+                            <div v-if="showExample" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                              <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ t('translations.ui.exampleJsonFormat') }}</p>
+                              <pre class="text-xs overflow-x-auto"><code>{{ exampleJson }}</code></pre>
+                            </div>
+
+                            <!-- Import Textarea -->
+                            <UTextarea
+                              v-model="bulkImportJson"
+                              :placeholder="t('translations.ui.pasteJsonHere')"
+                              :rows="10"
+                              class="font-mono text-sm w-full"
+                            />
+
+                            <!-- Import Button -->
+                            <div class="flex justify-end gap-2">
+                              <UButton
+                                @click="bulkImportJson = ''"
+                                variant="ghost"
+                                :disabled="!bulkImportJson || importing"
+                              >
+                                {{ t('translations.ui.clear') }}
+                              </UButton>
+                              <UButton
+                                @click="handleBulkImport"
+                                :loading="importing"
+                                :disabled="!bulkImportJson"
+                                color="green"
+                              >
+                                {{ t('translations.ui.importTranslations') }}
+                              </UButton>
+                            </div>
+                          </div>
+                        </UCard>
+                      </template>
+                    </UModal>
+
+
                   </div>
-                </UCard>
                 </template>
               </UModal>
+
+
 
             </template>
           </CrudTableHeader>
@@ -241,16 +269,34 @@ const exampleJson = `{
 }`
 
 // Import translations from locale files to database
-async function importFromLocales() {
+async function importFromLocales(mode = 'replace') {
+  console.log('🔵 Starting import from locales, mode:', mode)
   importingFromLocales.value = true
   try {
-    const result = await $fetch('/api/super-admin/translations-ui/import', {
-      method: 'POST'
+    const endpoint = mode === 'merge'
+      ? '/api/super-admin/translations-ui/import-merge'
+      : '/api/super-admin/translations-ui/import'
+
+    console.log('🔵 Calling endpoint:', endpoint)
+    const result = await $fetch(endpoint, {
+      method: 'POST',
+      onResponseError({ response }) {
+        console.error('🔴 Response error:', response._data)
+      }
     })
+    console.log('🔵 Import result:', result)
+
+    // Custom message based on mode and result
+    let description = ''
+    if (mode === 'merge' && result.details) {
+      description = `${result.details.inserted} added, ${result.details.updated} updated, ${result.details.skipped} unchanged`
+    } else {
+      description = result.message || `Imported ${result.imported} translations from locale files`
+    }
 
     toast.add({
-      title: 'Success',
-      description: `Imported ${result.imported} translations from locale files`,
+      title: 'Import Successful',
+      description,
       color: 'green',
       icon: 'i-lucide-circle-check'
     })
@@ -258,8 +304,10 @@ async function importFromLocales() {
     // Refresh the list
     await refresh()
   } catch (error) {
+    console.error('🔴 Import failed:', error)
+    console.error('🔴 Error details:', error.data)
     toast.add({
-      title: 'Error',
+      title: 'Import Failed',
       description: error.data?.statusMessage || 'Failed to import translations',
       color: 'red',
       icon: 'i-lucide-circle-x'

@@ -1,4 +1,4 @@
-import type { PosSystemLog, NewPosSystemLog } from '../types'
+import type { PosSystemLog, NewPosSystemLog } from '../../types'
 
 export async function getAllPosSystemLogs(teamId: string) {
   const db = useDB()

@@ -3,6 +3,12 @@ import { getTeamBySlug, getSystemTranslationByKeyPath } from '../../../../databa
 
 export default defineEventHandler(async (event) => {
   const teamSlug = getRouterParam(event, 'id')
+  if (!teamSlug) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Team slug is required',
+    })
+  }
   const { user } = await requireUserSession(event)
   const query = getQuery(event)
   const keyPath = query.keyPath as string | undefined

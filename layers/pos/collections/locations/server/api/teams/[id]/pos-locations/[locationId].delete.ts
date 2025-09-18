@@ -3,6 +3,12 @@ import { isTeamMember } from '@@/server/database/queries/teams'
 
 export default defineEventHandler(async (event) => {
   const { id: teamId, locationId } = getRouterParams(event)
+  if (!teamId || typeof teamId !== 'string') {
+    throw createError({ statusCode: 400, statusMessage: 'Team ID is required' })
+  }
+  if (!locationId || typeof locationId !== 'string') {
+    throw createError({ statusCode: 400, statusMessage: 'Location ID is required' })
+  }
   const { user } = await requireUserSession(event)
   const hasAccess = await isTeamMember(teamId, user.id)
   if (!hasAccess) {

@@ -11,6 +11,7 @@ export interface PosLocation {
   isActive?: boolean
   printerMode?: string
   maxRetryAttempts?: number
+  translations?: Record<string, any>
   createdAt: Date
   updatedAt: Date
   optimisticId?: string
@@ -19,6 +20,10 @@ export interface PosLocation {
 
 export type PosLocationFormData = z.infer<typeof posLocationSchema>
 export type NewPosLocation = Omit<PosLocation, 'id' | 'createdAt' | 'updatedAt'>
+export type CreatePosLocationInput = Partial<NewPosLocation> & {
+  id?: string  // Can be provided but will be excluded
+  locale?: string
+}
 
 // Props type for the Form component
 export interface PosLocationFormProps {

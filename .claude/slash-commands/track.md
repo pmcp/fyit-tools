@@ -1,3 +1,9 @@
+---
+name: track
+description: Set up and manage agent activity tracking
+namespace: project
+---
+
 # /track - Agent Activity Tracker
 
 Set up and manage agent activity tracking for your project.

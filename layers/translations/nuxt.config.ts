@@ -1,4 +1,4 @@
-import { basename } from 'path'
+import {basename, join} from 'path'
 
 const layerName = basename(__dirname)
 
@@ -10,20 +10,21 @@ export default defineNuxtConfig({
       { code: 'nl', name: 'Nederlands', file: 'nl.json' },
       { code: 'fr', name: 'Français', file: 'fr.json' }
     ],
-    lazy: true,
     langDir: 'locales',
     defaultLocale: 'en',
     strategy: 'no_prefix',
   },
+
   components: {
     dirs: [
       {
         path: './components',
         prefix: layerName,
-        global: true // Makes them available globally
+        global: true
       }
     ]
   },
+
   extends: [
     './collections/ui'
   ]

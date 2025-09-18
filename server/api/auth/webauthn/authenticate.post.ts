@@ -68,8 +68,9 @@ export default defineWebAuthnAuthenticateEventHandler({
 
   async onSuccess(
     event: H3Event,
-    { credential }: { credential: { userId: string } },
+    data: any,
   ) {
+    const { credential } = data;
     const user = await findUserById(credential.userId)
     if (!user) {
       throw createError({

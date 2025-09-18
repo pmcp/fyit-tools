@@ -1,9 +1,9 @@
 <template>
   <UCard>
     <template #header>
-      <h3 class="font-medium">Personal Information</h3>
+      <h3 class="font-medium">{{ tString('accountSettings.general.personalInformation') }}</h3>
       <p class="mt-1 text-sm text-neutral-500">
-        Your personal information is not shared with anyone.
+        {{ tString('accountSettings.general.privacyNotice') }}
       </p>
     </template>
     <UForm
@@ -12,34 +12,34 @@
       class="max-w-md space-y-4"
       @submit="onSubmit as any"
     >
-      <UFormField label="Avatar" name="avatar">
+      <UFormField :label="t('accountSettings.general.avatar')" name="avatar">
         <AppAvatarUploader
           v-model="state.avatarUrl"
           @file-selected="handleFileSelected"
         />
       </UFormField>
-      <UFormField label="Name" name="name">
+      <UFormField :label="t('accountSettings.general.name')" name="name">
         <UInput
           v-model="state.name"
-          placeholder="Name"
+          :placeholder="t('accountSettings.general.name')"
           class="w-full"
           size="lg"
         />
       </UFormField>
-      <UFormField label="Email">
+      <UFormField :label="t('accountSettings.general.email')">
         <UInput
           :value="user?.email"
-          placeholder="Email"
+          :placeholder="t('accountSettings.general.email')"
           class="w-full"
           disabled
           variant="subtle"
           size="lg"
         />
       </UFormField>
-      <UFormField label="Account ID">
+      <UFormField :label="t('accountSettings.general.accountId')">
         <UInput
           :value="user?.id"
-          placeholder="Account ID"
+          :placeholder="t('accountSettings.general.accountId')"
           class="w-full"
           disabled
           variant="subtle"
@@ -51,7 +51,7 @@
         :loading="loading"
         :disabled="loading"
         type="submit"
-        label="Save"
+        :label="tString('common.save')"
       />
     </UForm>
   </UCard>
@@ -59,6 +59,8 @@
 
 <script lang="ts" setup>
 import type { FormSubmitEvent } from '#ui/types'
+
+const { t, tString } = useT()
 
 const { user, fetch: refreshSession } = useUserSession()
 const selectedFile = ref<File | null>(null)

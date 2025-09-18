@@ -1,15 +1,15 @@
 <template>
   <UForm :state="state" :schema="schema" @submit="handleSubmit" class="space-y-4">
     <!-- Search system translations -->
-    <UFormField label="Base from System Translation" name="systemTranslation" v-if="!item?.id">
+    <UFormField :label="tString('forms.baseFromSystemTranslation')" name="systemTranslation" v-if="!item?.id">
 
       <USelectMenu
         v-model="selectedSystemTranslation"
         :items="systemTranslations"
         :loading="loadingSystemTranslations"
-        placeholder="Search system translations..."
+:placeholder="tString('forms.searchSystemTranslations')"
         :search-input="{
-          placeholder: 'Search by key, category or description...',
+          placeholder: tString('forms.searchByKeyCategoryDescription'),
           icon: 'i-lucide-search'
         }"
         :filter-fields="['keyPath', 'category', 'description']"
@@ -38,58 +38,60 @@
       </USelectMenu>
     </UFormField>
 
-    <UFormField label="Key Path" name="keyPath" required>
+    <UFormField :label="tString('forms.keyPath')" name="keyPath" required>
       <UInput
         v-model="state.keyPath"
-        placeholder="e.g., common.welcome, navigation.home"
+:placeholder="tString('forms.keyPathPlaceholder')"
         :disabled="!!item?.id"
       />
     </UFormField>
 
-    <UFormField label="Category" name="category" required>
+    <UFormField :label="tString('forms.category')" name="category" required>
       <UInput
         v-model="state.category"
-        placeholder="e.g., common, navigation, forms"
+        :placeholder="tString('forms.categoryPlaceholder')"
       />
     </UFormField>
 
-    <UFormField label="Description" name="description">
+    <UFormField :label="tString('forms.description')" name="description">
       <UTextarea
         v-model="state.description"
-        placeholder="Optional description for this translation"
-        :rows="2"
+        :placeholder="tString('forms.descriptionPlaceholder')"
+        rows="3"
       />
     </UFormField>
 
-    <div class="space-y-2">
-      <label class="text-sm font-medium">Translations</label>
-      <div class="space-y-2">
-        <div v-for="locale in availableLocales" :key="locale" class="flex items-center gap-2">
-          <UBadge :label="locale.toUpperCase()" variant="soft" class="w-12 justify-center" />
-          <UInput
+    <div class="space-y-3">
+      <label class="block text-sm font-medium">
+        {{ tString('forms.translations') }} <span class="text-red-500">*</span>
+      </label>
+
+      <UCard v-for="locale in availableLocales" :key="locale" class="p-4">
+        <UFormField :label="getLocaleLabel(locale)" :name="`values.${locale}`">
+          <TranslationsInputWithEditor
             v-model="state.values[locale]"
-            :placeholder="`Translation for ${locale}`"
-            class="flex-1"
+            :placeholder="tString('forms.enterTranslationFor', { params: { locale: getLocaleLabel(locale) } })"
+            :use-editor="false"
           />
-        </div>
-      </div>
+        </UFormField>
+      </UCard>
     </div>
 
-    <div class="flex justify-end gap-2">
+    <!-- Action buttons -->
+    <div class="flex items-center justify-end gap-3 pt-4">
       <UButton
         type="button"
         variant="ghost"
-        color="gray"
-        @click="emit('cancel')"
+        @click="$emit('cancel')"
+        :disabled="loading"
       >
-        Cancel
+        {{ tString('common.cancel') }}
       </UButton>
       <UButton
         type="submit"
         :loading="loading"
-        color="primary"
       >
-        {{ item?.id ? 'Update' : 'Create' }} Translation
+        {{ item?.id ? tString('common.update') : tString('common.create') }}
       </UButton>
     </div>
   </UForm>
@@ -98,26 +100,37 @@
 <script setup lang="ts">
 import { z } from 'zod'
 
-const props = defineProps<{
-  item?: any
-  collection: string
-}>()
+interface TranslationItem {
+  id?: string
+  keyPath: string
+  category?: string
+  values?: Record<string, string>
+  description?: string | null
+  label?: string
+}
+
+interface Props {
+  item?: TranslationItem
+}
+
+const props = defineProps<Props>()
 
 const emit = defineEmits<{
+  saved: [item: TranslationItem]
   cancel: []
-  success: [data: any]
 }>()
 
 const route = useRoute()
 const toast = useToast()
 const { locales } = useI18n()
+const { tString } = useT()
 
 // Get team slug from route
 const teamSlug = computed(() => route.params.team as string)
 
 // Available locales
 const availableLocales = computed(() =>
-  locales.value.map(l => typeof l === 'string' ? l : l.code)
+  locales.value.map((l: string | { code: string }) => typeof l === 'string' ? l : l.code)
 )
 
 // Form schema
@@ -141,13 +154,13 @@ const state = ref({
 })
 
 // System translations search
-const selectedSystemTranslation = ref(null)
-const systemTranslations = ref([])
+const selectedSystemTranslation = ref<TranslationItem | null>(null)
+const systemTranslations = ref<TranslationItem[]>([])
 const loadingSystemTranslations = ref(false)
 
 // Initialize empty values for all locales
 watchEffect(() => {
-  availableLocales.value.forEach(locale => {
+  availableLocales.value.forEach((locale: string) => {
     if (!state.value.values[locale]) {
       state.value.values[locale] = ''
     }
@@ -159,16 +172,16 @@ onMounted(async () => {
   if (!props.item?.id) {
     loadingSystemTranslations.value = true
     try {
-      const data = await $fetch(`/api/teams/${teamSlug.value}/translations-ui/system`)
-      systemTranslations.value = data.map(t => ({
+      const data = await $fetch<TranslationItem[]>(`/api/teams/${teamSlug.value}/translations-ui/system`)
+      systemTranslations.value = data.map((t: TranslationItem) => ({
         ...t,
         label: t.keyPath // Required for SelectMenu filtering
       }))
     } catch (error) {
       console.error('Failed to fetch system translations:', error)
       toast.add({
-        title: 'Error',
-        description: 'Failed to load system translations',
+        title: tString('common.error'),
+        description: tString('errors.failedToLoadSystemTranslations'),
         color: 'red',
         icon: 'i-lucide-circle-x',
       })
@@ -179,7 +192,7 @@ onMounted(async () => {
 })
 
 // Watch for selection changes and populate form
-watch(selectedSystemTranslation, (newTranslation) => {
+watch(selectedSystemTranslation, (newTranslation: TranslationItem | null) => {
   if (newTranslation && !props.item?.id) {
     // Only populate if not editing an existing translation
     state.value.keyPath = newTranslation.keyPath
@@ -188,7 +201,7 @@ watch(selectedSystemTranslation, (newTranslation) => {
 
     // Copy translation values
     if (newTranslation.values) {
-      Object.keys(newTranslation.values).forEach(locale => {
+      Object.keys(newTranslation.values).forEach((locale: string) => {
         if (state.value.values[locale] !== undefined) {
           state.value.values[locale] = newTranslation.values[locale]
         }
@@ -196,8 +209,8 @@ watch(selectedSystemTranslation, (newTranslation) => {
     }
 
     toast.add({
-      title: 'Translation loaded',
-      description: `Populated form with system translation: ${newTranslation.keyPath}`,
+      title: tString('messages.translationLoaded'),
+      description: tString('messages.populatedFormWithSystemTranslation', { params: { keyPath: newTranslation.keyPath } }),
       color: 'green',
       icon: 'i-lucide-circle-check',
     })
@@ -207,46 +220,48 @@ watch(selectedSystemTranslation, (newTranslation) => {
 // Handle form submission
 async function handleSubmit() {
   loading.value = true
-
   try {
-    // Remove empty values
-    const cleanedValues = Object.fromEntries(
-      Object.entries(state.value.values).filter(([_, v]) => v && v.trim())
-    )
-
-    const payload = {
-      ...state.value,
-      values: cleanedValues,
-    }
-
-    const isUpdate = !!props.item?.id
-    const url = isUpdate
+    const endpoint = props.item?.id
       ? `/api/teams/${teamSlug.value}/translations-ui/${props.item.id}`
       : `/api/teams/${teamSlug.value}/translations-ui`
 
-    const result = await $fetch(url, {
-      method: isUpdate ? 'PATCH' : 'POST',
-      body: payload,
+    const method = props.item?.id ? 'PATCH' : 'POST'
+
+    const response = await $fetch<TranslationItem>(endpoint, {
+      method,
+      body: state.value,
     })
 
     toast.add({
-      title: 'Success',
-      description: `Translation ${isUpdate ? 'updated' : 'created'} successfully`,
+      title: props.item?.id ? tString('common.updated') : tString('common.created'),
+      description: props.item?.id
+        ? tString('messages.translationUpdated', { params: { keyPath: state.value.keyPath } })
+        : tString('messages.translationCreated', { params: { keyPath: state.value.keyPath } }),
       color: 'green',
       icon: 'i-lucide-circle-check',
     })
 
-    emit('success', result)
+    emit('saved', response)
   } catch (error: any) {
     console.error('Failed to save translation:', error)
     toast.add({
-      title: 'Error',
-      description: error.data?.statusMessage || 'Failed to save translation',
+      title: tString('common.error'),
+      description: error.data?.message || tString('errors.failedToSaveTranslation'),
       color: 'red',
       icon: 'i-lucide-circle-x',
     })
   } finally {
     loading.value = false
   }
+}
+
+// Helper to get locale label
+function getLocaleLabel(locale: string): string {
+  const labels: Record<string, string> = {
+    en: 'English',
+    nl: 'Nederlands',
+    fr: 'Français'
+  }
+  return labels[locale] || locale.toUpperCase()
 }
 </script>

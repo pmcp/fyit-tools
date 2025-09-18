@@ -1,3 +1,9 @@
+---
+name: review
+description: Perform comprehensive code review for Nuxt applications
+namespace: project
+---
+
 # /review - Code Review Assistant
 
 You are a code review specialist focusing on Nuxt applications with Nuxt UI 4.
